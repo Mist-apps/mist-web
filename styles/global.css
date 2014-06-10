@@ -1,0 +1,467 @@
+body {
+	margin: 0px;
+	background-color: rgba(0, 0, 0, 0.07);
+	font-family: arial,sans-serif;
+	z-index: 100;
+}
+
+
+/**
+ * Navbar
+ * The colored navbar with a menu button, and the username
+ */
+
+#navbar {
+	background: none repeat scroll 0% 0% #C0C0C0;
+	height: 45px;
+	line-height: 45px;
+	width: 100%;
+	position: fixed;
+	top: 0px;
+	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+	z-index: 600;
+	color: rgba(0, 0, 0, 0.6);
+	text-align: center;
+	vertical-align: middle;
+}
+
+#nav-menu {
+	text-align: left;
+	display: inline-block;
+	height: 100%;
+	width: 250px;
+	margin-left: 30px;
+	cursor: pointer;
+	font-size: 16px;
+	float:left;
+}
+
+#nav-menu:before {
+	margin-right: 10px;
+	font-size: 150%;
+}
+
+#nav-menu:hover {
+	color: rgba(0, 0, 0, 0.9);
+}
+
+#nav-user {
+	text-align: right;
+	display: inline-block;
+	height: 100%;
+	width: 250px;
+	margin-right: 20px;
+	cursor: pointer;
+	float:right;
+	font-size: 14px;
+}
+
+#nav-user:hover {
+	color: rgba(0, 0, 0, 0.9);
+}
+
+#user-image {
+	width: 32px;
+	height: 32px;
+	vertical-align: middle;
+	margin-right: 8px;
+	border: 2px solid rgba(255, 255, 255, 0.6);
+	border-radius: 50%;
+}
+
+#nav-search {
+	text-align: left;
+	display: inline-block;
+	background-color: rgba(255, 255, 255, 0.3);
+	width: 450px;
+	height: 22px;
+	line-height: 22px;
+	vertical-align: middle;
+	padding: 4px;
+	border-radius: 4px;
+}
+
+#nav-search-icon {
+	margin: 0px 15px;
+	float: left;
+	width: 16px;
+	cursor: default;
+}
+
+#nav-search-content {
+	margin: 0px 25px 0px 46px;
+	display: block;
+	vertical-align: middle;
+	color: rgba(0, 0, 0, 0.6);
+}
+
+#nav-search-content input {
+	height: 22px;
+}
+
+#nav-search-stop {
+	margin: 0px 5px;
+	position: relative;
+	top: -22px;
+	right: 0px;
+	float: right;
+	cursor: pointer;
+}
+
+
+/**
+ * User menu
+ * Popup menu showed when clicking on the username
+ */
+
+#user-menu {
+	line-height: 1;
+	background-color: #FFF;
+	position: absolute;
+	right: 25px;
+	top: 45px;
+	z-index: 900;
+	width: 223px;											<!-- WHY +3 ??? -->
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+	border-radius: 2px 2px 2px 2px;
+	display: none;
+}
+
+#user-menu-arrow {
+	border-color: transparent transparent rgba(0, 0, 0, 0.2);
+	border-style: dashed dashed solid;
+	border-width: 0px 8px 8px;
+	position: absolute;
+	right: 15px;
+	top: -8px;
+	z-index: 900;
+}
+
+#user-menu-arrow-fill {
+	border-color: transparent transparent rgb(255, 255, 255);
+	border-style: dashed dashed solid;
+	border-width: 0px 8px 8px;
+	position: absolute;
+	right: 15px;
+	top: -7px;
+	z-index: 901;
+}
+
+#user-menu-apps {
+	padding: 15px;
+	font-size: 12px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#user-menu-apps div {
+	padding: 15px;
+	width: 65px;
+	height: 55px;
+	text-align: center;
+	display: inline-block;
+	cursor: pointer;
+}
+
+#user-menu-apps div:before {
+	font-size: 36px;
+	display: block;
+}
+
+#user-menu-apps div:hover {
+	background-color: rgba(0, 0, 0, 0.02);
+	color: rgba(0, 0, 0, 0.9);
+}
+
+#user-menu-footer {
+	font-size: 12px;
+}
+
+#user-menu-footer div {
+	text-align: center;
+	width: 80px;
+	padding: 15px;
+	display: inline-block;
+	cursor: pointer;
+}
+
+#user-menu-footer div:before {
+	margin-right: 10px;
+	font-size: 150%;
+}
+
+#user-menu-footer div:hover {
+	background-color: rgba(0, 0, 0, 0.02);
+	color: rgba(0, 0, 0, 0.9);
+}
+
+
+/**
+ * Left panel menu
+ * Menu with all the views that can be displayed
+ */
+
+.menu {
+	background-color: #FFF;
+	margin-left: -260px;
+	width: 250px;
+	position: fixed;
+	left: 0px;
+	top: 45px;
+	bottom: 0px;
+	z-index: 300;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+	padding-top: 20px;
+	transition-duration: 0.4s;
+	transition-property: margin-left;
+	transition-timing-function: ease-in-out;
+}
+
+.menu-show {
+	margin-left: 0px;
+}
+
+.menu-item {
+	height: 24px;
+	line-height: 24px;
+	padding: 13px 30px 13px 30px;
+	cursor: pointer;
+	color: rgba(0, 0, 0, 0.6);
+	font-size: 15px;
+}
+
+.menu-item:before {
+	margin-right: 13px;
+	font-size: 150%;
+}
+
+.menu-item:hover {
+	background-color: rgba(0, 0, 0, 0.02);
+	color: rgba(0, 0, 0, 0.9);
+}
+
+.menu-item-active {
+	background-color: rgba(0, 0, 0, 0.06);
+}
+
+.menu-item-active:hover {
+	background-color: rgba(0, 0, 0, 0.08);
+}
+
+.menu-separator {
+	margin: 10px 0px;
+	height: 1px;
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+.menu-bottom {
+	vertical-align: bottom;
+	position: absolute;
+	bottom: 5px;
+	width: 200px;
+	left: 265px;
+}
+
+.menu-bottom > div {
+	margin: 15px;
+	color: rgba(0, 0, 0, 0.3);
+}
+
+#menu-sync div {
+	font-size: 12px;
+	white-space: nowrap;
+	cursor: pointer;
+	display: inline-block;
+}
+
+#menu-sync div:hover {
+	color: rgba(0, 0, 0, 0.5);
+	font-weight: bold;
+}
+
+#menu-sync div:before {
+	margin-right: 10px;
+	font-size: 130%;
+}
+
+#menu-order div {
+	margin: 0px;
+	font-size: 12px;
+	color: rgba(0, 0, 0, 0.3);
+	white-space: nowrap;
+	cursor: pointer;
+	display: inline-block;
+}
+
+#menu-order div:hover {
+	color: rgba(0, 0, 0, 0.5);
+	font-weight: bold;
+}
+
+#menu-order-direction:before {
+	margin-right: 5px;
+	font-size: 130%;
+}
+
+/**
+ * Add menu
+ * Downside buttons to add some stuff
+ */
+
+#add-menu {
+	position: fixed;
+	bottom: 0px;
+	right: 0px;
+	margin: 0px 15px 5px 0px;
+	text-align: right;
+	z-index: 200;
+}
+
+#add-menu div {
+	font-size: 11px;
+	font-weight: bold;
+	display: none;
+}
+
+#add-menu div div {
+	display: inline-block;
+	font-size: 18px;
+	width: 40px;
+	height: 40px;
+	margin: 10px;
+	cursor: pointer;
+	border-radius: 50%;
+	color: #FFF;
+	line-height: 40px;
+	text-align: center;
+	vertical-align: middle;
+	transition-duration: 0.1s;
+	transition-property: height, width, margin, line-height, font-size;
+	transition-timing-function: linear;
+}
+
+#add-menu div div:hover {
+	width: 52px;
+	height: 52px;
+	margin: 4px 4px 4px 10px;
+	line-height: 52px;
+	font-size: 27px;
+}
+
+#add-menu div:nth-child(1) {
+	display: block;
+}
+
+#add-menu div:nth-child(1) span {
+	color: #DB4437;
+}
+#add-menu div:nth-child(1) div {
+	background-color: #DB4437;
+}
+#add-menu div:nth-child(2) span {
+	color: #DB4437;
+}
+#add-menu div:nth-child(2) div {
+	background-color: #DB4437;
+}
+#add-menu div:nth-child(3) span {
+	color: #3C80F6;
+}
+#add-menu div:nth-child(3) div {
+	background-color: #3C80F6;
+}
+#add-menu div:nth-child(4) span {
+	color: #FFCD35;
+}
+#add-menu div:nth-child(4) div {
+	background-color: #FFCD35;
+}
+#add-menu div:nth-child(5) span {
+	color: #3C80F6;
+}
+#add-menu div:nth-child(5) div {
+	background-color: #3C80F6;
+}
+
+
+/**
+ * Container
+ */
+
+#container {
+	position: relative;
+	top: 45px;
+	padding: 25px;
+}
+
+
+/**
+ * Miscellaneous objects
+ */
+
+.button {
+	box-shadow: none;
+	background-color: rgb(245, 245, 245);
+	background-image: -moz-linear-gradient(center top , rgb(245, 245, 245), rgb(241, 241, 241));
+	color: rgb(68, 68, 68);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 2px 2px 2px 2px;
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: center;
+	white-space: nowrap;
+	height: 30px;
+	min-width: 60px;
+	line-height: 30px;
+	outline: 0px none;
+	padding: 0px 8px;
+}
+
+.button:hover {
+	border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-input-placeholder {	/* WebKit browsers */
+	color: rgba(0, 0, 0, 0.2);;
+}
+:-moz-placeholder {				/* Mozilla Firefox 4 to 18 */
+    opacity:  1;
+    color: rgba(0, 0, 0, 0.2);;
+}
+::-moz-placeholder {			/* Mozilla Firefox 19+ */
+    opacity:  1;
+    color: rgba(0, 0, 0, 0.2);;
+}
+:-ms-input-placeholder {		/* Internet Explorer 10+ */
+	color: rgba(0, 0, 0, 0.2);;
+}
+
+
+input {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	background-color: transparent;
+	color: rgba(0, 0, 0, 0.8);
+	font-family: arial,sans-serif;
+	width: 100%;
+	height: 100%;
+	display: block;
+	outline: none;
+}
+
+textarea {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	background-color: transparent;
+	color: rgba(0, 0, 0, 0.8);
+	font-family: arial,sans-serif;
+	width: 100%;
+	height: 100%;
+	display: block;
+	overflow: hidden;
+	resize: none;
+	outline: none;
+}

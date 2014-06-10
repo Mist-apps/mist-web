@@ -1,0 +1,65 @@
+<!-- Left menu -->
+<div class="menu" ng-controller="LeftMenuCtrl">
+	<!-- Items -->
+	<div id="menu-item-all" ng-click="goto('all')" ng-class="{'menu-item-active': location=='all'}" class="menu-item icon-notes-all">All</div>
+	<div id="menu-item-notes" ng-click="goto('notes')" ng-class="{'menu-item-active': location=='notes'}" class="menu-item icon-notes-notes">Notes</div>
+	<div id="menu-item-todo" ng-click="goto('todo')" ng-class="{'menu-item-active': location=='todo'}" class="menu-item icon-notes-todo">Todo lists</div>
+	<div class="menu-separator"></div>
+	<div id="menu-item-trash" ng-click="goto('trash')" ng-class="{'menu-item-active': location=='trash'}" class="menu-item icon-notes-trash">Trash</div>
+	<!-- Sync status -->
+	<div class="menu-bottom">
+		<div id="menu-order">
+			<div id="menu-order-direction" ng-click="$root.reverse = !$root.reverse" ng-class="{'icon-global-order-asc': !$root.reverse, 'icon-global-order-desc': $root.reverse}"></div>
+			<div ng-show="$root.order == 'title'" ng-click="$root.order = 'creationDate'">Title</div>
+			<div ng-show="$root.order == 'creationDate'" ng-click="$root.order = 'modificationDate'">Creation date</div>
+			<div ng-show="$root.order == 'modificationDate'" ng-click="$root.order = 'title'">Modification date</div>
+		</div>
+		<div id="menu-sync">
+			<div class="icon-global-sync" ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'">Syncing</div>
+			<div class="icon-global-ok" ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'">Synced</div>
+			<div class="icon-global-warning" ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'">Sync error</div>
+			<div class="icon-global-warning" ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'">Sync stopped</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Notes view -->
+<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:$root.order:$root.reverse">
+
+	<!-- Title -->
+	<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />
+
+	<!-- If note, print contents -->
+	<textarea class="note-content" ng-if="!note.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, note);" ng-model="note.content" resize></textarea>
+
+	<!-- If todo list, print tasks -->
+	<div class="note-tasks" ng-if="note.tasks">
+		<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in note.tasks">
+			<div class="note-task-icon" ng-click="toggleTaskDone(note, task);"></div>
+			<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, note, $index)" ng-model="task.content" resize></textarea>
+		</div>
+	</div>
+
+	<!-- Menu -->
+	<div class="note-menu">
+		<div class="icon-notes-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
+		<div class="icon-notes-delete" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
+		<div class="icon-notes-restore" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
+		<div class="button" ng-click="show();">OK</div>
+	</div>
+
+</div>
+
+
+<!-- No notes message -->
+<div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0" id="no-notes-message">No notes here...</div>
+
+
+<!-- Bottom add menu -->
+<div id="add-menu">
+	<div><div class="icon-global-add"></div></div>
+	<div><span>Import/export</span><div class="icon-global-import"></div></div>
+	<div><span>New todo list</span><div class="icon-notes-todo" ng-click="addNewTodo();"></div></div>
+	<div><span>New note</span><div class="icon-notes-notes" ng-click="addNewNote();"></div></div>
+</div>

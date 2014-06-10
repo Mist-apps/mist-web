@@ -1,0 +1,64 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "notes";
+  src:url("fonts/notes.eot");
+  src:url("fonts/notes.eot?#iefix") format("embedded-opentype"),
+    url("fonts/notes.woff") format("woff"),
+    url("fonts/notes.ttf") format("truetype"),
+    url("fonts/notes.svg#notes") format("svg");
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+[data-icon]:before {
+  font-family: "notes" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-notes-"]:before,
+[class*=" icon-notes-"]:before {
+  font-family: "notes" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-notes-trash:before {
+  content: "a";
+}
+.icon-notes-all:before {
+  content: "b";
+}
+.icon-notes-todo:before {
+  content: "c";
+}
+.icon-notes-checked:before {
+  content: "d";
+}
+.icon-notes-unchecked:before {
+  content: "e";
+}
+.icon-notes-notes:before {
+  content: "f";
+}
+.icon-notes-restore:before {
+  content: "g";
+}
+.icon-notes-delete:before {
+  content: "h";
+}

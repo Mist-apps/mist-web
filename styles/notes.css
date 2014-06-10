@@ -1,0 +1,193 @@
+/**
+ * Redefine global components
+ */
+
+#navbar {
+	background-color: #FFCD35;
+}
+
+
+/**
+ * Miscellaneous
+ */
+
+#no-notes-message {
+	padding-top: 15px;
+	text-align: center;
+	font-size: 36px;
+	color: #FFF;
+	text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+	cursor: default;
+}
+
+
+/**
+ * Notes elements
+ */
+
+.note {
+	vertical-align: top;
+	background-color: #FFF;
+	display: inline-block;
+	margin: 15px;
+	border-radius: 1px;
+	width: 250px;
+	box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.08);
+	position: relative;
+}
+
+.note-title {
+	padding: 0px 15px;
+	margin: 15px 0px 10px 0px;
+	width: 220px;
+	height: 18px;
+	line-height: 18px;
+	font-size: 16px;
+	font-weight: bold;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.note-content {
+	padding: 5px 15px 15px 15px;
+	width: 220px;
+	font-size: 14px;
+	word-wrap: break-word;
+}
+
+.note-tasks {
+	margin-bottom: 15px;
+}
+
+.note-task {
+	padding: 5px 0px 5px 0px;
+	width: 100%;
+	border-top: 1px solid transparent;
+	border-bottom: 1px solid transparent;
+
+}
+
+.note-task-content {
+	width: 190px;
+	margin-right: 15px;
+	margin-left: 45px;
+	display: block;
+	font-size: 14px;
+}
+
+.note-task-icon {
+	vertical-align: top;
+	width: 20px;
+	margin-left: 15px;
+	height: 20px;
+	line-height: 20px;
+	float:left;
+	cursor: pointer;
+}
+
+.note-task-icon:before {
+	font-family: "notes" !important;
+	font-style: normal !important;
+	font-weight: normal !important;
+	font-variant: normal !important;
+	text-transform: none !important;
+	speak: none;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: "e";
+	font-size: 20px;
+	color: rgba(0, 0, 0, 0.35);
+}
+
+.note-task-icon:hover:before {
+	color: rgba(0, 0, 0, 0.8);
+}
+
+.note-task-done .note-task-content {
+	color: rgba(0, 0, 0, 0.35);
+	text-decoration: line-through;
+}
+
+.note-task-done .note-task-icon:before {
+	content: "d";
+}
+
+
+/**
+ * Notes menu
+ */
+
+.note-menu {
+	background-color: rgba(0, 0, 0, 0.15);
+	height: 0px;
+	width: 100%;
+	position: relative;
+	left: 0px;
+	display: none;
+	transition-duration: 0.3s;
+	transition-property: height;
+	transition-timing-function: linear;
+}
+
+.note-menu-active {
+	height: 40px;
+	line-height: 40px;
+	display: block;
+	vertical-align: middle;
+}
+
+.note-menu div[class^="icon-"]:before {
+	color: rgba(255, 255, 255, 1);
+	font-size: 25px;
+	cursor: pointer;
+	height: 36px;
+	line-height: 36px;
+}
+
+.note-menu div[class^="icon-"]:hover:before {
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.note-menu div {
+	display: inline-block;
+	margin: 0px 0px 0px 10px;
+}
+
+.note-menu .button {
+	position: absolute;
+	right: 4px;
+	bottom: 4px;
+}
+
+
+/**
+ * Notes editor
+ */
+
+.editor {
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 950;
+	background-color: rgba(255, 255, 255, 0);
+	display: none;
+	text-align: center;
+}
+
+.editor-active {
+	background-color: rgba(255, 255, 255, 0.7);
+	display: block;
+}
+
+.note-edit {
+	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
+	z-index: 960;
+}
+
+.note-task-edit {
+	border-top: 1px solid rgba(0, 0, 0, 0.15);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
