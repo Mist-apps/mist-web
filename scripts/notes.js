@@ -152,6 +152,11 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 				$event.preventDefault();
 			}
 		}
+		// "F1" -> "F12" keys
+		else if ($event.which >= 112 && $event.keyCode <=123) {
+			// Execute default behaviour and do not inform syncService
+			return;
+		}
 		// Inform sync service
 		syncService.updateNote(note);
 	}
