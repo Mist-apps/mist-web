@@ -1,29 +1,22 @@
 'use strict';
 
 
+
 var API_URL = {{API_URL}};
+
 
 
 var webApp = angular.module('webApp', ['ngResource', 'ngRoute']);
 
-webApp.constant('USER_ROLES', {
-	all:		'*',
-	admin:		'admin',
-	user:		'user',
-	guest:		'guest'
-});
-
 /**
  * Configure the routes
  */
-webApp.config(function ($routeProvider, $locationProvider, USER_ROLES) {
+webApp.config(function ($routeProvider, $locationProvider) {
 
 	$routeProvider.when('/notes', {
 		templateUrl: 'views/notes.html',
 		controller: 'NotesCtrl',
-		data: {
-			authorizedRoles: [USER_ROLES.admin, USER_ROLES.user]
-		}
+		authenticated: true
 	});
 
 	$routeProvider.when('/login', {
@@ -103,15 +96,18 @@ webApp.factory('toastr', function() {
 	};
 });
 
-
 /**
  * User controller
  */
-webApp.controller('UserCtrl', function ($scope, userResource, toastr, AuthService) {
-
+webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session) {
 	$scope.user = null;
 	$scope.isAuthorized = AuthService.isAuthorized;
 
+	$scope.logout = function () {
+		AuthService.logout();
+		$scope.user = Session.user;
+		$location.path('/');
+	};
 });
 
 /**
@@ -125,68 +121,67 @@ webApp.controller('LoginCtrl', function ($scope, $location , AuthService, Sessio
 	$scope.login = function (credentials) {
 		if (AuthService.login(credentials)) {
 			$scope.$parent.user = Session.user;
-			console.log('go to /');
 			$location.path('/');
 		} else {
-			$scope.$parent.user = null;
-		}
-	};
-})
-
-webApp.factory('AuthService', function ($http, Session) {
-	return {
-		login: function (credentials) {
-			Session.create(1, {
-				"_id" : "538c331956f47c5338ca9985",
-				"firstName" : "Laurent",
-				"lastName" : "Leleux",
-				"mail" : "lolo88l@hotmail.com",
-				"login" : "laurent",
-				"password" : "e93e656e4144cd4a59f7d8d886bdb3b59b8f8ae9",
-				"role" : "admin"});
-			return true;
-		},
-		isAuthenticated: function () {
-			return !!Session.id;
-		},
-		isAuthorized: function (authorizedRoles) {
-			if (!angular.isArray(authorizedRoles)) {
-				authorizedRoles = [authorizedRoles];
-			}
-			return (this.isAuthenticated() && authorizedRoles.indexOf(Session.user.role) !== -1);
+			$scope.$parent.user = Session.user;
 		}
 	};
 });
 
+/**
+ * Authentication service to login/logout and manage the Session.
+ */
+webApp.factory('AuthService', function ($http, Session) {
+	return {
+		login: function (credentials) {
+			var token = 'e93e656e4144cd4a59f7d8d886bdb3b59b8f8ae9';
+			Session.create(token, {
+				"_id" : "538c331956f47c5338ca9985",
+				"firstName" : "Laurent",
+				"lastName" : "Leleux",
+				"mail" : "lolo88l@hotmail.com",
+				"login" : "laurent"
+			});
+			$http.defaults.headers.common['API-Token'] = token;
+			return true;
+		},
+		logout: function () {
+			Session.destroy();
+			//delete($http.defaults.headers.common['API-Token']);
+			return true;
+		},
+		isAuthenticated: function () {
+			return !!Session.token;
+		}
+	};
+});
+
+/**
+ * Session containing the user, token...
+ */
 webApp.service('Session', function () {
-	this.create = function (sessionId, user) {
-		this.id = sessionId;
+	this.create = function (token, user) {
+		this.token = token;
 		this.user = user;
 	};
 	this.destroy = function () {
-		this.id = null;
+		this.token = null;
 		this.user = null;
 	};
 	return this;
 });
 
+/**
+ * Route Change Listener to check if the user is authenticated where he must be
+ */
 webApp.run(function ($rootScope, $location, AuthService) {
 	$rootScope.$on('$routeChangeStart', function (event, next) {
-		// Check authorisation
-		console.log("DATA: " + JSON.stringify(next.data));
-		if (next.data && !AuthService.isAuthorized(next.data.authorizedRoles)) {
+		// Check authentication
+		if (next.authenticated && !AuthService.isAuthenticated()) {
 			// Stop routing
 			event.preventDefault();
-			// If user is not allowed
-			if (AuthService.isAuthenticated()) {
-				console.log('A');
-				$location.path('/login');
-			}
-			// If user is not logged in
-			else {
-				console.log('B');
-				$location.path('/login');
-			}
+			// Go to login page
+			$location.path('/login');
 		}
 	});
 });
