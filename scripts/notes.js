@@ -249,12 +249,15 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource) {
 	 * Handle sync status
 	 */
 	var setStatusSyncing = function () {
+		if ($rootScope.syncStatus === 'stopped') return;
 		$rootScope.syncStatus = 'syncing';
 	}
 	var setStatusSynced = function () {
+		if ($rootScope.syncStatus === 'stopped') return;
 		$rootScope.syncStatus = 'synced';
 	}
 	var setStatusError = function () {
+		if ($rootScope.syncStatus === 'stopped') return;
 		$rootScope.syncStatus = 'error';
 	}
 

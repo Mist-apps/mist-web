@@ -1,6 +1,9 @@
 'use strict';
 
 
+var API_URL = {{API_URL}};
+
+
 var webApp = angular.module('webApp', ['ngResource', 'ngRoute']);
 
 webApp.constant('USER_ROLES', {
@@ -54,7 +57,7 @@ webApp.directive('resize', function ($timeout) {
  * Users resource
  */
 webApp.factory('userResource', ['$resource', function ($resource) {
-	return $resource('http://localhost:8081/user/:id', {id: '@id'}, {
+	return $resource(API_URL + '/user/:id', {id: '@id'}, {
 		update: {method: 'PUT'}
 	});
 }]);
@@ -63,7 +66,7 @@ webApp.factory('userResource', ['$resource', function ($resource) {
  * Notes resource
  */
 webApp.factory('noteResource', ['$resource', function ($resource) {
-	return $resource('http://localhost:8081/note/:id', {id: '@id'}, {
+	return $resource(API_URL + '/note/:id', {id: '@id'}, {
 		update: {method: 'PUT'}
 	});
 }]);
