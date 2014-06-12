@@ -70,16 +70,20 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 			// Stop key default behaviour
 			$event.preventDefault();
 		}
-		// Inform sync service
-		syncService.updateNote(note)
+		// Inform sync service if necessary
+		if (!_keyMustBeIgnored($event.keyCode)) {
+			syncService.updateNote(note);
+		}
 	};
 
 	/**
 	 * Listen to key events on the note contents
 	 */
 	$scope.contentKeyListener = function ($event, note) {
-		// Inform sync service
-		syncService.updateNote(note)
+		// Inform sync service if necessary
+		if (!_keyMustBeIgnored($event.keyCode)) {
+			syncService.updateNote(note);
+		}
 	};
 
 	/**
@@ -152,13 +156,27 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 				$event.preventDefault();
 			}
 		}
-		// "F1" -> "F12" keys
-		else if ($event.which >= 112 && $event.keyCode <=123) {
-			// Execute default behaviour and do not inform syncService
-			return;
+		// Inform sync service if necessary
+		if (!_keyMustBeIgnored($event.keyCode)) {
+			syncService.updateNote(note);
 		}
-		// Inform sync service
-		syncService.updateNote(note);
+	}
+
+	/**
+	 * Check whether the key must be ignored or not for informing
+	 * the sync service
+	 */
+	var _keyMustBeIgnored = function (keyCode) {
+		var keysToIgnore = [
+			37, 38, 39, 40,		// Arrows
+			16, 17, 18, 27,		// Shift Control Alt Escape
+			9, 19, 91, 92,		// Tab Pause WindowsLeft WindowsRight
+			20, 144, 145,		// CapsLock NumLock ScrollLock
+			33, 34, 35, 36,		// PageUp PageDown End Home
+			45, 93,				// Insert Select
+			112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123	// F1 -> F12
+		];
+		return keysToIgnore.indexOf(keyCode) !== -1
 	}
 
 	/**
@@ -167,7 +185,8 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	$scope.addNewNote = function () {
 		// Add new note
 		var date = new Date().getTime();
-		var note = {title: '', content: '', creationDate: date};
+		var tmpId = "" + date + Math.floor(Math.random() * 1000000);
+		var note = {tmpId: tmpId, title: '', content: '', creationDate: date};
 		$scope.notes.push(note);
 		// Inform sync service
 		syncService.newNote(note);
@@ -179,7 +198,8 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	$scope.addNewTodo = function () {
 		// Add new todo list
 		var date = new Date().getTime();
-		var note = {title: '', tasks: [{content: '', done: false}], creationDate: date};
+		var tmpId = "" + date + Math.floor(Math.random() * 1000000);
+		var note = {tmpId: tmpId, title: '', tasks: [{content: '', done: false}], creationDate: date};
 		$scope.notes.push(note);
 		// Inform sync service
 		syncService.newNote(note);
@@ -203,7 +223,8 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	$scope.destroyNote = function (note) {
 		// Delete note
 		for (var key in $scope.notes) {
-			if ($scope.notes[key]._id === note._id) {
+			// If the note has an id, search if id match, else, search if tmpId match
+			if ((note._id && $scope.notes[key]._id === note._id) || (!note._id && $scope.notes[key].tmpId === note.tmpId)) {
 				$scope.notes.splice(key, 1);
 				break;
 			}
@@ -354,7 +375,9 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource) {
 		// New notes
 		newNotes.forEach(function (note, key) {
 			newNotes.splice(key, 1);
-			noteResource.save(note, function (data) { success(note); note._id = data._id; }, function () { newNote(note); error(note); });
+			var clone = $.extend(true, {}, note);
+			delete(clone.tmpId);
+			noteResource.save(clone, function (data) { success(note); note._id = data._id; }, function () { newNote(note); error(note); });
 		});
 		// Dirty notes
 		Object.keys(dirtyNotes).forEach(function (id) {
