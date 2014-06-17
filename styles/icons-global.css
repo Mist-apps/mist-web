@@ -82,3 +82,6 @@
 .icon-global-order-asc:before {
 	content: "s";
 }
+.icon-global-user:before {
+	content: "t";
+}

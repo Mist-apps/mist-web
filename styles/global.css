@@ -437,7 +437,6 @@ body {
 	color: rgba(0, 0, 0, 0.2);;
 }
 
-
 input {
 	border: 0px;
 	margin: 0px;
@@ -447,7 +446,6 @@ input {
 	font-family: arial,sans-serif;
 	width: 100%;
 	height: 100%;
-	display: block;
 	outline: none;
 }
 

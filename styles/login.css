@@ -1,0 +1,95 @@
+#login-container {
+	width: 100%;
+	text-align: center;
+	color: #555;
+}
+
+#login-form {
+	text-align: left;
+	display: inline-block;
+}
+
+#login-form input {
+	text-align: left;
+	display: inline-block;
+	width: auto;
+}
+
+#login-title {
+	font-size: 48px;
+	margin-bottom: 10px;
+	display: inline-block;
+}
+
+#login-colored-line {
+	height: 4px;
+	width: 250px;
+	margin: auto;
+	margin-bottom: 20px;
+}
+
+#login-colored-line div {
+	width: 33.33%;
+	float: left;
+	height: 4px;
+}
+
+#login-colored-line div:nth-child(1) {
+	background-color: #DB4437;
+}
+
+#login-colored-line div:nth-child(2) {
+	background-color: #3C80F6;
+}
+
+#login-colored-line div:nth-child(3) {
+	background-color: #FFCD35;
+}
+
+.login-form-input {
+	background-color: #FFF;
+	border-radius: 6px;
+	display: inline-block;
+	height: 39px;
+	border: 1px solid #CCC;
+	margin: 3px;
+}
+
+.login-form-input div {
+	display: inline-block;
+	border-right: 1px solid #CCC;
+	padding: 7px 10px;
+	background-color: rgb(246, 246, 246);
+	font-size: 20px;
+	height: 25px;
+}
+
+.login-form-input input {
+	padding: 4px;
+	height: 31px;
+	line-height: 31px;
+	color: #555;
+	font-size: 16px;
+}
+
+#remember {
+	margin: 15px 3px;
+}
+
+#login-submit {
+	text-align: center;
+}
+
+#login-submit button {
+	border: 1px solid #CCC;
+	padding: 7px 10px;
+	background-color: rgb(246, 246, 246);
+	font-size: 16px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+#login-submit button:hover {
+	border: 1px solid #BBB;
+	background-color: rgb(230, 230, 230);
+}
