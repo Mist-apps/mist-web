@@ -271,7 +271,7 @@ webApp.controller('LeftMenuCtrl', function ($scope, $rootScope) {
 /**
  * Sync service to sync the notes with the server
  */
-webApp.factory('syncService', function ($interval, $rootScope, noteResource) {
+webApp.factory('syncService', function ($interval, $rootScope, noteResource, toastr) {
 
 	$rootScope.syncStatus = 'synced';
 
@@ -279,15 +279,25 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource) {
 	 * Handle sync status
 	 */
 	var setStatusSyncing = function () {
+		// If the sync is set to stopped, it is not possible to change the status from the sync service
 		if ($rootScope.syncStatus === 'stopped') return;
+		// If the sync is in error, it is not possible to set it to syncing, wait for good sync before
+		if ($rootScope.syncStatus === 'error') return;
+		// Set status
 		$rootScope.syncStatus = 'syncing';
 	}
 	var setStatusSynced = function () {
+		// If the sync is set to stopped, it is not possible to change the status from the sync service
 		if ($rootScope.syncStatus === 'stopped') return;
+		// Set status
 		$rootScope.syncStatus = 'synced';
 	}
 	var setStatusError = function () {
+		// If the sync is set to stopped, it is not possible to change the status from the sync service
 		if ($rootScope.syncStatus === 'stopped') return;
+		// If the sync pass for the first time in error, show an error notification
+		if ($rootScope.syncStatus !== 'error') toastr.error('Unable to sync notes');
+		// Set status
 		$rootScope.syncStatus = 'error';
 	}
 
@@ -343,7 +353,7 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource) {
 		if ($rootScope.syncStatus === 'stopped') {
 			return;
 		}
-		// Get actions to do, and check if some things to do
+		// Get actions to do, and check if something to do
 		var todo = newNotes.length + Object.keys(dirtyNotes).length + Object.keys(deletedNotes).length;
 		if (todo === 0) {
 			setStatusSynced();
