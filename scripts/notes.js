@@ -30,6 +30,8 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	$scope.toggleTaskDone = function (note, task) {
 		// Toggle
 		task.done = !task.done;
+		// Set modification date
+		note.modificationDate = new Date().getTime();
 		// Inform sync service
 		syncService.updateNote(note)
 	};
@@ -70,8 +72,9 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 			// Stop key default behaviour
 			$event.preventDefault();
 		}
-		// Inform sync service if necessary
+		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
+			note.modificationDate = new Date().getTime();
 			syncService.updateNote(note);
 		}
 	};
@@ -80,8 +83,9 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	 * Listen to key events on the note contents
 	 */
 	$scope.contentKeyListener = function ($event, note) {
-		// Inform sync service if necessary
+		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
+			note.modificationDate = new Date().getTime();
 			syncService.updateNote(note);
 		}
 	};
@@ -156,8 +160,9 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 				$event.preventDefault();
 			}
 		}
-		// Inform sync service if necessary
+		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
+			note.modificationDate = new Date().getTime();
 			syncService.updateNote(note);
 		}
 	}
@@ -210,8 +215,7 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	 */
 	$scope.deleteNote = function (note) {
 		// Update note
-		var date = new Date().getTime();
-		note.deleteDate = date;
+		note.deleteDate = new Date().getTime();
 		stopEditNotes();
 		// Inform sync service
 		syncService.updateNote(note);
