@@ -74,7 +74,11 @@
 }
 
 #remember {
-	margin: 15px 3px;
+	margin: 15px 5px;
+}
+
+#remember input {
+	height: auto;
 }
 
 #login-submit {
