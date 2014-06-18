@@ -6,7 +6,7 @@ var API_URL = {{API_URL}};
 
 
 
-var webApp = angular.module('webApp', ['ngResource', 'ngRoute']);
+var webApp = angular.module('webApp', ['ngResource', 'ngRoute', 'ngStorage']);
 
 /**
  * Configure the routes
@@ -108,15 +108,22 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session)
 		$scope.user = Session.user;
 		$location.path('/');
 	};
+
+	// Try to recover the authentication from the session/local storage
+	if (AuthService.recover()) {
+		$scope.user = Session.user;
+		$location.path('/');
+	}
 });
 
 /**
- * Login controller
+ * Login controller, child of User controller
  */
-webApp.controller('LoginCtrl', function ($scope, $location , AuthService, Session) {
+webApp.controller('LoginCtrl', function ($scope, $location, AuthService, Session) {
 	$scope.credentials = {
 		username: '',
-		password: ''
+		password: '',
+		remember: false
 	};
 	$scope.login = function (credentials) {
 		if (AuthService.login(credentials)) {
@@ -131,10 +138,11 @@ webApp.controller('LoginCtrl', function ($scope, $location , AuthService, Sessio
 /**
  * Authentication service to login/logout and manage the Session.
  */
-webApp.factory('AuthService', function ($http, Session) {
+webApp.factory('AuthService', function ($http, $sessionStorage, $localStorage, Session) {
 	return {
 		login: function (credentials) {
 			var token = 'e93e656e4144cd4a59f7d8d886bdb3b59b8f8ae9';
+			// Create the session
 			Session.create(token, {
 				"_id" : "538c331956f47c5338ca9985",
 				"firstName" : "Laurent",
@@ -142,13 +150,48 @@ webApp.factory('AuthService', function ($http, Session) {
 				"mail" : "lolo88l@hotmail.com",
 				"login" : "laurent"
 			});
+			// Send the token on each API request
 			$http.defaults.headers.common['API-Token'] = token;
+			// Save token in local/session storage
+			if (credentials.remember) {
+				$localStorage.token = token;
+			} else {
+				$sessionStorage.token = token;
+			}
 			return true;
 		},
 		logout: function () {
 			Session.destroy();
-			//delete($http.defaults.headers.common['API-Token']);
+			// No more send the token on each API request
+			delete($http.defaults.headers.common['API-Token']);
+			// Delete token in local/session storage
+			delete($sessionStorage.token);
+			delete($localStorage.token);
 			return true;
+		},
+		recover: function () {
+			// Search for token in local/session storage
+			var token = null;
+			if ($sessionStorage.token) {
+				token = $sessionStorage.token;
+			} else if($localStorage.token) {
+				token = $localStorage.token;
+			}
+			// If token found
+			if (token) {
+				// Create the session
+				Session.create(token, {
+					"_id" : "538c331956f47c5338ca9985",
+					"firstName" : "Laurent",
+					"lastName" : "Leleux",
+					"mail" : "lolo88l@hotmail.com",
+					"login" : "laurent"
+				});
+				// Send the token on each API request
+				$http.defaults.headers.common['API-Token'] = token;
+				return true;
+			}
+			return false;
 		},
 		isAuthenticated: function () {
 			return !!Session.token;
