@@ -315,12 +315,17 @@ body {
 	margin: 0px 15px 5px 0px;
 	text-align: right;
 	z-index: 200;
+	width: 200px;
 }
 
 #add-menu div {
 	font-size: 11px;
 	font-weight: bold;
 	display: none;
+	height: 52px;
+	margin: 4px 4px 4px 10px;
+	line-height: 52px;
+	vertical-align: middle;
 }
 
 #add-menu div div {
@@ -328,28 +333,28 @@ body {
 	font-size: 18px;
 	width: 40px;
 	height: 40px;
-	margin: 10px;
 	cursor: pointer;
 	border-radius: 50%;
 	color: #FFF;
 	line-height: 40px;
 	text-align: center;
 	vertical-align: middle;
+	margin: 0px 6px 0px 10px;
 	transition-duration: 0.1s;
-	transition-property: height, width, margin, line-height, font-size;
+	transition-property: height, width, margin-right, line-height, font-size;
 	transition-timing-function: linear;
 }
 
 #add-menu div div:hover {
 	width: 52px;
 	height: 52px;
-	margin: 4px 4px 4px 10px;
 	line-height: 52px;
+	margin-right: 0px;
 	font-size: 27px;
 }
 
 #add-menu div:nth-child(1) {
-	display: block;
+	display: inline-block;
 }
 
 #add-menu div:nth-child(1) span {
