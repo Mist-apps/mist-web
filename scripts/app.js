@@ -112,7 +112,6 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session)
 	// Try to recover the authentication from the session/local storage
 	if (AuthService.recover()) {
 		$scope.user = Session.user;
-		$location.path('/');
 	}
 });
 
@@ -226,6 +225,34 @@ webApp.run(function ($rootScope, $location, AuthService) {
 			// Go to login page
 			$location.path('/login');
 		}
+	});
+});
+
+webApp.config(function ($httpProvider) {
+	$httpProvider.interceptors.push(function ($location, $q, $sessionStorage, $localStorage, Session) {
+		return {
+			response: function (response){
+				if (response.status === 401) {
+					console.log("Response 401");
+				}
+				return response || $q.when(response);
+			},
+			responseError: function (rejection) {
+				if (rejection.status === 401) {
+					console.log("Response Error 401", rejection);
+					// Destroy session
+					Session.destroy();
+					// No more send the token on each API request
+					delete($httpProvider.defaults.headers.common['API-Token']);
+					// Delete token in local/session storage
+					delete($sessionStorage.token);
+					delete($localStorage.token);
+					// Redirect to login form
+					$location.path('/login');
+				}
+				return $q.reject(rejection);
+			}
+		};
 	});
 });
 
