@@ -217,13 +217,20 @@ webApp.service('Session', function () {
  * Route Change Listener to check if the user is authenticated where he must be
  */
 webApp.run(function ($rootScope, $location, AuthService) {
-	$rootScope.$on('$routeChangeStart', function (event, next) {
-		// Check authentication
+	$rootScope.$on('$routeChangeStart', function (event, next, current) {
+		// If not authenticated and asking for an authenticated page
 		if (next.authenticated && !AuthService.isAuthenticated()) {
 			// Stop routing
 			event.preventDefault();
 			// Go to login page
 			$location.path('/login');
+		}
+		// If authenticated and going on the login page
+		else if (AuthService.isAuthenticated() && next.$$route && next.$$route.originalPath === '/login') {
+			// Stop routing
+			event.preventDefault();
+			// Go to home page
+			$location.path('/');
 		}
 	});
 });
