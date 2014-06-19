@@ -51,7 +51,8 @@ webApp.directive('resize', function ($timeout) {
  */
 webApp.factory('userResource', ['$resource', function ($resource) {
 	return $resource(API_URL + '/user/:id', {id: '@id'}, {
-		update: {method: 'PUT'}
+		update: {method: 'PUT'},
+		login: {method: 'POST', url: API_URL + '/login'}
 	});
 }]);
 
@@ -106,7 +107,11 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session)
 	};
 
 	// Try to recover the authentication from the session/local storage
-	AuthService.recover();
+	AuthService.recover().then(function () {
+		$location.path('/');
+	}, function (reason) {
+		//$location.path('/login');
+	});
 });
 
 /**
@@ -119,38 +124,45 @@ webApp.controller('LoginCtrl', function ($scope, $location, AuthService, Session
 		remember: false
 	};
 	$scope.login = function (credentials) {
-		if (AuthService.login(credentials)) {
+		AuthService.login(credentials).then(function () {
 			$location.path('/');
-		}
+		}, function (reason) {
+			console.log(reason);
+		});
 	};
 });
 
 /**
  * Authentication service to login/logout and manage the Session.
  */
-webApp.factory('AuthService', function ($http, $sessionStorage, $localStorage, Session) {
+webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $localStorage, userResource, Session) {
 	return {
 		login: function (credentials) {
-			var token = 'e93e656e4144cd4a59f7d8d886bdb3b59b8f8ae9';
-			// Create the session
-			Session.create(token, {
-				"_id" : "538c331956f47c5338ca9985",
-				"firstName" : "Laurent",
-				"lastName" : "Leleux",
-				"mail" : "lolo88l@hotmail.com",
-				"login" : "laurent"
-			});
-			// Send the token on each API request
-			$http.defaults.headers.common['API-Token'] = token;
-			// Save token in local/session storage
-			if (credentials.remember) {
-				$localStorage.token = token;
-			} else {
-				$sessionStorage.token = token;
-			}
-			return true;
+			var promise = $q.defer();
+			var success = function (data, responseHeaders) {
+				// Create the session
+				Session.create(data.token, data.user);
+				// Send the token on each API request
+				$http.defaults.headers.common['API-Token'] = data.token;
+				// Save token in local/session storage
+				if (credentials.remember) {
+					$localStorage.token = data.token;
+				} else {
+					$sessionStorage.token = data.token;
+				}
+				// Connected
+				promise.resolve();
+			};
+			var error = function (httpResponse) {
+				// Not connected
+				promise.reject("Bad credentials");
+			};
+			userResource.login(credentials, success, error);
+			// Return a promise
+			return promise.promise;
 		},
 		logout: function () {
+			// Destroy session
 			Session.destroy();
 			// No more send the token on each API request
 			delete($http.defaults.headers.common['API-Token']);
@@ -160,6 +172,7 @@ webApp.factory('AuthService', function ($http, $sessionStorage, $localStorage, S
 			return true;
 		},
 		recover: function () {
+			var promise = $q.defer();
 			// Search for token in local/session storage
 			var token = null;
 			if ($sessionStorage.token) {
@@ -169,19 +182,25 @@ webApp.factory('AuthService', function ($http, $sessionStorage, $localStorage, S
 			}
 			// If token found
 			if (token) {
-				// Create the session
-				Session.create(token, {
-					"_id" : "538c331956f47c5338ca9985",
-					"firstName" : "Laurent",
-					"lastName" : "Leleux",
-					"mail" : "lolo88l@hotmail.com",
-					"login" : "laurent"
+				var success = function (data, responseHeaders) {
+					// Create the session
+					Session.create(token, data);
+					// Send the token on each API request
+					$http.defaults.headers.common['API-Token'] = token;
+					// Connected
+					promise.resolve();
+				};
+				var error = function (httpResponse) {
+					// Not connected
+					promise.reject("Unknown error when retrieving user");
+				};
+				userResource.get(success, error);
+			} else {
+				$timeout(function () {
+					promise.reject("No token found in storage");
 				});
-				// Send the token on each API request
-				$http.defaults.headers.common['API-Token'] = token;
-				return true;
 			}
-			return false;
+			return promise.promise;
 		},
 		isAuthenticated: function () {
 			return !!Session.token;
@@ -229,15 +248,8 @@ webApp.run(function ($rootScope, $location, AuthService) {
 webApp.config(function ($httpProvider) {
 	$httpProvider.interceptors.push(function ($location, $q, $sessionStorage, $localStorage, Session) {
 		return {
-			response: function (response){
-				if (response.status === 401) {
-					console.log("Response 401");
-				}
-				return response || $q.when(response);
-			},
 			responseError: function (rejection) {
 				if (rejection.status === 401) {
-					console.log("Response Error 401", rejection);
 					// Destroy session
 					Session.destroy();
 					// No more send the token on each API request
