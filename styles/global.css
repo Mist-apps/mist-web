@@ -419,7 +419,6 @@ body {
 	height: 30px;
 	min-width: 60px;
 	line-height: 30px;
-	outline: 0px none;
 	padding: 0px 8px;
 }
 
@@ -467,4 +466,12 @@ textarea {
 	overflow: hidden;
 	resize: none;
 	outline: none;
+}
+
+button {
+	outline: none;
+}
+
+button::-moz-focus-inner {
+	border: 0;
 }
