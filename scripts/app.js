@@ -80,7 +80,7 @@ webApp.factory('toastr', function() {
 webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session) {
 	$scope.logout = function () {
 		AuthService.logout();
-		$location.path('/');
+		$location.path('/login');
 	};
 
 	// Try to recover the authentication from the session/local storage
@@ -131,7 +131,6 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			// Delete token in local/session storage
 			delete($sessionStorage.token);
 			delete($localStorage.token);
-			return true;
 		},
 		recover: function () {
 			var promise = $q.defer();
@@ -142,17 +141,19 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			} else if($localStorage.token) {
 				token = $localStorage.token;
 			}
+			// Send the token on each API request
+			$http.defaults.headers.common['API-Token'] = token;
 			// If token found
 			if (token) {
 				var success = function (data, responseHeaders) {
 					// Create the session
 					Session.create(token, data);
-					// Send the token on each API request
-					$http.defaults.headers.common['API-Token'] = token;
 					// Connected
 					promise.resolve();
 				};
 				var error = function (httpResponse) {
+					// No more send the token on each API request
+					delete($http.defaults.headers.common['API-Token']);
 					// Not connected
 					promise.reject("Unknown error when retrieving user");
 				};
