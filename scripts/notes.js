@@ -407,6 +407,15 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 		});
 	};
 
+	// Listen if the user is disconnected to stop syncing
+	$rootScope.$watch('user', function (user) {
+		if (user === null) {
+			$rootScope.syncStatus = 'stopped';
+		} else {
+			$rootScope.syncStatus = 'syncing';
+		}
+	})
+
 	// Sync the changes every X seconds
 	var timer = $interval(sync, 2000);
 

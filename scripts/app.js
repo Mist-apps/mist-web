@@ -110,7 +110,7 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session)
 });
 
 /**
- * Login controller, child of User controller
+ * Login controller
  */
 webApp.controller('LoginCtrl', function ($scope, $location, AuthService, Session) {
 	$scope.credentials = {
