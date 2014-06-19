@@ -53,6 +53,33 @@
 	height: 39px;
 	border: 1px solid #CCC;
 	margin: 3px;
+
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	-ms-backface-visibility: hidden;
+	-o-backface-visibility: hidden;
+	backface-visibility: hidden;
+	
+	-webkit-animation-duration: 0.4s;
+	-webkit-animation-timing-function: ease;
+	-webkit-animation-fill-mode: both;
+	-moz-animation-duration: 0.4s;
+	-moz-animation-timing-function: ease;
+	-moz-animation-fill-mode: both;
+	-ms-animation-duration: 0.4s;
+	-ms-animation-timing-function: ease;
+	-ms-animation-fill-mode: both;
+	-o-animation-duration: 0.4s;
+	-o-animation-timing-function: ease;
+	-o-animation-fill-mode: both;
+	animation-duration: 0.4s;
+	animation-timing-function: ease;
+	animation-fill-mode: both;
+}
+
+.login-form-input-error {
+	border-color: #DB4437;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 6px #DB4437;
 }
 
 .login-form-input div {
@@ -69,7 +96,6 @@
 	padding: 4px;
 	height: 31px;
 	line-height: 31px;
-	color: #555;
 	font-size: 16px;
 }
 
@@ -97,4 +123,42 @@
 #login-submit button:hover {
 	border: 1px solid #BBB;
 	background-color: rgb(230, 230, 230);
+}
+
+#login-error {
+	color: #DB4437;
+	font-weight: bold;
+	text-align: center;
+	margin-top: 20px;
+}
+
+@-webkit-keyframes shake {
+	0%, 100% {-webkit-transform: translateX(0);}
+	25%, 75% {-webkit-transform: translateX(-10px);}
+	50% {-webkit-transform: translateX(10px);}
+}
+
+@-moz-keyframes shake {
+	0%, 100% {-moz-transform: translateX(0);}
+	25%, 75% {-moz-transform: translateX(-10px);}
+	50% {-moz-transform: translateX(10px);}
+}
+
+@-o-keyframes shake {
+	0%, 100% {-o-transform: translateX(0);}
+	25%, 75% {-o-transform: translateX(-10px);}
+	50% {-o-transform: translateX(10px);}
+}
+
+@keyframes shake {
+	0%, 100% {transform: translateX(0);}
+	25%, 75% {transform: translateX(-10px);}
+	50% {transform: translateX(10px);}
+}
+
+.shake {
+	-webkit-animation-name: shake;
+	-moz-animation-name: shake;
+	-o-animation-name: shake;
+	animation-name: shake;
 }

@@ -92,24 +92,6 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session)
 });
 
 /**
- * Login controller
- */
-webApp.controller('LoginCtrl', function ($scope, $location, AuthService, Session) {
-	$scope.credentials = {
-		username: '',
-		password: '',
-		remember: false
-	};
-	$scope.login = function (credentials) {
-		AuthService.login(credentials).then(function () {
-			$location.path('/');
-		}, function (reason) {
-			console.log(reason);
-		});
-	};
-});
-
-/**
  * Authentication service to login/logout and manage the Session.
  */
 webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $localStorage, userResource, Session) {
@@ -131,8 +113,11 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 				promise.resolve();
 			};
 			var error = function (httpResponse) {
-				// Not connected
-				promise.reject("Bad credentials");
+				if (httpResponse.status === 401) {
+					promise.reject({code: 1, message: "Bad credentials"});
+				} else {
+					promise.reject({code: 2, message: "Unknown error"});
+				}
 			};
 			userResource.login(credentials, success, error);
 			// Return a promise
