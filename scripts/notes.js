@@ -419,19 +419,44 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 			newNotes.splice(key, 1);
 			var clone = $.extend(true, {}, note);
 			delete(clone.tmpId);
-			noteResource.save(clone, function (data) { success(note); note._id = data._id; }, function () { newNote(note); error(note); });
+			noteResource.save(clone,
+				function (data) {
+					success(note);
+					note._id = data._id;
+					note._revision = data._revision;
+					delete(note.tmpId);
+				}, function () {
+					newNote(note);
+					error(note);
+				}
+			);
 		});
 		// Dirty notes
 		Object.keys(dirtyNotes).forEach(function (id) {
 			var note = dirtyNotes[id];
 			delete(dirtyNotes[id]);
-			noteResource.update({id: id}, note, function () { success(note); }, function () { updateNote(note); error(note); });
+			noteResource.update({id: id}, note,
+				function (data) {
+					success(note);
+					note._revision = data._revision;
+				}, function () {
+					updateNote(note);
+					error(note);
+				}
+			);
 		});
 		// Deleted Notes
 		Object.keys(deletedNotes).forEach(function (id) {
 			var note = deletedNotes[id];
 			delete(deletedNotes[id]);
-			noteResource.delete({id: id}, function () { success(note); }, function () { deleteNote(note); error(note); });
+			noteResource.delete({id: id},
+				function () {
+					success(note);
+				}, function () {
+					deleteNote(note);
+					error(note);
+				}
+			);
 		});
 	};
 
