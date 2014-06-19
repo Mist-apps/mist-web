@@ -2,6 +2,33 @@
 
 
 /**
+ * Notes resource
+ */
+webApp.factory('noteResource', ['$resource', function ($resource) {
+	return $resource(API_URL + '/note/:id', {id: '@id'}, {
+		update: {method: 'PUT'}
+	});
+}]);
+
+/**
+ * Resize directive to resize automatically textarea's during
+ * writing.
+ */
+webApp.directive('resize', function ($timeout) {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+			var resize = function () {
+				element[0].style.height = 'auto';
+				element[0].style.height = element[0].scrollHeight+'px';
+			};
+			element.on('change cut paste drop keyup keydown', resize);
+			$timeout(resize);
+		}
+	};
+});
+
+/**
  * Notes Controller
  */
 webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr, syncService) {

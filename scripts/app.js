@@ -32,20 +32,6 @@ webApp.config(function ($routeProvider, $locationProvider) {
 
 });
 
-webApp.directive('resize', function ($timeout) {
-	return {
-		restrict: 'A',
-		link: function(scope, element, attrs) {
-			var resize = function () {
-				element[0].style.height = 'auto';
-				element[0].style.height = element[0].scrollHeight+'px';
-			};
-			element.on('change cut paste drop keyup keydown', resize);
-			$timeout(resize);
-		}
-	};
-});
-
 /**
  * Users resource
  */
@@ -53,15 +39,6 @@ webApp.factory('userResource', ['$resource', function ($resource) {
 	return $resource(API_URL + '/user/:id', {id: '@id'}, {
 		update: {method: 'PUT'},
 		login: {method: 'POST', url: API_URL + '/login'}
-	});
-}]);
-
-/**
- * Notes resource
- */
-webApp.factory('noteResource', ['$resource', function ($resource) {
-	return $resource(API_URL + '/note/:id', {id: '@id'}, {
-		update: {method: 'PUT'}
 	});
 }]);
 
@@ -245,6 +222,9 @@ webApp.run(function ($rootScope, $location, AuthService) {
 	});
 });
 
+/**
+ * HTTP Interceptor to catch 401 statuses and redirect the user to the /login page.
+ */
 webApp.config(function ($httpProvider) {
 	$httpProvider.interceptors.push(function ($location, $q, $sessionStorage, $localStorage, Session) {
 		return {
