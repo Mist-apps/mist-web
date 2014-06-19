@@ -25,7 +25,7 @@
 <body ng-app="webApp" ng-controller="UserCtrl">
 
 	<!-- Top navigation bar -->
-	<div id="navbar" ng-if="user">
+	<div id="navbar" ng-if="$root.user">
 
 		<!-- Left menu icon -->
 		<div id="nav-menu" class="icon-global-menu"></div>
@@ -39,8 +39,8 @@
 
 		<!-- User navbar menu -->
 		<div id="nav-user">
-			<img id="user-image" ng-src="{{user.image || 'images/user.png'}}">
-			{{user.lastName}} {{user.firstName}} &nbsp;&nbsp;&#9662;
+			<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
+			{{$root.user.lastName}} {{$root.user.firstName}} &nbsp;&nbsp;&#9662;
 		</div>
 
 		<!-- User dropdown menu -->

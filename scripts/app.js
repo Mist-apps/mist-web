@@ -100,19 +100,13 @@ webApp.factory('toastr', function() {
  * User controller
  */
 webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session) {
-	$scope.user = null;
-	$scope.isAuthorized = AuthService.isAuthorized;
-
 	$scope.logout = function () {
 		AuthService.logout();
-		$scope.user = Session.user;
 		$location.path('/');
 	};
 
 	// Try to recover the authentication from the session/local storage
-	if (AuthService.recover()) {
-		$scope.user = Session.user;
-	}
+	AuthService.recover();
 });
 
 /**
@@ -126,10 +120,7 @@ webApp.controller('LoginCtrl', function ($scope, $location, AuthService, Session
 	};
 	$scope.login = function (credentials) {
 		if (AuthService.login(credentials)) {
-			$scope.$parent.user = Session.user;
 			$location.path('/');
-		} else {
-			$scope.$parent.user = Session.user;
 		}
 	};
 });
@@ -201,14 +192,14 @@ webApp.factory('AuthService', function ($http, $sessionStorage, $localStorage, S
 /**
  * Session containing the user, token...
  */
-webApp.service('Session', function () {
+webApp.service('Session', function ($rootScope) {
 	this.create = function (token, user) {
-		this.token = token;
-		this.user = user;
+		this.token = $rootScope.token = token;
+		this.user = $rootScope.user = user;
 	};
 	this.destroy = function () {
-		this.token = null;
-		this.user = null;
+		this.token = $rootScope.token = null;
+		this.user = $rootScope.user = null;
 	};
 	return this;
 });
