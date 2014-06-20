@@ -97,7 +97,8 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session,
 		if ($scope.tmpUser.password !== $scope.tmpUser.password2 || ($scope.tmpUser.password !== '' && $scope.tmpUser.password < 6)) {
 			return;
 		}
-		// Remove password2, and password if empty
+		// Remove login, password2, and password if empty
+		delete($scope.tmpUser.login);
 		delete($scope.tmpUser.password2);
 		if (!$scope.tmpUser.password) {
 			delete($scope.tmpUser.password);

@@ -409,16 +409,32 @@ body {
 	z-index: 960;
 	text-align: left;
 	display: inline-block;
+	color: rgba(0, 0, 0, 0.6);
 }
 
 #user-settings .header {
 	font-weight: bold;
-	padding: 10px 15px;
+	padding: 12px 15px 8px 15px;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
 
+#user-settings .header:before {
+	font-size: 150%;
+	margin-right: 8px;
+}
+
 #user-settings .content {
-	padding: 10px 15px;
+	padding: 20px 15px;
+	font-size: 14px;
+}
+
+#user-settings .content input[type='file'] {
+	width: auto;
+}
+
+#user-settings .content table {
+	margin-top: 10px;
+	margin-left: 20px;
 }
 
 #user-settings .footer {

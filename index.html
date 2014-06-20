@@ -74,18 +74,42 @@
 	<!-- Settings modal -->
 	<div id="user-settings-container">
 		<div id="user-settings">
-			<div class="header">
+			<div class="header icon-global-user">
 				Profile
 			</div>
 			<div class="content">
-				<input type="text" class="form-input" placeholder="First name" ng-model="tmpUser.firstName"><br>
-				<input type="text" class="form-input" placeholder="Last name" ng-model="tmpUser.lastName"><br>
-				<input type="text" class="form-input" placeholder="E-mail" ng-model="tmpUser.mail"><br>
-				<input type="text" class="form-input" placeholder="Login" ng-model="tmpUser.login"><br>
-				<br>
-				<strong>Change password:</strong><br>
-				<input type="password" class="form-input" placeholder="Password" ng-model="tmpUser.password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"><br>
-				<input type="password" class="form-input" placeholder="Re-type password" ng-model="tmpUser.password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}">
+				<strong>Personal information:</strong>
+				<table>
+					<tr>
+						<td>First name: </td>
+						<td><input type="text" class="form-input" placeholder="First name" ng-model="tmpUser.firstName"></td>
+					</tr>
+					<tr>
+						<td>Last name: </td>
+						<td><input type="text" class="form-input" placeholder="Last name" ng-model="tmpUser.lastName"></td>
+					</tr>
+					<tr>
+						<td>E-mail: </td>
+						<td><input type="text" class="form-input" placeholder="E-mail" ng-model="tmpUser.mail"></td>
+					</tr>
+				</table>
+				<br><br>
+				<strong>Change password:</strong>
+				<table>
+					<tr>
+						<td>Password: </td>
+						<td><input type="password" class="form-input" placeholder="Password" ng-model="tmpUser.password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"></td>
+					</tr>
+					<tr>
+						<td>Re-type password: </td>
+						<td><input type="password" class="form-input" placeholder="Re-type password" ng-model="tmpUser.password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}"></td>
+					</tr>
+				</table>
+				<br><br>
+				<strong>Image:</strong>
+				<br><br>
+				<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
+				<input type="file" name="image">
 			</div>
 			<div class="footer">
 				<div class="button" ng-click="cancelSettings();">Cancel</div>
