@@ -56,7 +56,7 @@
 				<div class="icon-global-notes">Notes</div>
 			</div>
 			<div id="user-menu-footer">
-				<div class="icon-global-settings">Settings</div>
+				<div class="icon-global-settings" ng-click="showSettings()">Settings</div>
 				<div class="icon-global-logout" ng-click="logout()">Logout</div>
 			</div>
 		</div>
@@ -68,7 +68,31 @@
 		<div ng-view></div>
 	</div>
 
-	<div class="editor"></div>
+	<!-- Dim filter -->
+	<div class="dim"></div>
+
+	<!-- Settings modal -->
+	<div id="user-settings-container">
+		<div id="user-settings">
+			<div class="header">
+				Profile
+			</div>
+			<div class="content">
+				<input type="text" class="form-input" placeholder="First name" ng-model="tmpUser.firstName"><br>
+				<input type="text" class="form-input" placeholder="Last name" ng-model="tmpUser.lastName"><br>
+				<input type="text" class="form-input" placeholder="E-mail" ng-model="tmpUser.mail"><br>
+				<input type="text" class="form-input" placeholder="Login" ng-model="tmpUser.login"><br>
+				<br>
+				<strong>Change password:</strong><br>
+				<input type="text" class="form-input" placeholder="Password" ng-model="tmpUser.password"><br>
+				<input type="text" class="form-input" placeholder="Re-type password">
+			</div>
+			<div class="footer">
+				<div class="button" ng-click="cancelSettings();">Cancel</div>
+				<div class="button" ng-click="saveSettings();">Save</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- Libraries -->
 	<script src="libs/jquery.min.js"></script>

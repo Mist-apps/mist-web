@@ -505,7 +505,7 @@ var startEditTask = function () {
 var startEditNote = function (event) {
 	if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
 		// Show editor menu, and put the note on front
-		$('.editor').addClass('editor-active');
+		$('.dim').addClass('dim-active');
 		$(this).addClass('note-edit');
 		$(this).find('.note-menu').addClass('note-menu-active');
 		// Remove the binding to start a new edit
@@ -513,7 +513,7 @@ var startEditNote = function (event) {
 	}
 };
 var stopEditNotes = function () {
-	$('.editor').removeClass('editor-active');
+	$('.dim').removeClass('dim-active');
 	$('.note').removeClass('note-edit');
 	$('.note-menu').removeClass('note-menu-active');
 	$('body').on('click', '.note', startEditNote);
@@ -527,7 +527,7 @@ var escapeKeyListener = function (event) {
 	}
 };
 $('body').on('click', '.note', startEditNote);
-$('body').on('click', '.editor, .note-menu .button, .note-menu div', stopEditNotes);
+$('body').on('click', '.note-menu .button, .note-menu div', stopEditNotes);
 $('body').on('focus', '.note-task-content', startEditTask);
 $('body').on('focus', '.note-title', stopEditTasks);
 $('body').on('keydown', '.note-title, .note-content, .note-task-edit', escapeKeyListener);

@@ -36,7 +36,7 @@ webApp.config(function ($routeProvider, $locationProvider) {
  * Users resource
  */
 webApp.factory('userResource', ['$resource', function ($resource) {
-	return $resource(API_URL + '/user/:id', {id: '@id'}, {
+	return $resource(API_URL + '/user', {}, {
 		update: {method: 'PUT'},
 		login: {method: 'POST', url: API_URL + '/login'}
 	});
@@ -77,10 +77,39 @@ webApp.factory('toastr', function() {
 /**
  * User controller
  */
-webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session) {
+webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session, userResource) {
 	$scope.logout = function () {
 		AuthService.logout();
 		$location.path('/login');
+	};
+
+	$scope.showSettings = function () {
+		// Clone user in a tmp user to update
+		$scope.tmpUser = $.extend(true, {}, Session.user);
+		// Show the user settings modal
+		$('.dim').addClass('dim-active');
+		$('#user-settings-container').show();
+	};
+
+	$scope.saveSettings = function () {
+		delete($scope.tmpUser.password);
+		// Remove the id before updating
+		delete($scope.tmpUser._id);
+		userResource.update($scope.tmpUser,
+			function () {
+				Session.update(data);
+				toastr.success('Settings saved');
+			}, function () {
+				toastr.error('Unable to save settings');
+			}
+		);
+		$('.dim').removeClass('dim-active');
+		$('#user-settings-container').hide();
+	};
+
+	$scope.cancelSettings = function () {
+		$('.dim').removeClass('dim-active');
+		$('#user-settings-container').hide();
 	};
 
 	// Try to recover the authentication from the session/local storage
@@ -183,6 +212,9 @@ webApp.service('Session', function ($rootScope) {
 		this.token = $rootScope.token = null;
 		this.user = $rootScope.user = null;
 	};
+	this.update = function (user) {
+		this.user = $rootScope.user = user;
+	}
 	return this;
 });
 

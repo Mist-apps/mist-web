@@ -165,23 +165,6 @@
  * Notes editor
  */
 
-.editor {
-	height: 100%;
-	width: 100%;
-	position: fixed;
-	left: 0;
-	top: 0;
-	z-index: 950;
-	background-color: rgba(255, 255, 255, 0);
-	display: none;
-	text-align: center;
-}
-
-.editor-active {
-	background-color: rgba(255, 255, 255, 0.7);
-	display: block;
-}
-
 .note-edit {
 	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
 	z-index: 960;

@@ -390,6 +390,49 @@ body {
 
 
 /**
+ * User settings modal
+ */
+
+#user-settings-container {
+	position: absolute;
+	top: 60px;
+	margin: auto;
+	width: 100%;
+	z-index: 960;
+	text-align: center;
+	display: none;
+}
+
+#user-settings {
+	background-color: #FFF;
+	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
+	z-index: 960;
+	text-align: left;
+	display: inline-block;
+}
+
+#user-settings .header {
+	font-weight: bold;
+	padding: 10px 15px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+#user-settings .content {
+	padding: 10px 15px;
+}
+
+#user-settings .footer {
+	padding: 10px 15px;
+	border-top: 1px solid rgba(0, 0, 0, 0.3);
+	text-align: center;
+}
+
+#user-settings .footer .button {
+	display: inline-block;
+}
+
+
+/**
  * Container
  */
 
@@ -397,6 +440,23 @@ body {
 	position: relative;
 	top: 45px;
 	padding: 25px;
+}
+
+.dim {
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 950;
+	background-color: rgba(255, 255, 255, 0);
+	display: none;
+	text-align: center;
+}
+
+.dim-active {
+	background-color: rgba(255, 255, 255, 0.8);
+	display: block;
 }
 
 
@@ -474,4 +534,14 @@ button {
 
 button::-moz-focus-inner {
 	border: 0;
+}
+
+.form-input {
+	background-color: #FFF;
+	border-radius: 3px;
+	display: inline-block;
+	border: 1px solid #CCC;
+	margin: 4px;
+	width: auto;
+	padding: 4px;
 }
