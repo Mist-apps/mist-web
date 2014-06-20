@@ -545,3 +545,8 @@ button::-moz-focus-inner {
 	width: auto;
 	padding: 4px;
 }
+
+.form-input-error {
+	border-color: #DB4437;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 6px #DB4437;
+}

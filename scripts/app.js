@@ -86,17 +86,25 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session,
 	$scope.showSettings = function () {
 		// Clone user in a tmp user to update
 		$scope.tmpUser = $.extend(true, {}, Session.user);
+		$scope.tmpUser.password = $scope.tmpUser.password2 = '';
 		// Show the user settings modal
 		$('.dim').addClass('dim-active');
 		$('#user-settings-container').show();
 	};
 
 	$scope.saveSettings = function () {
-		delete($scope.tmpUser.password);
-		// Remove the id before updating
-		delete($scope.tmpUser._id);
+		// Check password
+		if ($scope.tmpUser.password !== $scope.tmpUser.password2 || ($scope.tmpUser.password !== '' && $scope.tmpUser.password < 6)) {
+			return;
+		}
+		// Remove password2, and password if empty
+		delete($scope.tmpUser.password2);
+		if (!$scope.tmpUser.password) {
+			delete($scope.tmpUser.password);
+		}
+		// Update the user
 		userResource.update($scope.tmpUser,
-			function () {
+			function (data) {
 				Session.update(data);
 				toastr.success('Settings saved');
 			}, function () {

@@ -84,8 +84,8 @@
 				<input type="text" class="form-input" placeholder="Login" ng-model="tmpUser.login"><br>
 				<br>
 				<strong>Change password:</strong><br>
-				<input type="text" class="form-input" placeholder="Password" ng-model="tmpUser.password"><br>
-				<input type="text" class="form-input" placeholder="Re-type password">
+				<input type="password" class="form-input" placeholder="Password" ng-model="tmpUser.password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"><br>
+				<input type="password" class="form-input" placeholder="Re-type password" ng-model="tmpUser.password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}">
 			</div>
 			<div class="footer">
 				<div class="button" ng-click="cancelSettings();">Cancel</div>
