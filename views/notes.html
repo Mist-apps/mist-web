@@ -23,30 +23,34 @@
 	</div>
 </div>
 
+<!-- Grid container for notes -->
+<div id="grid-container" >
 
-<!-- Notes view -->
-<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:$root.order:$root.reverse">
+	<!-- Notes view -->
+	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:$root.order:$root.reverse" grid>
 
-	<!-- Title -->
-	<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />
+		<!-- Title -->
+		<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />
 
-	<!-- If note, print contents -->
-	<textarea class="note-content" ng-if="!note.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, note);" ng-model="note.content" resize></textarea>
+		<!-- If note, print contents -->
+		<textarea class="note-content" ng-if="!note.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, note);" ng-model="note.content" resize></textarea>
 
-	<!-- If todo list, print tasks -->
-	<div class="note-tasks" ng-if="note.tasks">
-		<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in note.tasks">
-			<div class="note-task-icon" ng-click="toggleTaskDone(note, task);"></div>
-			<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, note, $index)" ng-model="task.content" resize></textarea>
+		<!-- If todo list, print tasks -->
+		<div class="note-tasks" ng-if="note.tasks">
+			<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in note.tasks">
+				<div class="note-task-icon" ng-click="toggleTaskDone(note, task);"></div>
+				<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, note, $index)" ng-model="task.content" resize></textarea>
+			</div>
 		</div>
-	</div>
 
-	<!-- Menu -->
-	<div class="note-menu">
-		<div class="icon-notes-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
-		<div class="icon-notes-delete" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
-		<div class="icon-notes-restore" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
-		<div class="button" ng-click="show();">OK</div>
+		<!-- Menu -->
+		<div class="note-menu">
+			<div class="icon-notes-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
+			<div class="icon-notes-delete" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
+			<div class="icon-notes-restore" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
+			<div class="button" ng-click="show();">OK</div>
+		</div>
+
 	</div>
 
 </div>

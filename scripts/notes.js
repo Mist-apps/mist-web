@@ -15,13 +15,16 @@ webApp.factory('noteResource', ['$resource', function ($resource) {
  * Resize directive to resize automatically textarea's during
  * writing.
  */
-webApp.directive('resize', function ($timeout) {
+webApp.directive('resize', function ($timeout, $rootScope) {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attrs) {
 			var resize = function () {
+				// Resize the element
 				element[0].style.height = 'auto';
-				element[0].style.height = element[0].scrollHeight+'px';
+				element[0].style.height = element[0].scrollHeight + 'px';
+				// Refresh grid layout
+				$rootScope.masonry.layout();
 			};
 			element.on('change cut paste drop keyup keydown', resize);
 			$timeout(resize);
@@ -29,10 +32,43 @@ webApp.directive('resize', function ($timeout) {
 	};
 });
 
+
+/**
+ * Manage grid elements
+ */
+webApp.directive('grid', ['$rootScope', function($rootScope, $timeout) {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+			// Create masonry object if not created yet
+			if (!$rootScope.masonry) {
+				$rootScope.masonry = new Masonry(element[0].parentElement, { itemSelector: '.note', gutter: 25 });
+				$rootScope.masonry.bindResize();
+				$rootScope.masonry.appended(element[0]);
+				$rootScope.masonry.items.splice(1, 1);	// Hack for bug
+			} else {
+				$rootScope.masonry.appended(element[0]);
+			}
+			// Refresh layout when item destroyed
+			scope.$on('$destroy', function () {
+				$rootScope.masonry.remove(element[0]);
+				$rootScope.masonry.layout();
+			});
+			// Refresh layout when position changes
+			scope.$watch('$index', function () {
+				$rootScope.masonry.reloadItems();
+				$rootScope.masonry.layout();
+			});
+			// Refresh layout
+			$rootScope.masonry.layout();
+		}
+	};
+}]);
+
 /**
  * Notes Controller
  */
-webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr, syncService) {
+webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $timeout, toastr, syncService) {
 
 	$scope.location = 'all';
 
@@ -244,7 +280,7 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	$scope.deleteNote = function (note) {
 		// Update note
 		note.deleteDate = new Date().getTime();
-		stopEditNotes();
+		$scope.stopEditNotes();
 		// Inform sync service
 		syncService.updateNote(note);
 	}
@@ -261,7 +297,7 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 				break;
 			}
 		}
-		stopEditNotes();
+		$scope.stopEditNotes();
 		// Inform sync service
 		syncService.deleteNote(note);
 	}
@@ -272,10 +308,57 @@ webApp.controller('NotesCtrl', function ($scope, noteResource, $timeout, toastr,
 	$scope.restoreNote = function (note) {
 		// Update note
 		delete(note.deleteDate);
-		stopEditNotes();
+		$scope.stopEditNotes();
 		// Inform sync service
 		syncService.updateNote(note);
 	}
+
+	/**
+	 * Note editor management
+	 */
+	$scope.stopEditTasks = function () {
+		$('.note-task-edit').removeClass('note-task-edit');
+	};
+	$scope.startEditTask = function () {
+		$scope.stopEditTasks();
+		$(this).parent().addClass('note-task-edit');
+		// Remove the binding to start a new edit
+		$('body').unbind('click', $scope.startEditTask);
+	};
+	$scope.startEditNote = function (event) {
+		if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
+			// Show editor menu, and put the note on front
+			$('.dim').addClass('dim-active');
+			$(this).addClass('note-edit');
+			$(this).find('.note-menu').addClass('note-menu-active');
+			// Remove the binding to start a new edit
+			$('body').unbind('click', $scope.startEditNote);
+			// Reorganize grid
+			$rootScope.masonry.layout();
+		}
+	};
+	$scope.stopEditNotes = function () {
+		$('.dim').removeClass('dim-active');
+		$('.note').removeClass('note-edit');
+		$('.note-menu').removeClass('note-menu-active');
+		$('body').on('click', '.note', $scope.startEditNote);
+		$scope.stopEditTasks();
+		// Reorganize grid
+		$rootScope.masonry.layout();
+	};
+	$scope.escapeKeyListener = function (event) {
+		// If press "escape", stop edit
+		if (event.which === 27) {
+			$(this).blur();
+			$scope.stopEditNotes();
+		}
+	};
+
+	$('body').on('click', '.note', $scope.startEditNote);
+	$('body').on('click', '.dim, .note-menu .button, .note-menu div', $scope.stopEditNotes);
+	$('body').on('focus', '.note-task-content', $scope.startEditTask);
+	$('body').on('focus', '.note-title', $scope.stopEditTasks);
+	$('body').on('keydown', '.note-title, .note-content, .note-task-edit', $scope.escapeKeyListener);
 
 });
 
@@ -487,50 +570,6 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
  *         Normal Javascript
  * =================================
  */
-
-
-
-/**
- * Note editor management
- */
-var stopEditTasks = function () {
-	$('.note-task-edit').removeClass('note-task-edit');
-};
-var startEditTask = function () {
-	stopEditTasks();
-	$(this).parent().addClass('note-task-edit');
-	// Remove the binding to start a new edit
-	$('body').unbind('click', startEditTask);
-};
-var startEditNote = function (event) {
-	if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
-		// Show editor menu, and put the note on front
-		$('.dim').addClass('dim-active');
-		$(this).addClass('note-edit');
-		$(this).find('.note-menu').addClass('note-menu-active');
-		// Remove the binding to start a new edit
-		$('body').unbind('click', startEditNote);
-	}
-};
-var stopEditNotes = function () {
-	$('.dim').removeClass('dim-active');
-	$('.note').removeClass('note-edit');
-	$('.note-menu').removeClass('note-menu-active');
-	$('body').on('click', '.note', startEditNote);
-	stopEditTasks();
-};
-var escapeKeyListener = function (event) {
-	// If press "escape", stop edit
-	if (event.which === 27) {
-		$(this).blur();
-		stopEditNotes();
-	}
-};
-$('body').on('click', '.note', startEditNote);
-$('body').on('click', '.note-menu .button, .note-menu div', stopEditNotes);
-$('body').on('focus', '.note-task-content', startEditTask);
-$('body').on('focus', '.note-title', stopEditTasks);
-$('body').on('keydown', '.note-title, .note-content, .note-task-edit', escapeKeyListener);
 
 
 /**
