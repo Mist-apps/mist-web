@@ -121,6 +121,20 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session,
 		$('#user-settings-container').hide();
 	};
 
+	$scope.uploadImage = function () {
+		var input = $('#user-image-input').get(0);
+		alert(input);
+		if (input.files && input.files[0]) {
+			alert('b');
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				alert(e.target.result);
+				$scope.tmpUser.image = e.target.result;
+			}
+			reader.readAsDataURL(input.files[0]);
+		}
+	};
+
 	// Try to recover the authentication from the session/local storage
 	AuthService.recover().then(function () {
 		$location.path('/');

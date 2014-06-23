@@ -108,8 +108,10 @@
 				<br><br>
 				<strong>Image:</strong>
 				<br><br>
-				<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
-				<input type="file" name="image">
+				<div id="user-settings-image">
+					<img ng-src="{{tmpUser.image || 'images/user.png'}}">
+					<input id="user-image-input" type="file" onchange="angular.element(this).scope().uploadImage()">
+				</div>
 			</div>
 			<div class="footer">
 				<div class="button" ng-click="cancelSettings();">Cancel</div>
