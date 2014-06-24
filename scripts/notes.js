@@ -24,7 +24,7 @@ webApp.directive('resize', function ($timeout, $rootScope) {
 				element[0].style.height = 'auto';
 				element[0].style.height = element[0].scrollHeight + 'px';
 				// Refresh grid layout
-				$rootScope.masonry.layout();
+				$rootScope.masonry.draw();
 			};
 			element.on('change cut paste drop keyup keydown', resize);
 			$timeout(resize);
@@ -32,38 +32,31 @@ webApp.directive('resize', function ($timeout, $rootScope) {
 	};
 });
 
-
 /**
  * Manage grid elements
  */
-webApp.directive('grid', ['$rootScope', function($rootScope, $timeout) {
+webApp.directive('grid', function ($rootScope, $timeout) {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attrs) {
 			// Create masonry object if not created yet
 			if (!$rootScope.masonry) {
-				$rootScope.masonry = new Masonry(element[0].parentElement, { itemSelector: '.note', gutter: 25 });
-				$rootScope.masonry.bindResize();
-				$rootScope.masonry.appended(element[0]);
-				$rootScope.masonry.items.splice(1, 1);	// Hack for bug
-			} else {
-				$rootScope.masonry.appended(element[0]);
+				$rootScope.masonry = new Masonry(element[0].parentElement);
 			}
+			// Add element to grid
+			$rootScope.masonry.append(element[0]);
 			// Refresh layout when item destroyed
 			scope.$on('$destroy', function () {
 				$rootScope.masonry.remove(element[0]);
-				$rootScope.masonry.layout();
+				$rootScope.masonry.draw();
 			});
 			// Refresh layout when position changes
-			scope.$watch('$index', function () {
-				$rootScope.masonry.reloadItems();
-				$rootScope.masonry.layout();
+			scope.$watch('$index', function (newIndex, oldIndex) {
+				$rootScope.masonry.draw();
 			});
-			// Refresh layout
-			$rootScope.masonry.layout();
 		}
 	};
-}]);
+});
 
 /**
  * Notes Controller
@@ -334,7 +327,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 			// Remove the binding to start a new edit
 			$('body').unbind('click', $scope.startEditNote);
 			// Reorganize grid
-			$rootScope.masonry.layout();
+			$rootScope.masonry.draw();
 		}
 	};
 	$scope.stopEditNotes = function () {
@@ -344,7 +337,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		$('body').on('click', '.note', $scope.startEditNote);
 		$scope.stopEditTasks();
 		// Reorganize grid
-		$rootScope.masonry.layout();
+		$rootScope.masonry.draw();
 	};
 	$scope.escapeKeyListener = function (event) {
 		// If press "escape", stop edit
