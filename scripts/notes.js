@@ -43,17 +43,12 @@ webApp.directive('grid', function ($rootScope, $timeout) {
 			if (!$rootScope.masonry) {
 				$rootScope.masonry = new Masonry(element[0].parentElement);
 			}
-			// Add element to grid
-			$rootScope.masonry.append(element[0]);
 			// Refresh layout when item destroyed
 			scope.$on('$destroy', function () {
-				$rootScope.masonry.remove(element[0]);
 				$rootScope.masonry.draw();
 			});
-			// Refresh layout when position changes
-			scope.$watch('$index', function (newIndex, oldIndex) {
-				$rootScope.masonry.draw();
-			});
+			// Refresh the grid
+			$rootScope.masonry.draw();
 		}
 	};
 });
