@@ -395,20 +395,21 @@ body {
 	margin-bottom: 35px;
 }
 
-#user-settings .header {
+.header {
 	font-weight: bold;
 	padding: 12px 15px 8px 15px;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-#user-settings .header:before {
+.header:before {
 	font-size: 150%;
 	margin-right: 8px;
 }
 
-#user-settings .content {
+.content {
 	padding: 20px 15px;
 	font-size: 14px;
+	text-align: left;
 }
 
 #user-settings .content table {

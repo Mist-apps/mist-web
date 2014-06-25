@@ -24,27 +24,42 @@
 	position: relative;
 }
 
-#notes-conflict-view {
-	display: block;
+#notes-conflict-modal-container {
 	text-align: center;
 }
 
-#notes-conflict-view > div {
+#notes-conflict-modal {
 	display: inline-block;
-}
-
-#notes-conflict-view div div {
-	position: relative;
+	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
 	z-index: 970;
+	position: relative;
+	width: 700px;
+	background-color: #FFF;
+	color: rgba(0, 0, 0, 0.6);
 }
 
-#notes-conflict-view .button {
+#notes-conflict-modal .header {
+	text-align: left;
+	display: block;
+}
+
+.notes-conflict-note {
+	display: inline-block;
+	margin-top: 10px;
+	margin-bottom: 15px;
+}
+
+#notes-conflict-modal .button {
 	display: inline-block;
 }
 
 .note-conflict-version-title {
 	font-weight: bold;
-	font-size: 18px;
+	font-size: 14px;
+}
+
+.note-conflict-date {
+	font-size: 12px;
 }
 
 
