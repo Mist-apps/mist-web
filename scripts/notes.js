@@ -355,9 +355,6 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
  */
 webApp.controller('LeftMenuCtrl', function ($scope, $rootScope) {
 
-	$rootScope.order = 'creationDate';
-	$rootScope.reverse = false;
-
 	$scope.goto = function (location) {
 		$scope.location = $scope.$parent.location = location;
 		$('#nav-menu').html($('#menu-item-' + location).html());

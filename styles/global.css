@@ -257,9 +257,9 @@ body {
 .menu-bottom {
 	vertical-align: bottom;
 	position: absolute;
-	bottom: 5px;
+	bottom: 0px;
 	width: 200px;
-	left: 265px;
+	left: 0px;
 }
 
 .menu-bottom > div {
@@ -284,24 +284,6 @@ body {
 	font-size: 130%;
 }
 
-#menu-order div {
-	margin: 0px;
-	font-size: 12px;
-	color: rgba(0, 0, 0, 0.3);
-	white-space: nowrap;
-	cursor: pointer;
-	display: inline-block;
-}
-
-#menu-order div:hover {
-	color: rgba(0, 0, 0, 0.5);
-	font-weight: bold;
-}
-
-#menu-order-direction:before {
-	margin-right: 5px;
-	font-size: 130%;
-}
 
 /**
  * Add menu

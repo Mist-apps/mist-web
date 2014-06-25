@@ -8,12 +8,6 @@
 	<div id="menu-item-trash" ng-click="goto('trash')" ng-class="{'menu-item-active': location=='trash'}" class="menu-item icon-notes-trash">Trash</div>
 	<!-- Sync status -->
 	<div class="menu-bottom">
-		<div id="menu-order">
-			<div id="menu-order-direction" ng-click="$root.reverse = !$root.reverse" ng-class="{'icon-global-order-asc': !$root.reverse, 'icon-global-order-desc': $root.reverse}"></div>
-			<div ng-show="$root.order == 'title'" ng-click="$root.order = 'creationDate'">Title</div>
-			<div ng-show="$root.order == 'creationDate'" ng-click="$root.order = 'modificationDate'">Creation date</div>
-			<div ng-show="$root.order == 'modificationDate'" ng-click="$root.order = 'title'">Modification date</div>
-		</div>
 		<div id="menu-sync">
 			<div class="icon-global-sync" ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'">Syncing</div>
 			<div class="icon-global-ok" ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'">Synced</div>
@@ -27,7 +21,7 @@
 <div id="grid-container" >
 
 	<!-- Notes view -->
-	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:$root.order:$root.reverse" grid>
+	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:creationDate" grid>
 
 		<!-- Title -->
 		<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />
