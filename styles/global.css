@@ -430,6 +430,10 @@ body {
 	float: left;
 }
 
+#user-image-canvas {
+	display: none;
+}
+
 #user-settings .content input[type='file'] {
 	width: auto;
 	height: auto;

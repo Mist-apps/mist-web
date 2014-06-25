@@ -111,6 +111,7 @@
 				<div id="user-settings-image">
 					<img ng-src="{{tmpUser.image || 'images/user.png'}}">
 					<input id="user-image-input" type="file" onchange="angular.element(this).scope().uploadImage()">
+					<canvas id="user-image-canvas"></canvas>
 				</div>
 			</div>
 			<div class="footer">

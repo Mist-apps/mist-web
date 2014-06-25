@@ -123,14 +123,21 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session,
 
 	$scope.uploadImage = function () {
 		var input = $('#user-image-input').get(0);
-		alert(input);
 		if (input.files && input.files[0]) {
-			alert('b');
+			// Read file
+			var canvas = document.getElementById("user-image-canvas");
+			canvas.width = 85;
+			canvas.height = 85;
+			var ctx = canvas.getContext("2d");
 			var reader = new FileReader();
+			var image = new Image();
 			reader.onload = function (e) {
-				alert(e.target.result);
-				$scope.tmpUser.image = e.target.result;
-			}
+				image.src = e.target.result;
+			};
+			image.onload = function() {
+				ctx.drawImage(image, 0, 0, 85, 85);
+				$scope.tmpUser.image = canvas.toDataURL();
+			};
 			reader.readAsDataURL(input.files[0]);
 		}
 	};
