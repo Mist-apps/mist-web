@@ -8,16 +8,16 @@
 	<div></div>
 </div>
 
-<form id="login-form" name="login-form" ng-submit="login(credentials)" novalidate>
+<form id="login-form" name="login-form" ng-submit="login()" novalidate>
 
-	<div id="login" class="login-form-input" ng-class="{'login-form-input-error': formError}">
+	<div id="login" class="login-form-input">
 		<div class="icon-global-user"></div>
 		<input type="text" name="login" placeholder="Login" ng-model="credentials.login">
 	</div>
 
 	<br>
 
-	<div id="password" class="login-form-input" ng-class="{'login-form-input-error': formError}">
+	<div id="password" class="login-form-input">
 		<div class="icon-global-pass"></div>
 		<input type="password" name="password" placeholder="Password" ng-model="credentials.password">
 	</div>

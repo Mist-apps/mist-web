@@ -22,13 +22,13 @@
 
 </head>
 
-<body ng-app="webApp" ng-controller="UserCtrl">
+<body ng-app="webApp" ng-controller="ApplicationController">
 
 	<!-- Top navigation bar -->
 	<div id="navbar" ng-if="$root.user">
 
 		<!-- Left menu icon -->
-		<div id="nav-menu" class="icon-global-menu"></div>
+		<div id="nav-menu" class="icon-global-menu" ng-click="toggleLeftMenu($event);"></div>
 
 		<!-- Search menu -->
 		<div id="nav-search">
@@ -38,7 +38,7 @@
 		</div>
 
 		<!-- User navbar menu -->
-		<div id="nav-user">
+		<div id="nav-user" ng-click="toggleUserMenu($event);">
 			<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
 			{{$root.user.firstName}} {{$root.user.lastName}} &nbsp;&nbsp;&#9662;
 		</div>
@@ -72,7 +72,7 @@
 	<div class="dim"></div>
 
 	<!-- Settings modal -->
-	<div id="user-settings-container">
+	<div id="user-settings-container" ng-controller="SettingsController">
 		<div id="user-settings">
 			<div class="header icon-global-user">
 				Profile

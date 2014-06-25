@@ -75,23 +75,122 @@ webApp.factory('toastr', function() {
 });
 
 /**
- * User controller
+ * Application controller. It manages:
+ *		- Show/hide all menus
+ *		- Logout
  */
-webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session, userResource) {
-	$scope.logout = function () {
-		AuthService.logout();
-		$location.path('/login');
+webApp.controller('ApplicationController', function ($scope, $location, AuthService) {
+
+	// Try to recover the authentication from the session/local storage
+	AuthService.recover().then(function () {
+		$location.path('/');
+	}, function (reason) {
+		console.log('Unable to recover session: ' + reason);
+	});
+
+	/**
+	 * Hide all menus
+	 */
+	var _hideMenus = function () {
+		$('.menu').removeClass('menu-show');
+		$('#user-menu').hide();
+		$('#add-menu div').hide();
+		$('#add-menu div:first-child').show();
+		$('#add-menu div:first-child div').show();
+		$('html').unbind('click');
 	};
 
+	/**
+	 * Show and hide left menu dynamically
+	 */
+	$scope.toggleLeftMenu = function ($event) {
+		if (!$('.menu').hasClass('menu-show')) {
+			_hideMenus();
+			$('.menu').addClass('menu-show');
+			$('html').click(function () {
+				_hideMenus();
+			});
+			$event.stopPropagation();
+		} else {
+			_hideMenus();
+		}
+	};
+
+	/**
+	 * Show and hide user menu dynamically
+	 */
+	$scope.toggleUserMenu = function ($event) {
+		if ($('#user-menu').is(':hidden')) {
+			_hideMenus();
+			$('#user-menu').show();
+			$('html').click(function () {
+				_hideMenus();
+			});
+			$event.stopPropagation();
+		} else {
+			_hideMenus();
+		}
+	};
+
+	/**
+	 * Show and hide the add menu dynamically
+	 */
+	$scope.toggleAddMenu = function ($event) {
+		if ($('#add-menu div:first-child').is(':visible')) {
+			_hideMenus();
+			$('#add-menu div').show();
+			$('#add-menu div:first-child').hide();
+			$('html').click(function () {
+				_hideMenus();
+			});
+			$event.stopPropagation();
+		}
+	};
+
+	/**
+	 * Show the settings modal and send a broadcast to initialize the
+	 * settings controller.
+	 */
 	$scope.showSettings = function () {
-		// Clone user in a tmp user to update
-		$scope.tmpUser = $.extend(true, {}, Session.user);
-		$scope.tmpUser.password = $scope.tmpUser.password2 = '';
+		// Init the settings modal
+		$scope.$broadcast('INIT_SETTINGS');
 		// Show the user settings modal
 		$('.dim').addClass('dim-active');
 		$('#user-settings-container').show();
 	};
 
+	/**
+	 * Log the user out and redirect it to the login page
+	 */
+	$scope.logout = function () {
+		AuthService.logout();
+		$location.path('/login');
+	};
+
+});
+
+
+/**
+ * Settings modal controller
+ */
+webApp.controller('SettingsController', function ($scope, toastr, Session, userResource) {
+
+	/**
+	 * Init the settings temporary user
+	 */
+	var initSettings = function () {
+		// Clone user in a tmp user to update
+		$scope.tmpUser = $.extend(true, {}, Session.user);
+		$scope.tmpUser.password = $scope.tmpUser.password2 = '';
+	};
+
+	$scope.$on('INIT_SETTINGS', initSettings);
+
+	/**
+	 * Save the settings and remove the settings modal
+	 * If the settings form is not consistent, does nothing
+	 * Show a notification if saved or if an error occurs
+	 */
 	$scope.saveSettings = function () {
 		// Check password
 		if ($scope.tmpUser.password !== $scope.tmpUser.password2 || ($scope.tmpUser.password !== '' && $scope.tmpUser.password < 6)) {
@@ -112,28 +211,40 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session,
 				toastr.error('Unable to save settings');
 			}
 		);
-		$('.dim').removeClass('dim-active');
-		$('#user-settings-container').hide();
+		// Remove temporary user and hide modal
+		$scope.cancelSettings();
 	};
 
+	/**
+	 * Cancel the settings modifications: remove temporary user and hide modal
+	 */
 	$scope.cancelSettings = function () {
+		// Remove temporary user
+		delete($scope.tmpUser);
+		// Hide modal
 		$('.dim').removeClass('dim-active');
 		$('#user-settings-container').hide();
 	};
 
+	/**
+	 * Get the image from input, resize it to 85px/85px,
+	 * transform it in base64 and update the temporary user
+	 */
 	$scope.uploadImage = function () {
 		var input = $('#user-image-input').get(0);
 		if (input.files && input.files[0]) {
-			// Read file
+			// Create canvas for resizing image
 			var canvas = document.getElementById("user-image-canvas");
 			canvas.width = 85;
 			canvas.height = 85;
 			var ctx = canvas.getContext("2d");
-			var reader = new FileReader();
+			// Create image object with base64 upload
 			var image = new Image();
 			reader.onload = function (e) {
 				image.src = e.target.result;
 			};
+			// Read the image from the input in base64
+			var reader = new FileReader();
 			image.onload = function() {
 				ctx.drawImage(image, 0, 0, 85, 85);
 				$scope.tmpUser.image = canvas.toDataURL();
@@ -142,21 +253,25 @@ webApp.controller('UserCtrl', function ($scope, $location, AuthService, Session,
 		}
 	};
 
-	// Try to recover the authentication from the session/local storage
-	AuthService.recover().then(function () {
-		$location.path('/');
-	}, function (reason) {
-		//$location.path('/login');
-	});
 });
 
 /**
  * Authentication service to login/logout and manage the Session.
  */
 webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $localStorage, userResource, Session) {
+
 	return {
+
+		/**
+		 * Login by sending the credentials to the API and waiting for a token.
+		 * This method returns a promise.
+		 *
+		 * If ok, store the token into session/local storage and resolve the promise
+		 * If not ok, reject the promise with an error code and message
+		 */
 		login: function (credentials) {
 			var promise = $q.defer();
+			// If login attempt success
 			var success = function (data, responseHeaders) {
 				// Create the session
 				Session.create(data.token, data.user);
@@ -171,6 +286,7 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 				// Connected
 				promise.resolve();
 			};
+			// If login attempt fails
 			var error = function (httpResponse) {
 				if (httpResponse.status === 401) {
 					promise.reject({code: 1, message: "Bad credentials"});
@@ -178,10 +294,15 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 					promise.reject({code: 2, message: "Unknown error"});
 				}
 			};
+			// Try to log in
 			userResource.login(credentials, success, error);
 			// Return a promise
 			return promise.promise;
 		},
+
+		/**
+		 * Logout by destroying the token
+		 */
 		logout: function () {
 			// Destroy session
 			Session.destroy();
@@ -191,6 +312,11 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			delete($sessionStorage.token);
 			delete($localStorage.token);
 		},
+
+		/**
+		 * Try to recover the authentication by searching for a token in
+		 * session/local storage. If found, ask for user information.
+		 */
 		recover: function () {
 			var promise = $q.defer();
 			// Search for token in local/session storage
@@ -204,12 +330,14 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			$http.defaults.headers.common['API-Token'] = token;
 			// If token found
 			if (token) {
+				// If user information retrieval success
 				var success = function (data, responseHeaders) {
 					// Create the session
 					Session.create(token, data);
 					// Connected
 					promise.resolve();
 				};
+				// If user information retrieval fails
 				var error = function (httpResponse) {
 					// No more send the token on each API request
 					delete($http.defaults.headers.common['API-Token']);
@@ -217,17 +345,26 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 					promise.reject("Unknown error when retrieving user");
 				};
 				userResource.get(success, error);
-			} else {
+			}
+			// If no token found
+			else {
 				$timeout(function () {
 					promise.reject("No token found in storage");
 				});
 			}
+			// Return a promise
 			return promise.promise;
 		},
+
+		/**
+		 * Check if the user is authenticated or not
+		 */
 		isAuthenticated: function () {
 			return !!Session.token;
 		}
+
 	};
+
 });
 
 /**
@@ -252,6 +389,7 @@ webApp.service('Session', function ($rootScope) {
  * Route Change Listener to check if the user is authenticated where he must be
  */
 webApp.run(function ($rootScope, $location, AuthService) {
+
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
 		// If not authenticated and asking for an authenticated page
 		if (next.authenticated && !AuthService.isAuthenticated()) {
@@ -268,12 +406,14 @@ webApp.run(function ($rootScope, $location, AuthService) {
 			$location.path('/');
 		}
 	});
+
 });
 
 /**
  * HTTP Interceptor to catch 401 statuses and redirect the user to the /login page.
  */
 webApp.config(function ($httpProvider) {
+
 	$httpProvider.interceptors.push(function ($location, $q, $sessionStorage, $localStorage, Session) {
 		return {
 			responseError: function (rejection) {
@@ -292,80 +432,5 @@ webApp.config(function ($httpProvider) {
 			}
 		};
 	});
+
 });
-
-
-
-/**
- * =================================
- *         Normal Javascript
- * =================================
- */
-
-
-
-/**
- * Hide all menus
- */
-var hideMenus = function () {
-	$('.menu').removeClass('menu-show');
-	$('#user-menu').hide();
-	$('#add-menu div').hide();
-	$('#add-menu div:first-child').show();
-	$('#add-menu div:first-child div').show();
-	$('html').unbind('click');
-};
-
-/**
- * Show and hide left menu dynamically
- */
-var handleLeftMenu = function (event) {
-	if (!$('.menu').hasClass('menu-show')) {
-		hideMenus();
-		$('.menu').addClass('menu-show');
-		$('html').click(function () {
-			hideMenus();
-		});
-		event.stopPropagation();
-	} else {
-		hideMenus();
-	}
-};
-
-/**
- * Show and hide user menu dynamically
- */
-var handleUserMenu = function (event) {
-	if ($('#user-menu').is(':hidden')) {
-		hideMenus();
-		$('#user-menu').show();
-		$('html').click(function () {
-			hideMenus();
-		});
-		event.stopPropagation();
-	} else {
-		hideMenus();
-	}
-};
-
-/**
- * Show and hide the add menu dynamically
- */
-var handleAddMenu = function (event) {
-	if ($('#add-menu div:first-child').is(':visible')) {
-		hideMenus();
-		$('#add-menu div').show();
-		$('#add-menu div:first-child').hide();
-		$('html').click(function () {
-			hideMenus();
-		});
-		event.stopPropagation();
-	}
-};
-
-/**
- * Set the handlers when page loaded
- */
-$('body').on('click', '#nav-menu', handleLeftMenu);
-$('body').on('click', '#nav-user', handleUserMenu);
-$('body').on('click', '#add-menu div:first-child div', handleAddMenu);
