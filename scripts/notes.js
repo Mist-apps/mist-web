@@ -342,8 +342,15 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		}
 	};
 
+	/**
+	 * When a conflict is detected, stop edit the note
+	 */
+	$scope.$on('CONFLICT', function () {
+		$scope.stopEditNotes();
+	});
+
 	$('body').on('click', '.note', $scope.startEditNote);
-	$('body').on('click', '.dim, .note-menu .button, .note-menu div', $scope.stopEditNotes);
+	$('body').on('click', '.note-menu .button, .note-menu div', $scope.stopEditNotes);
 	$('body').on('focus', '.note-task-content', $scope.startEditTask);
 	$('body').on('focus', '.note-title', $scope.stopEditTasks);
 	$('body').on('keydown', '.note-title, .note-content, .note-task-edit', $scope.escapeKeyListener);
@@ -464,13 +471,21 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 			}
 			checkEndOfSync();
 		};
-		var error = function (note) {
+		var error = function (response, note) {
 			if (note._id) {
 				syncErrors[note._id] = 1;
 			} else {
 				syncErrors.new = 1;
 			}
 			checkEndOfSync();
+			// Check for conflict
+			if (response.status === 409) {
+				$rootScope.syncStatus = 'stopped';
+				$rootScope.$broadcast('CONFLICT', note, response.data);
+				$rootScope.localNote = note;
+				$rootScope.remoteNote = response.data;
+				$('.dim').addClass('dim-active');
+			}
 		};
 		var checkEndOfSync = function () {
 			todo--;
@@ -493,9 +508,9 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 					note._id = data._id;
 					note._revision = data._revision;
 					delete(note.tmpId);
-				}, function () {
+				}, function (httpResponse) {
 					newNote(note);
-					error(note);
+					error(httpResponse, note);
 				}
 			);
 		});
@@ -507,9 +522,9 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 				function (data) {
 					success(note);
 					note._revision = data._revision;
-				}, function () {
+				}, function (httpResponse) {
 					updateNote(note);
-					error(note);
+					error(httpResponse, note);
 				}
 			);
 		});
@@ -520,9 +535,9 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 			noteResource.delete({id: id},
 				function () {
 					success(note);
-				}, function () {
+				}, function (httpResponse) {
 					deleteNote(note);
-					error(note);
+					error(httpResponse, note);
 				}
 			);
 		});
@@ -548,6 +563,34 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 	};
 });
 
+/**
+ * Notes Controller
+ */
+webApp.controller('ConflictCtrl', function ($scope, $rootScope) {
+
+	$scope.resolve = function (which) {
+		if (which === 'local') {
+			$rootScope.localNote._revision = $rootScope.remoteNote._revision
+			// Delete conflicting notes
+			delete($rootScope.localNote);
+			delete($rootScope.remoteNote);
+			// Restart syncing
+			$rootScope.syncStatus = 'syncing';
+		} else if (which === 'remote') {
+			// Copy remote note in local note
+			for (var key in $rootScope.remoteNote) {
+				console.log(key + ' -> ' + $rootScope.remoteNote[key]);
+				$rootScope.localNote[key] = $rootScope.remoteNote[key];
+			}
+			// Delete conflicting notes
+			delete($rootScope.localNote);
+			delete($rootScope.remoteNote);
+			// Restart syncing
+			$rootScope.syncStatus = 'syncing';
+		}
+	};
+
+});
 
 
 /**

@@ -50,6 +50,41 @@
 </div>
 
 
+<!-- Conflict view -->
+<div id="notes-conflict-view" ng-controller="ConflictCtrl">
+	<!-- Local note view -->
+	<div ng-if="$root.localNote">
+		<div class="note-conflict-version-title">Local version</div>
+		<div class="note note-visible note-edit note-conflict">
+			<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, $root.localNote);" ng-model="$root.localNote.title" />
+			<textarea class="note-content" ng-if="!$root.localNote.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, $root.localNote);" ng-model="$root.localNote.content" resize></textarea>
+			<div class="note-tasks" ng-if="$root.localNote.tasks">
+				<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in $root.localNote.tasks">
+					<div class="note-task-icon" ng-click="toggleTaskDone($root.localNote, task);"></div>
+					<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, $root.localNote, $index)" ng-model="task.content" resize></textarea>
+				</div>
+			</div>
+		</div>
+		<div><div class="button" ng-click="resolve('local')">Choose this version</div></div>
+	</div>
+	<!-- Remote note view -->
+	<div ng-if="$root.remoteNote">
+		<div class="note-conflict-version-title">Remote version</div>
+		<div class="note note-visible note-edit note-conflict">
+			<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, $root.remoteNote);" ng-model="$root.remoteNote.title" />
+			<textarea class="note-content" ng-if="!$root.remoteNote.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, $root.remoteNote);" ng-model="$root.remoteNote.content" resize></textarea>
+			<div class="note-tasks" ng-if="$root.remoteNote.tasks">
+				<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in $root.remoteNote.tasks">
+					<div class="note-task-icon" ng-click="toggleTaskDone($root.remoteNote, task);"></div>
+					<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, $root.remoteNote, $index)" ng-model="task.content" resize></textarea>
+				</div>
+			</div>
+		</div>
+		<div><div class="button" ng-click="resolve('remote')">Choose this version</div></div>
+	</div>
+</div>
+
+
 <!-- No notes message -->
 <div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0" id="no-notes-message">No notes here...</div>
 
