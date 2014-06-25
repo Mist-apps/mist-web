@@ -434,7 +434,7 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 		setStatusSyncing();
 	};
 	var updateNote = function (note) {
-		if (note._id) {
+		if (note._id && !dirtyNotes[note._id]) {
 			dirtyNotes[note._id] = note;
 			setStatusSyncing();
 		}
@@ -569,25 +569,23 @@ webApp.factory('syncService', function ($interval, $rootScope, noteResource, toa
 webApp.controller('ConflictCtrl', function ($scope, $rootScope) {
 
 	$scope.resolve = function (which) {
+		// Resolve the conflict
 		if (which === 'local') {
 			$rootScope.localNote._revision = $rootScope.remoteNote._revision
-			// Delete conflicting notes
-			delete($rootScope.localNote);
-			delete($rootScope.remoteNote);
-			// Restart syncing
-			$rootScope.syncStatus = 'syncing';
 		} else if (which === 'remote') {
 			// Copy remote note in local note
 			for (var key in $rootScope.remoteNote) {
 				console.log(key + ' -> ' + $rootScope.remoteNote[key]);
 				$rootScope.localNote[key] = $rootScope.remoteNote[key];
 			}
-			// Delete conflicting notes
-			delete($rootScope.localNote);
-			delete($rootScope.remoteNote);
-			// Restart syncing
-			$rootScope.syncStatus = 'syncing';
 		}
+		// Delete conflicting notes
+		delete($rootScope.localNote);
+		delete($rootScope.remoteNote);
+		// Restart syncing
+		$rootScope.syncStatus = 'syncing';
+		// Remove dim
+		$('.dim').removeClass('dim-active');
 	};
 
 });
