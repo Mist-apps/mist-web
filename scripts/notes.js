@@ -32,16 +32,25 @@ webApp.directive('resize', function ($timeout, $rootScope) {
 });
 
 /**
- * Manage grid elements
+ * Manage grid
  */
 webApp.directive('grid', function ($rootScope, $timeout) {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attrs) {
-			// Create masonry object if not created yet
-			if (!$rootScope.masonry) {
-				$rootScope.masonry = new Masonry(element[0].parentElement);
-			}
+			// Create masonry object
+			$rootScope.masonry = new Masonry(element[0]);
+		}
+	};
+});
+
+/**
+ * Grid elements
+ */
+webApp.directive('gridItem', function ($rootScope, $timeout) {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
 			// Refresh layout when item destroyed
 			scope.$on('$destroy', function () {
 				$rootScope.masonry.draw();
@@ -393,7 +402,6 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal) {
 		} else if (which === 'remote') {
 			// Copy remote note in local note
 			for (var key in $scope.remote) {
-				console.log(key + ' -> ' + $scope.remote[key]);
 				$scope.local[key] = $scope.remote[key];
 			}
 		}

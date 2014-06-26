@@ -19,10 +19,10 @@
 
 
 <!-- Grid container for notes -->
-<div id="grid-container" >
+<div id="grid-container" grid>
 
 	<!-- Notes view -->
-	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:creationDate" grid>
+	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:creationDate" grid-item>
 
 		<!-- Title -->
 		<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />

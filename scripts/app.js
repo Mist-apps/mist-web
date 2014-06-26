@@ -175,7 +175,6 @@ webApp.controller('ApplicationController', function ($scope, $location, $modal, 
 webApp.controller('SettingsController', function ($scope, $modal, toastr, Session, userResource) {
 
 	// Clone user in a tmp user to update
-	console.log("Settings controller");
 	$scope.tmpUser = $.extend(true, {}, Session.user);
 	$scope.tmpUser.password = $scope.tmpUser.password2 = '';
 
