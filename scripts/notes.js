@@ -7,13 +7,12 @@
  */
 webApp.factory('noteResource', ['$resource', function ($resource) {
 	return $resource(API_URL + '/note/:id', {id: '@id'}, {
-		update: {method: 'PUT'}
+		update: { method: 'PUT' }
 	});
 }]);
 
 /**
- * Resize directive to resize automatically textarea's during
- * writing.
+ * Resize directive to resize automatically textarea's during writing.
  */
 webApp.directive('resize', function ($timeout, $rootScope) {
 	return {
@@ -47,7 +46,7 @@ webApp.directive('grid', function ($rootScope, $timeout) {
 			scope.$on('$destroy', function () {
 				$rootScope.masonry.draw();
 			});
-			// Refresh the grid
+			// Refresh the grid when item added
 			$rootScope.masonry.draw();
 		}
 	};
@@ -56,7 +55,7 @@ webApp.directive('grid', function ($rootScope, $timeout) {
 /**
  * Notes Controller
  */
-webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, $timeout, toastr, syncService) {
+webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, noteResource, toastr, syncService) {
 
 	$scope.location = 'all';
 
@@ -68,7 +67,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 			$scope.notes = data;
 		};
 		var error = function (httpResponse) {
-			toastr.error('Unable to get notes');
+			toastr.error('Unable to get notes (' + httpResponse.status + ')');
 		};
 		noteResource.query(success, error);
 	}
@@ -268,6 +267,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	$scope.deleteNote = function (note) {
 		// Update note
 		note.deleteDate = new Date().getTime();
+		// Stop edit the note
 		$scope.stopEditNotes();
 		// Inform sync service
 		syncService.updateResource('NOTE', note);
@@ -285,6 +285,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 				break;
 			}
 		}
+		// Stop edit the note
 		$scope.stopEditNotes();
 		// Inform sync service
 		syncService.deleteResource('NOTE', note);
@@ -296,6 +297,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	$scope.restoreNote = function (note) {
 		// Update note
 		delete(note.deleteDate);
+		// Stop edit the note
 		$scope.stopEditNotes();
 		// Inform sync service
 		syncService.updateResource('NOTE', note);
