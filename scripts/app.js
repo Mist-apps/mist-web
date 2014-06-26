@@ -434,3 +434,248 @@ webApp.config(function ($httpProvider) {
 	});
 
 });
+
+/**
+ * Sync service to sync resources with the server.
+ *
+ * This service is generic so you may pass any resource you want to sync.
+ * Keep in mind a Resource provider must be present and named: "{{type}}Resource"
+ */
+webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr) {
+
+	// Sync status is shared
+	$rootScope.syncStatus = 'synced';
+
+	/**
+	 * Handle sync status
+	 */
+	var setStatusSyncing = function () {
+		// If the sync is set to stopped, it is not possible to change the status from the sync service
+		if ($rootScope.syncStatus === 'stopped') return;
+		// If the sync is in error, it is not possible to set it to syncing, wait for good sync before
+		if ($rootScope.syncStatus === 'error') return;
+		// Set status
+		$rootScope.syncStatus = 'syncing';
+	};
+	var setStatusSynced = function () {
+		// If the sync is set to stopped, it is not possible to change the status from the sync service
+		if ($rootScope.syncStatus === 'stopped') return;
+		// Set status
+		$rootScope.syncStatus = 'synced';
+	};
+	var setStatusError = function () {
+		// If the sync is set to stopped, it is not possible to change the status from the sync service
+		if ($rootScope.syncStatus === 'stopped') return;
+		// If the sync pass for the first time in error, show an error notification
+		if ($rootScope.syncStatus !== 'error') toastr.error('Unable to sync');
+		// Set status
+		$rootScope.syncStatus = 'error';
+	};
+
+	/**
+	 * Prevent leave page when not totally synced
+	 */
+	window.onbeforeunload = function(event) {
+		event = event || window.event;
+		var message = '';
+		switch ($rootScope.syncStatus) {
+			case 'syncing':		message = 'Data is syncing, if you leave, you will loose some data...'; break;
+			case 'error':		message = 'Error during sync, if you leave, you will loose some data...'; break;
+			case 'stopped':		if (getTodo() < 0) break;
+								message = 'Sync is stopped, if you leave, you will loose some data...'; break;
+		}
+		if (message !== '') {
+			if (event) { event.returnValue = message; }		// For IE and Firefox
+			return message;									// For Safari
+		}
+	};
+
+	//	Save resources to sync, new resources have no _id
+	var newResources = {};
+	var dirtyResources = {};
+	var deletedResources = {};
+	// Save the sync errors
+	var syncErrors = {};
+	// Save the HTTP resources dynamically injected
+	var httpResources = {};
+
+	/**
+	 * Handle note modifications.
+	 * Add new notes to sync, updated notes...
+	 */
+	var newResource = function (type, resource) {
+		// If first resource of this type, initialize the array
+		if (!newResources[type]) newResources[type] = [];
+		// Sync it
+		newResources[type].push(resource);
+		setStatusSyncing();
+	};
+	var updateResource = function (type, resource) {
+		// If first resource of this type, initialize the object
+		if (!dirtyResources[type]) dirtyResources[type] = {};
+		// If the resource is not new and is not already in
+		if (resource._id && !dirtyResources[type][resource._id]) {
+			dirtyResources[type][resource._id] = resource;
+			setStatusSyncing();
+		}
+	};
+	var deleteResource = function (type, resource) {
+		// If first resource of this type, initialize the object
+		if (!deletedResources[type]) deletedResources[type] = {};
+		// If the resource is not new
+		if (resource._id) {
+			delete(dirtyResources[type][resource._id]);
+			deletedResources[type][resource._id] = resource;
+			setStatusSyncing();
+		}
+	};
+
+	/**
+	 * Get the number of actions to do for sync
+	 */
+	var getTodo = function () {
+		var count = 0;
+		for (var key in newResources) { count += newResources[key].length; }
+		for (var key in dirtyResources) { count += Object.keys(dirtyResources[key]).length; }
+		for (var key in deletedResources) { count += Object.keys(deletedResources[key]).length; }
+		return count;
+	};
+
+	/**
+	 * Get the HTTP Resource to sync with
+	 */
+	var getHTTPResource = function (type) {
+		type = type.toLowerCase();
+		if (!httpResources[type]) {
+			httpResources[type] = $injector.get(type + 'Resource');
+		}
+		return httpResources[type];
+	};
+
+	/**
+	 * Sync method
+	 * When error occurs, the resources in error are added in a syncErrors
+	 * object.
+	 */
+	var sync = function () {
+		// Do not sync if stopped
+		if ($rootScope.syncStatus === 'stopped') {
+			return;
+		}
+		// Get actions to do, and check if something to do
+		var todo = getTodo();
+		if (todo === 0) {
+			setStatusSynced();
+			return;
+		}
+		// If a resource sync success
+		var success = function (resource) {
+			if (resource._id) {
+				delete(syncErrors[resource._id]);
+			} else {
+				delete(syncErrors.new);
+			}
+			checkEndOfSync();
+		};
+		// If a resource sync error
+		var error = function (response, resource) {
+			if (resource._id) {
+				syncErrors[resource._id] = 1;
+			} else {
+				syncErrors.new = 1;
+			}
+			checkEndOfSync();
+			// Check for conflict
+			if (response.status === 409) {
+				$rootScope.syncStatus = 'stopped';
+				$rootScope.$broadcast('CONFLICT', resource, response.data);
+				$rootScope.conflictLocalItem = resource;
+				$rootScope.conflictRemoteItem = response.data;
+				$('.dim').addClass('dim-active');
+			}
+		};
+		// Check if the sync is done, and set the status
+		var checkEndOfSync = function () {
+			todo--;
+			if (todo === 0) {
+				if (Object.keys(syncErrors).length === 0) {
+					setStatusSynced();
+				} else {
+					setStatusError();
+				}
+			}
+		}
+		// Handle new resources
+		Object.keys(newResources).forEach(function (type) {
+			var httpResource = getHTTPResource(type);
+			newResources[type].forEach(function (resource, key) {
+				newResources[type].splice(key, 1);
+				var clone = $.extend(true, {}, resource);
+				delete(clone.tmpId);
+				httpResource.save(clone,
+					function (data) {
+						success(resource);
+						resource._id = data._id;
+						resource._revision = data._revision;
+						delete(resource.tmpId);
+					}, function (httpResponse) {
+						newResource('NOTE', resource);
+						error(httpResponse, resource);
+					}
+				);
+			});
+		});
+		// Handle dirty resources
+		Object.keys(dirtyResources).forEach(function (type) {
+			var httpResource = getHTTPResource(type);
+			Object.keys(dirtyResources[type]).forEach(function (id) {
+				var resource = dirtyResources[type][id];
+				delete(dirtyResources[type][id]);
+				httpResource.update({id: id}, resource,
+					function (data) {
+						success(resource);
+						resource._revision = data._revision;
+					}, function (httpResponse) {
+						updateResource('NOTE', resource);
+						error(httpResponse, resource);
+					}
+				);
+			});
+		});
+		// Handle deleted resources
+		Object.keys(deletedResources).forEach(function (type) {
+			var httpResource = getHTTPResource(type);
+			Object.keys(deletedResources[type]).forEach(function (id) {
+				var resource = deletedResources[type][id];
+				delete(deletedResources[type][id]);
+				httpResource.delete({id: id},
+					function () {
+						success(resource);
+					}, function (httpResponse) {
+						deleteResource('NOTE', resource);
+						error(httpResponse, resource);
+					}
+				);
+			});
+		});
+	};
+
+	// Listen if the user is disconnected to stop syncing
+	$rootScope.$watch('user', function (user) {
+		if (user === null) {
+			$rootScope.syncStatus = 'stopped';
+		} else {
+			$rootScope.syncStatus = 'syncing';
+		}
+	})
+
+	// Sync the changes every X seconds
+	var timer = $interval(sync, 2000);
+
+	// Return change handling methods
+	return {
+		newResource:		newResource,
+		updateResource:		updateResource,
+		deleteResource:		deleteResource
+	};
+});

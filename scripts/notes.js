@@ -85,7 +85,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		// Set modification date
 		note.modificationDate = new Date().getTime();
 		// Inform sync service
-		syncService.updateNote(note)
+		syncService.updateResource('NOTE', note)
 	};
 
 	/**
@@ -127,7 +127,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
 			note.modificationDate = new Date().getTime();
-			syncService.updateNote(note);
+			syncService.updateResource('NOTE', note);
 		}
 	};
 
@@ -138,7 +138,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
 			note.modificationDate = new Date().getTime();
-			syncService.updateNote(note);
+			syncService.updateResource('NOTE', note);
 		}
 	};
 
@@ -215,7 +215,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
 			note.modificationDate = new Date().getTime();
-			syncService.updateNote(note);
+			syncService.updateResource('NOTE', note);
 		}
 	}
 
@@ -246,7 +246,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		var note = {tmpId: tmpId, title: '', content: '', creationDate: date};
 		$scope.notes.push(note);
 		// Inform sync service
-		syncService.newNote(note);
+		syncService.newResource('NOTE', note);
 	}
 
 	/**
@@ -259,7 +259,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		var note = {tmpId: tmpId, title: '', tasks: [{content: '', done: false}], creationDate: date};
 		$scope.notes.push(note);
 		// Inform sync service
-		syncService.newNote(note);
+		syncService.newResource('NOTE', note);
 	}
 
 	/**
@@ -270,7 +270,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		note.deleteDate = new Date().getTime();
 		$scope.stopEditNotes();
 		// Inform sync service
-		syncService.updateNote(note);
+		syncService.updateResource('NOTE', note);
 	}
 
 	/**
@@ -287,7 +287,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		}
 		$scope.stopEditNotes();
 		// Inform sync service
-		syncService.deleteNote(note);
+		syncService.deleteResource('NOTE', note);
 	}
 
 	/**
@@ -298,7 +298,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 		delete(note.deleteDate);
 		$scope.stopEditNotes();
 		// Inform sync service
-		syncService.updateNote(note);
+		syncService.updateResource('NOTE', note);
 	}
 
 	/**
@@ -369,198 +369,6 @@ webApp.controller('LeftMenuCtrl', function ($scope, $rootScope) {
 
 	$scope.goto('all');
 
-});
-
-/**
- * Sync service to sync the notes with the server
- */
-webApp.factory('syncService', function ($interval, $rootScope, noteResource, toastr) {
-
-	$rootScope.syncStatus = 'synced';
-
-	/**
-	 * Handle sync status
-	 */
-	var setStatusSyncing = function () {
-		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') return;
-		// If the sync is in error, it is not possible to set it to syncing, wait for good sync before
-		if ($rootScope.syncStatus === 'error') return;
-		// Set status
-		$rootScope.syncStatus = 'syncing';
-	}
-	var setStatusSynced = function () {
-		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') return;
-		// Set status
-		$rootScope.syncStatus = 'synced';
-	}
-	var setStatusError = function () {
-		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') return;
-		// If the sync pass for the first time in error, show an error notification
-		if ($rootScope.syncStatus !== 'error') toastr.error('Unable to sync notes');
-		// Set status
-		$rootScope.syncStatus = 'error';
-	}
-
-	/**
-	 * Prevent leave page when syncing
-	 */
-	window.onbeforeunload = function(event) {
-		event = event || window.event;
-		var message = '';
-		switch ($rootScope.syncStatus) {
-			case 'syncing':		message = 'Notes are syncing, if you leave, you will loose some data...';	break;
-			case 'error':		message = 'Error during sync, if you leave, you will loose some data...';	break;
-			case 'stopped':		message = 'Sync is stopped, if you leave, you will loose some data...';		break;
-		}
-		if (message !== '') {
-			if (event) { event.returnValue = message; }		// For IE and Firefox
-			return message;									// For Safari
-		}
-	};
-
-	//	Save notes to sync, new notes have no _id
-	var newNotes = [];
-	var dirtyNotes = {};
-	var deletedNotes = {};
-
-	/**
-	 * Handle note modifications
-	 */
-	var newNote = function (note) {
-		newNotes.push(note);
-		setStatusSyncing();
-	};
-	var updateNote = function (note) {
-		if (note._id && !dirtyNotes[note._id]) {
-			dirtyNotes[note._id] = note;
-			setStatusSyncing();
-		}
-	};
-	var deleteNote = function (note) {
-		if (note._id) {
-			delete(dirtyNotes[note._id]);
-			deletedNotes[note._id] = note;
-			setStatusSyncing();
-		}
-	};
-
-	/**
-	 * Sync method
-	 */
-	var syncErrors = {};
-	var sync = function () {
-		// Do not sync if stopped
-		if ($rootScope.syncStatus === 'stopped') {
-			return;
-		}
-		// Get actions to do, and check if something to do
-		var todo = newNotes.length + Object.keys(dirtyNotes).length + Object.keys(deletedNotes).length;
-		if (todo === 0) {
-			setStatusSynced();
-			return;
-		}
-		// Response methods
-		var success = function (note) {
-			if (note._id) {
-				delete(syncErrors[note._id]);
-			} else {
-				delete(syncErrors.new);
-			}
-			checkEndOfSync();
-		};
-		var error = function (response, note) {
-			if (note._id) {
-				syncErrors[note._id] = 1;
-			} else {
-				syncErrors.new = 1;
-			}
-			checkEndOfSync();
-			// Check for conflict
-			if (response.status === 409) {
-				$rootScope.syncStatus = 'stopped';
-				$rootScope.$broadcast('CONFLICT', note, response.data);
-				$rootScope.localNote = note;
-				$rootScope.remoteNote = response.data;
-				$('.dim').addClass('dim-active');
-			}
-		};
-		var checkEndOfSync = function () {
-			todo--;
-			if (todo === 0) {
-				if (Object.keys(syncErrors).length === 0) {
-					setStatusSynced();
-				} else {
-					setStatusError();
-				}
-			}
-		}
-		// New notes
-		newNotes.forEach(function (note, key) {
-			newNotes.splice(key, 1);
-			var clone = $.extend(true, {}, note);
-			delete(clone.tmpId);
-			noteResource.save(clone,
-				function (data) {
-					success(note);
-					note._id = data._id;
-					note._revision = data._revision;
-					delete(note.tmpId);
-				}, function (httpResponse) {
-					newNote(note);
-					error(httpResponse, note);
-				}
-			);
-		});
-		// Dirty notes
-		Object.keys(dirtyNotes).forEach(function (id) {
-			var note = dirtyNotes[id];
-			delete(dirtyNotes[id]);
-			noteResource.update({id: id}, note,
-				function (data) {
-					success(note);
-					note._revision = data._revision;
-				}, function (httpResponse) {
-					updateNote(note);
-					error(httpResponse, note);
-				}
-			);
-		});
-		// Deleted Notes
-		Object.keys(deletedNotes).forEach(function (id) {
-			var note = deletedNotes[id];
-			delete(deletedNotes[id]);
-			noteResource.delete({id: id},
-				function () {
-					success(note);
-				}, function (httpResponse) {
-					deleteNote(note);
-					error(httpResponse, note);
-				}
-			);
-		});
-	};
-
-	// Listen if the user is disconnected to stop syncing
-	$rootScope.$watch('user', function (user) {
-		if (user === null) {
-			$rootScope.syncStatus = 'stopped';
-		} else {
-			$rootScope.syncStatus = 'syncing';
-		}
-	})
-
-	// Sync the changes every X seconds
-	var timer = $interval(sync, 2000);
-
-	// Return change handling methods
-	return {
-		newNote:		newNote,
-		updateNote:		updateNote,
-		deleteNote:		deleteNote
-	};
 });
 
 /**
