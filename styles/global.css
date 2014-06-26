@@ -380,12 +380,12 @@ body {
 	margin-left: 20px;
 }
 
-#user-settings-image {
+#modal-global-settings .modal-content div {
 	vertical-align: middle;
 	line-height: 93px;
 }
 
-#user-settings-image img {
+#modal-global-settings .modal-content div img {
 	width: 85px;
 	height: 85px;
 	border: 4px solid rgba(0, 0, 0, 0.15);
@@ -394,7 +394,7 @@ body {
 	float: left;
 }
 
-#user-image-canvas {
+#modal-global-settings .modal-content div canvas {
 	display: none;
 }
 
@@ -403,8 +403,7 @@ body {
 	height: auto;
 }
 
-#modal-global-settings .modal-footer .button {
-	display: inline-block;
+#modal-global-settings .modal-footer button {
 	margin-left: 15px;
 	margin-right: 15px;
 }
@@ -490,7 +489,7 @@ body {
  * Miscellaneous objects
  */
 
-.button {
+button {
 	box-shadow: none;
 	background-color: rgb(245, 245, 245);
 	background-image: -moz-linear-gradient(center top , rgb(245, 245, 245), rgb(241, 241, 241));
@@ -502,13 +501,12 @@ body {
 	font-weight: bold;
 	text-align: center;
 	white-space: nowrap;
-	height: 30px;
-	min-width: 60px;
+	min-width: 75px;
 	line-height: 30px;
-	padding: 0px 8px;
+	padding: 0px 15px;
 }
 
-.button:hover {
+button:hover {
 	border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
@@ -554,16 +552,7 @@ textarea {
 	outline: none;
 }
 
-button {
-	outline: none;
-}
-
-button::-moz-focus-inner {
-	border: 0;
-}
-
 .form-input {
-	background-color: #FFF;
 	border-radius: 3px;
 	display: inline-block;
 	border: 1px solid #CCC;

@@ -680,17 +680,35 @@ webApp.service('$modal', function ($rootScope) {
 	// Show the modal
 	this.show = function (name, params) {
 		if (!$rootScope.modal) {
-			$rootScope.modal = 'modals/' + name + '.html';
 			if (params) {
 				this.parameters = params;
 			}
+			this.dim();
+			$rootScope.modal = 'modals/' + name + '.html';
 		}
 	};
 
 	// Hide the modal
 	this.hide = function (name, params) {
 		$rootScope.modal = "";
+		this.clear();
 		this.parameters = {};
+	}
+
+	// Dim the screen
+	this.dim = function () {
+		if (!$rootScope.modal) {
+			$('#nav-search-content input').attr('tabindex', -1);
+			$('.dim').addClass('dim-active');
+		}
+	}
+
+	// Clear the screen
+	this.clear = function () {
+		if (!$rootScope.modal) {
+			$('.dim').removeClass('dim-active');
+			$('#nav-search-content input').attr('tabindex', 1);
+		}
 	}
 
 	// Export methods

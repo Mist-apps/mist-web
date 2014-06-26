@@ -313,45 +313,79 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 	}
 
 	/**
-	 * Note editor management
+	 * Start editing task
 	 */
-	$scope.stopEditTasks = function () {
-		$('.note-task-edit').removeClass('note-task-edit');
+	$scope.startEditTask = function ($event) {
+		$($event.target).parent().addClass('note-task-edit');
 	};
-	$scope.startEditTask = function () {
-		$scope.stopEditTasks();
-		$(this).parent().addClass('note-task-edit');
-		// Remove the binding to start a new edit
-		$('body').unbind('click', $scope.startEditTask);
+
+	/**
+	 * Stop editing task
+	 */
+	$scope.stopEditTask = function ($event) {
+		$($event.target).parent().removeClass('note-task-edit');
 	};
+
+	/**
+	 * Start editing the notes
+	 */
 	$scope.startEditNote = function (event) {
 		if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
-			// Show editor menu, and put the note on front
-			$('.dim').addClass('dim-active');
+			// Set tabindex
+			$(this).find('.note-title').attr('tabindex', 1);
+			$(this).find('.note-content').attr('tabindex', 1);
+			$(this).find('.note-task-content').attr('tabindex', 1);
+			$(this).find('button').attr('tabindex', 1);
+			// Show editor
+			$modal.dim();
 			$(this).addClass('note-edit');
 			$(this).find('.note-menu').addClass('note-menu-active');
 			// Remove the binding to start a new edit
-			$('body').unbind('click', $scope.startEditNote);
+			$('body').off('click', $scope.startEditNote);
+			// Listen to escape key
+			$('body').on('keydown', _escapeKeyListener);
+			// Listen to clicks on dim
+			$('.dim').on('click', $scope.stopEditNotes);
 			// Reorganize grid
 			$rootScope.masonry.draw();
 		}
 	};
-	$scope.stopEditNotes = function () {
-		$('.dim').removeClass('dim-active');
+
+	/**
+	 * Stop editing the notes
+	 */
+	$scope.stopEditNotes = function (event) {
+		// Stop focusing the element
+		if (event) {
+			$(event.target).blur();
+		}
+		// Remove notes tabindex
+		$('.note-title').attr('tabindex', -1);
+		$('.note-content').attr('tabindex', -1);
+		$('.note-task-content').attr('tabindex', -1);
+		$('.note button').attr('tabindex', -1);
+		// Remove editor
+		$modal.clear();
 		$('.note').removeClass('note-edit');
 		$('.note-menu').removeClass('note-menu-active');
+		// Rebind the listener to start edit a note
 		$('body').on('click', '.note', $scope.startEditNote);
-		$scope.stopEditTasks();
+		// Remove the binding to listen to escape key
+		$('body').off('keydown', _escapeKeyListener);
+		// Remove the binding to listen to clicks on dim
+		$('.dim').off('click', $scope.stopEditNotes);
 		// Reorganize grid
 		$rootScope.masonry.draw();
 	};
-	$scope.escapeKeyListener = function (event) {
-		// If press "escape", stop edit
+
+	/**
+	 * Custom listeners
+	 */
+	var _escapeKeyListener = function (event) {
 		if (event.which === 27) {
-			$(this).blur();
-			$scope.stopEditNotes();
+			$scope.stopEditNotes(event);
 		}
-	};
+	}
 
 	/**
 	 * When a conflict is detected, stop edit the note and show modal
@@ -361,11 +395,8 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 		$modal.show('notes-conflict', {local: local, remote: remote});
 	});
 
+	// Listen to clicks on note to start edit it
 	$('body').on('click', '.note', $scope.startEditNote);
-	$('body').on('click', '.note-menu .button, .note-menu div', $scope.stopEditNotes);
-	$('body').on('focus', '.note-task-content', $scope.startEditTask);
-	$('body').on('focus', '.note-title', $scope.stopEditTasks);
-	$('body').on('keydown', '.note-title, .note-content, .note-task-edit', $scope.escapeKeyListener);
 
 });
 

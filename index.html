@@ -33,7 +33,7 @@
 		<!-- Search menu -->
 		<div id="nav-search">
 			<div id="nav-search-icon" class="icon-global-search"></div>
-			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search"></div>
+			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search" tabindex="1"></div>
 			<div id="nav-search-stop" ng-show="$root.search && $root.search !== ''" ng-click="$root.search = '';" class="icon-global-cancel"></div>
 		</div>
 
@@ -69,7 +69,7 @@
 	</div>
 
 	<!-- Dim filter -->
-	<div class="dim" ng-class="{'dim-active': $root.modal}"></div>
+	<div class="dim"></div>
 
 	<!-- Modal container -->
 	<div id="modal-container" ng-include="$root.modal"></div>

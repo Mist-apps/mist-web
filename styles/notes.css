@@ -29,14 +29,6 @@
  * Conflict modal
  */
 
-.note-conflict {
-	position: static;
-	text-align: left;
-	z-index: 970;
-	display: inline-block;
-	margin: 25px;
-}
-
 .notes-conflict-note {
 	text-align: center;
 	display: inline-block;
@@ -44,7 +36,7 @@
 	margin-bottom: 15px;
 }
 
-#modal-notes-conflict .button {
+#modal-notes-conflict button {
 	display: inline-block;
 }
 
@@ -98,6 +90,13 @@
 .note-edit {
 	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
 	z-index: 960;
+}
+
+.note-conflict {
+	position: static;
+	text-align: left;
+	display: inline-block;
+	margin: 25px;
 }
 
 .note-title {
@@ -218,10 +217,10 @@
 	margin: 0px 0px 0px 10px;
 }
 
-.note-menu .button {
+.note-menu button {
 	position: absolute;
-	right: 4px;
-	bottom: 4px;
+	right: 3px;
+	bottom: 3px;
 }
 
 

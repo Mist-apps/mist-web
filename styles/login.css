@@ -59,7 +59,7 @@
 	-ms-backface-visibility: hidden;
 	-o-backface-visibility: hidden;
 	backface-visibility: hidden;
-	
+
 	-webkit-animation-duration: 0.4s;
 	-webkit-animation-timing-function: ease;
 	-webkit-animation-fill-mode: both;
@@ -113,10 +113,10 @@
 
 #login-submit button {
 	border: 1px solid #CCC;
-	padding: 7px 10px;
+	padding: 4px 15px;
 	background-color: rgb(246, 246, 246);
 	font-size: 16px;
-	border-radius: 4px;
+	border-radius: 5px;
 	cursor: pointer;
 }
 
