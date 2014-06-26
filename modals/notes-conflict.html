@@ -1,0 +1,59 @@
+<div id="modal-notes-conflict" class="modal" ng-controller="ConflictController">
+
+	<!-- Header -->
+	<div class="modal-header icon-global-warning">
+		Conflict detected
+	</div>
+
+	<!-- Content -->
+	<div class="modal-content">
+		<div>
+			A conflict has been detected between your version and another version on the server.<br>
+			Maybe you are editing the same note in another browser.<br>
+			Please choose the version that you want to keep.<br>
+			You may edit it before choose it.<br>
+		</div>
+
+		<br>
+
+		<!-- Local note view -->
+		<div class="notes-conflict-note">
+			<div class="note-conflict-version-title">Local version</div>
+			<div class="note note-visible note-edit note-conflict">
+				<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, local);" ng-model="local.title" />
+				<textarea class="note-content" ng-if="!local.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, local);" ng-model="local.content" resize></textarea>
+				<div class="note-tasks" ng-if="local.tasks">
+					<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in local.tasks">
+						<div class="note-task-icon" ng-click="toggleTaskDone(local, task);"></div>
+						<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, local, $index)" ng-model="task.content" resize></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="note-conflict-date" ng-if="local.modificationDate">Last modification on {{local.modificationDate | date:'short'}}</div>
+			<div class="note-conflict-date" ng-if="local.deleteDate">Deleted on {{local.deleteDate | date:'short'}}</div>
+			<br>
+			<div><div class="button" ng-click="resolve('local')">Choose this version</div></div>
+		</div>
+		
+		<!-- Remote note view -->
+		<div  class="notes-conflict-note">
+			<div class="note-conflict-version-title">Remote version</div>
+			<div class="note note-visible note-edit note-conflict">
+				<input class="note-title" type="text" placeholder="Title" ng-keydown="titleKeyListener($event, remote);" ng-model="remote.title" />
+				<textarea class="note-content" ng-if="!remote.tasks" rows="1" placeholder="Note" ng-keydown="contentKeyListener($event, remote);" ng-model="remote.content" resize></textarea>
+				<div class="note-tasks" ng-if="remote.tasks">
+					<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in remote.tasks">
+						<div class="note-task-icon" ng-click="toggleTaskDone(remote, task);"></div>
+						<textarea class="note-task-content" rows="1" placeholder="Task" ng-keydown="taskKeyListener($event, remote, $index)" ng-model="task.content" resize></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="note-conflict-date" ng-if="remote.modificationDate">Last modification on {{remote.modificationDate | date:'short'}}</div>
+			<div class="note-conflict-date" ng-if="remote.deleteDate">Deleted on {{remote.deleteDate | date:'short'}}</div>
+			<br>
+			<div><div class="button" ng-click="resolve('remote')">Choose this version</div></div>
+		</div>
+
+	</div>
+
+</div>

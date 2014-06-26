@@ -1,0 +1,53 @@
+<div id="modal-global-settings" class="modal" ng-controller="SettingsController">
+
+	<!-- Header -->
+	<div class="modal-header icon-global-user">
+		Profile
+	</div>
+
+	<!-- Content -->
+	<div class="modal-content">
+		<strong>Personal information:</strong>
+		<table>
+			<tr>
+				<td>First name: </td>
+				<td><input type="text" class="form-input" placeholder="First name" ng-model="tmpUser.firstName"></td>
+			</tr>
+			<tr>
+				<td>Last name: </td>
+				<td><input type="text" class="form-input" placeholder="Last name" ng-model="tmpUser.lastName"></td>
+			</tr>
+			<tr>
+				<td>E-mail: </td>
+				<td><input type="text" class="form-input" placeholder="E-mail" ng-model="tmpUser.mail"></td>
+			</tr>
+		</table>
+		<br><br>
+		<strong>Change password:</strong>
+		<table>
+			<tr>
+				<td>Password: </td>
+				<td><input type="password" class="form-input" placeholder="Password" ng-model="tmpUser.password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"></td>
+			</tr>
+			<tr>
+				<td>Re-type password: </td>
+				<td><input type="password" class="form-input" placeholder="Re-type password" ng-model="tmpUser.password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}"></td>
+			</tr>
+		</table>
+		<br><br>
+		<strong>Image:</strong>
+		<br><br>
+		<div id="user-settings-image">
+			<img ng-src="{{tmpUser.image || 'images/user.png'}}">
+			<input id="user-image-input" type="file" onchange="angular.element(this).scope().uploadImage()">
+			<canvas id="user-image-canvas"></canvas>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<div class="modal-footer">
+		<div class="button" ng-click="cancelSettings();">Cancel</div>
+		<div class="button" ng-click="saveSettings();">Save</div>
+	</div>
+
+</div>

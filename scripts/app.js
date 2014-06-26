@@ -79,7 +79,7 @@ webApp.factory('toastr', function() {
  *		- Show/hide all menus
  *		- Logout
  */
-webApp.controller('ApplicationController', function ($scope, $location, AuthService) {
+webApp.controller('ApplicationController', function ($scope, $location, $modal, AuthService) {
 
 	// Try to recover the authentication from the session/local storage
 	AuthService.recover().then(function () {
@@ -155,8 +155,7 @@ webApp.controller('ApplicationController', function ($scope, $location, AuthServ
 		// Init the settings modal
 		$scope.$broadcast('INIT_SETTINGS');
 		// Show the user settings modal
-		$('.dim').addClass('dim-active');
-		$('#user-settings-container').show();
+		$modal.show('global-settings');
 	};
 
 	/**
@@ -171,20 +170,14 @@ webApp.controller('ApplicationController', function ($scope, $location, AuthServ
 
 
 /**
- * Settings modal controller
+ * Settings controller (modal)
  */
-webApp.controller('SettingsController', function ($scope, toastr, Session, userResource) {
+webApp.controller('SettingsController', function ($scope, $modal, toastr, Session, userResource) {
 
-	/**
-	 * Init the settings temporary user
-	 */
-	var initSettings = function () {
-		// Clone user in a tmp user to update
-		$scope.tmpUser = $.extend(true, {}, Session.user);
-		$scope.tmpUser.password = $scope.tmpUser.password2 = '';
-	};
-
-	$scope.$on('INIT_SETTINGS', initSettings);
+	// Clone user in a tmp user to update
+	console.log("Settings controller");
+	$scope.tmpUser = $.extend(true, {}, Session.user);
+	$scope.tmpUser.password = $scope.tmpUser.password2 = '';
 
 	/**
 	 * Save the settings and remove the settings modal
@@ -211,19 +204,16 @@ webApp.controller('SettingsController', function ($scope, toastr, Session, userR
 				toastr.error('Unable to save settings');
 			}
 		);
-		// Remove temporary user and hide modal
-		$scope.cancelSettings();
+		// Hide modal
+		$modal.hide('global-settings');
 	};
 
 	/**
-	 * Cancel the settings modifications: remove temporary user and hide modal
+	 * Cancel the settings modifications: hide modal
 	 */
 	$scope.cancelSettings = function () {
-		// Remove temporary user
-		delete($scope.tmpUser);
 		// Hide modal
-		$('.dim').removeClass('dim-active');
-		$('#user-settings-container').hide();
+		$modal.hide('global-settings');
 	};
 
 	/**
@@ -589,9 +579,6 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			if (response.status === 409) {
 				$rootScope.syncStatus = 'stopped';
 				$rootScope.$broadcast('CONFLICT', resource, response.data);
-				$rootScope.conflictLocalItem = resource;
-				$rootScope.conflictRemoteItem = response.data;
-				$('.dim').addClass('dim-active');
 			}
 		};
 		// Check if the sync is done, and set the status
@@ -678,4 +665,36 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		updateResource:		updateResource,
 		deleteResource:		deleteResource
 	};
+});
+
+/**
+ * Modal service
+ */
+webApp.service('$modal', function ($rootScope) {
+
+	// Modal template url
+	$rootScope.modal = "";
+
+	// Modal parameters
+	this.parameters = {};
+
+	// Show the modal
+	this.show = function (name, params) {
+		if (!$rootScope.modal) {
+			$rootScope.modal = 'modals/' + name + '.html';
+			if (params) {
+				this.parameters = params;
+			}
+		}
+	};
+
+	// Hide the modal
+	this.hide = function (name, params) {
+		$rootScope.modal = "";
+		this.parameters = {};
+	}
+
+	// Export methods
+	return this;
+
 });

@@ -375,44 +375,7 @@ body {
  * User settings modal
  */
 
-#user-settings-container {
-	position: absolute;
-	top: 35px;
-	margin: auto;
-	width: 100%;
-	z-index: 960;
-	text-align: center;
-	display: none;
-}
-
-#user-settings {
-	background-color: #FFF;
-	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
-	z-index: 960;
-	text-align: left;
-	display: inline-block;
-	color: rgba(0, 0, 0, 0.6);
-	margin-bottom: 35px;
-}
-
-.header {
-	font-weight: bold;
-	padding: 12px 15px 8px 15px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-}
-
-.header:before {
-	font-size: 150%;
-	margin-right: 8px;
-}
-
-.content {
-	padding: 20px 15px;
-	font-size: 14px;
-	text-align: left;
-}
-
-#user-settings .content table {
+#modal-global-settings .modal-content table {
 	margin-top: 10px;
 	margin-left: 20px;
 }
@@ -435,18 +398,12 @@ body {
 	display: none;
 }
 
-#user-settings .content input[type='file'] {
+#modal-global-settings .modal-content input[type='file'] {
 	width: auto;
 	height: auto;
 }
 
-#user-settings .footer {
-	padding: 10px 15px;
-	border-top: 1px solid rgba(0, 0, 0, 0.3);
-	text-align: center;
-}
-
-#user-settings .footer .button {
+#modal-global-settings .modal-footer .button {
 	display: inline-block;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -476,9 +433,56 @@ body {
 	text-align: center;
 }
 
+#modal-container {
+	position: absolute;
+	top: 35px;
+	margin: auto;
+	width: 100%;
+	z-index: 960;
+	text-align: center;
+}
+
 .dim-active {
 	background-color: rgba(255, 255, 255, 0.8);
 	display: block;
+}
+
+
+/**
+ * Modal
+ */
+
+.modal {
+	background-color: #FFF;
+	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
+	z-index: 960;
+	text-align: left;
+	display: inline-block;
+	color: rgba(0, 0, 0, 0.6);
+	margin-bottom: 35px;
+}
+
+.modal-header {
+	font-weight: bold;
+	padding: 12px 15px 8px 15px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.modal-header:before {
+	font-size: 150%;
+	margin-right: 8px;
+}
+
+.modal-content {
+	padding: 20px 15px;
+	font-size: 14px;
+	text-align: left;
+}
+
+.modal-footer {
+	padding: 10px 15px;
+	border-top: 1px solid rgba(0, 0, 0, 0.3);
+	text-align: center;
 }
 
 

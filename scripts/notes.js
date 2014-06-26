@@ -56,7 +56,7 @@ webApp.directive('grid', function ($rootScope, $timeout) {
 /**
  * Notes Controller
  */
-webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $timeout, toastr, syncService) {
+webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, $timeout, toastr, syncService) {
 
 	$scope.location = 'all';
 
@@ -343,10 +343,11 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, noteResource, $time
 	};
 
 	/**
-	 * When a conflict is detected, stop edit the note
+	 * When a conflict is detected, stop edit the note and show modal
 	 */
-	$scope.$on('CONFLICT', function () {
+	$scope.$on('CONFLICT', function (event, local, remote) {
 		$scope.stopEditNotes();
+		$modal.show('notes-conflict', {local: local, remote: remote});
 	});
 
 	$('body').on('click', '.note', $scope.startEditNote);
@@ -372,28 +373,32 @@ webApp.controller('LeftMenuCtrl', function ($scope, $rootScope) {
 });
 
 /**
- * Notes Controller
+ * Conflict controller (modal)
  */
-webApp.controller('ConflictCtrl', function ($scope, $rootScope) {
+webApp.controller('ConflictController', function ($scope, $rootScope, $modal) {
 
+	// Get conflicted notes
+	$scope.local = $modal.parameters.local;
+	$scope.remote = $modal.parameters.remote;
+
+	/**
+	 * Resolve the conflict
+	 */
 	$scope.resolve = function (which) {
 		// Resolve the conflict
 		if (which === 'local') {
-			$rootScope.localNote._revision = $rootScope.remoteNote._revision
+			$scope.local._revision = $scope.remote._revision
 		} else if (which === 'remote') {
 			// Copy remote note in local note
-			for (var key in $rootScope.remoteNote) {
-				console.log(key + ' -> ' + $rootScope.remoteNote[key]);
-				$rootScope.localNote[key] = $rootScope.remoteNote[key];
+			for (var key in $scope.remote) {
+				console.log(key + ' -> ' + $scope.remote[key]);
+				$scope.local[key] = $scope.remote[key];
 			}
 		}
-		// Delete conflicting notes
-		delete($rootScope.localNote);
-		delete($rootScope.remoteNote);
 		// Restart syncing
 		$rootScope.syncStatus = 'syncing';
-		// Remove dim
-		$('.dim').removeClass('dim-active');
+		// Hide modal
+		$modal.hide('notes-conflict');
 	};
 
 });
