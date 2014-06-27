@@ -1,0 +1,25 @@
+<div id="modal-global-confirm" class="modal" ng-controller="ConfirmController">
+
+	<!-- Header -->
+	<div class="modal-header icon-global-warning">
+		Are you sure?
+	</div>
+
+	<!-- Content -->
+	<div id="login-form" class="modal-content">
+
+		<div>
+			Are you sure to logout ?<br>
+			Some modifications are not synced and will be loosed.<br>
+			Please be sure your modifications are saved before to logout.
+		</div>
+
+	</div>
+
+	<!-- Footer -->
+	<div class="modal-footer">
+		<button tabindex="1" ng-click="cancel()">Cancel</button>
+		<button tabindex="1" ng-click="logout()">Logout</button>
+	</div>
+
+</div>

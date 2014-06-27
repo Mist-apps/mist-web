@@ -79,7 +79,7 @@ webApp.factory('toastr', function() {
  *		- Show/hide all menus
  *		- Logout
  */
-webApp.controller('ApplicationController', function ($scope, $location, $modal, AuthService, syncService) {
+webApp.controller('ApplicationController', function ($scope, $rootScope, $location, $modal, AuthService, syncService) {
 
 	// Try to recover the authentication from the session/local storage
 	AuthService.recover().then(function () {
@@ -165,12 +165,16 @@ webApp.controller('ApplicationController', function ($scope, $location, $modal, 
 	 * Log the user out and redirect it to the login page
 	 */
 	$scope.logout = function () {
-		// Logout
-		AuthService.logout();
-		// Initialize sync service
-		syncService.init();
-		// Go to login page
-		$location.path('/login');
+		// If status is not synced, show the confirm dialog
+		if ($rootScope.syncStatus !== 'synced') {
+			$modal.show('global-confirm');
+		}
+		// If no confirmation needed, logout and go to the login page
+		else {
+			AuthService.logout();
+			syncService.init();
+			$location.path('/login');
+		}
 	};
 
 });
@@ -190,7 +194,7 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 	 * If the settings form is not consistent, does nothing
 	 * Show a notification if saved or if an error occurs
 	 */
-	$scope.saveSettings = function () {
+	$scope.save = function () {
 		// Check password
 		if ($scope.tmpUser.password !== $scope.tmpUser.password2 || ($scope.tmpUser.password !== '' && $scope.tmpUser.password < 6)) {
 			return;
@@ -217,7 +221,7 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 	/**
 	 * Cancel the settings modifications: hide modal
 	 */
-	$scope.cancelSettings = function () {
+	$scope.cancel = function () {
 		// Hide modal
 		$modal.hide('global-settings');
 	};
@@ -247,6 +251,35 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 			};
 			reader.readAsDataURL(input.files[0]);
 		}
+	};
+
+});
+
+/**
+ * Confirmation controller (modal)
+ */
+webApp.controller('ConfirmController', function ($scope, $location, $modal, syncService, AuthService) {
+
+	/**
+	 * Logout
+	 */
+	$scope.logout = function () {
+		// Logout
+		AuthService.logout();
+		// Initialize sync service
+		syncService.init();
+		// Hide modal
+		$modal.hide('global-confirm');
+		// Go to login page
+		$location.path('/login');
+	};
+
+	/**
+	 * Cancel the logout process
+	 */
+	$scope.cancel = function () {
+		// Hide modal
+		$modal.hide('global-confirm');
 	};
 
 });

@@ -14,20 +14,20 @@
 
 		<div class="login-form-input">
 			<div class="icon-global-user"></div>
-			<input type="text" placeholder="Login" ng-model="credentials.login">
+			<input type="text" placeholder="Login" tabindex="1" ng-model="credentials.login">
 		</div>
 
 		<br>
 
 		<div class="login-form-input">
 			<div class="icon-global-pass"></div>
-			<input type="password" placeholder="Password" ng-model="credentials.password">
+			<input type="password" placeholder="Password" tabindex="1" ng-model="credentials.password">
 		</div>
 
 		<br>
 
 		<div id="remember">
-			<input type="checkbox" ng-model="credentials.remember">
+			<input type="checkbox" tabindex="1" ng-model="credentials.remember">
 			<label for="remember"> Remember me ?</label>
 		</div>
 
@@ -37,7 +37,7 @@
 
 	<!-- Footer -->
 	<div class="modal-footer">
-		<button ng-click="login()">Login</button>
+		<button tabindex="1" ng-click="login()">Login</button>
 	</div>
 
 </div>
