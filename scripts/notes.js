@@ -286,7 +286,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 	 * Delete definitively a note
 	 */
 	$scope.destroyNote = function (note) {
-		// Delete note
+		// Search for note to delete
 		for (var key in $scope.notes) {
 			// If the note has an id, search if id match, else, search if tmpId match
 			if ((note._id && $scope.notes[key]._id === note._id) || (!note._id && $scope.notes[key].tmpId === note.tmpId)) {
@@ -394,6 +394,16 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 		$scope.stopEditNotes();
 		$modal.show('notes-conflict', {local: local, remote: remote});
 	});
+	$scope.$on('DESTROY_NOTE', function (event, note) {
+		// Search for note
+		for (var key in $scope.notes) {
+			// If the note has an id, search if id match, else, search if tmpId match
+			if ((note._id && $scope.notes[key]._id === note._id) || (!note._id && $scope.notes[key].tmpId === note.tmpId)) {
+				$scope.notes.splice(key, 1);
+				break;
+			}
+		}
+	});
 
 	// Listen to clicks on note to start edit it
 	$('body').on('click', '.note', $scope.startEditNote);
@@ -417,7 +427,7 @@ webApp.controller('LeftMenuCtrl', function ($scope, $rootScope) {
 /**
  * Conflict controller (modal)
  */
-webApp.controller('ConflictController', function ($scope, $rootScope, $modal) {
+webApp.controller('ConflictController', function ($scope, $rootScope, $modal, syncService) {
 
 	// Get conflicted notes
 	$scope.local = $modal.parameters.local;
@@ -429,11 +439,31 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal) {
 	$scope.resolve = function (which) {
 		// Resolve the conflict
 		if (which === 'local') {
-			$scope.local._revision = $scope.remote._revision
+			// Keep local version
+			if ($scope.remote) {
+				$scope.local._revision = $scope.remote._revision
+				syncService.updateResource('NOTE', $scope.local);
+			}
+			// Insert new note
+			else {
+				delete($scope.local._revision);
+				delete($scope.local._id);
+				delete($scope.local._user);
+				var date = new Date().getTime();
+				$scope.local.tmpId = "" + date + Math.floor(Math.random() * 1000000);
+				syncService.newResource('NOTE', $scope.local);
+			}
 		} else if (which === 'remote') {
-			// Copy remote note in local note
-			for (var key in $scope.remote) {
-				$scope.local[key] = $scope.remote[key];
+			// Keep remote version, so copy remote in local
+			if ($scope.remote) {
+				for (var key in $scope.remote) {
+					$scope.local[key] = $scope.remote[key];
+					syncService.updateResource('NOTE', $scope.local);
+				}
+			}
+			// Delete note locally
+			else {
+				$rootScope.$broadcast('DESTROY_NOTE', $scope.local);
 			}
 		}
 		// Restart syncing

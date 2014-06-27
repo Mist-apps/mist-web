@@ -18,7 +18,9 @@
 
 		<!-- Local note view -->
 		<div class="notes-conflict-note">
+
 			<div class="note-conflict-version-title">Local version</div>
+
 			<div class="note note-visible note-edit note-conflict">
 				<input class="note-title" type="text" placeholder="Title" tabindex="1" ng-keydown="titleKeyListener($event, local);" ng-model="local.title" />
 				<textarea class="note-content" ng-if="!local.tasks" rows="1" placeholder="Note" tabindex="1" ng-keydown="contentKeyListener($event, local);" ng-model="local.content" resize></textarea>
@@ -29,16 +31,22 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="note-conflict-date" ng-if="local.modificationDate">Last modification on {{local.modificationDate | date:'short'}}</div>
 			<div class="note-conflict-date" ng-if="local.deleteDate">Deleted on {{local.deleteDate | date:'short'}}</div>
+
 			<br>
-			<div><button tabindex="3" ng-click="resolve('local')">Choose this version</button></div>
+
+			<div ng-if="remote"><button tabindex="3" ng-click="resolve('local')">Choose this version</button></div>
+			<div ng-if="!remote"><button tabindex="3" ng-click="resolve('local')">Add this note</button></div>
 		</div>
 
 		<!-- Remote note view -->
 		<div  class="notes-conflict-note">
 			<div class="note-conflict-version-title">Remote version</div>
-			<div class="note note-visible note-edit note-conflict">
+
+			<!-- If remote note -->
+			<div class="note note-visible note-edit note-conflict" ng-if="remote">
 				<input class="note-title" type="text" placeholder="Title" tabindex="2" ng-keydown="titleKeyListener($event, remote);" ng-model="remote.title" />
 				<textarea class="note-content" ng-if="!remote.tasks" rows="1" placeholder="Note" tabindex="2" ng-keydown="contentKeyListener($event, remote);" ng-model="remote.content" resize></textarea>
 				<div class="note-tasks" ng-if="remote.tasks">
@@ -48,10 +56,19 @@
 					</div>
 				</div>
 			</div>
-			<div class="note-conflict-date" ng-if="remote.modificationDate">Last modification on {{remote.modificationDate | date:'short'}}</div>
-			<div class="note-conflict-date" ng-if="remote.deleteDate">Deleted on {{remote.deleteDate | date:'short'}}</div>
+			
+			<div class="note-conflict-date" ng-if="remote && remote.modificationDate">Last modification on {{remote.modificationDate | date:'short'}}</div>
+			<div class="note-conflict-date" ng-if="remote && remote.deleteDate">Deleted on {{remote.deleteDate | date:'short'}}</div>
+
+			<!-- If no remote note -->
+			<div class="no-remote-note-message" ng-if="!remote">
+				No note found on the server.
+			</div>
+
 			<br>
-			<div><button tabindex="3" ng-click="resolve('remote')">Choose this version</button></div>
+
+			<div ng-if="remote"><button tabindex="3" ng-click="resolve('remote')">Choose this version</button></div>
+			<div ng-if="!remote"><button tabindex="3" ng-click="resolve('remote')">Delete note</button></div>
 		</div>
 
 	</div>

@@ -470,7 +470,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		switch ($rootScope.syncStatus) {
 			case 'syncing':		message = 'Data is syncing, if you leave, you will loose some data...'; break;
 			case 'error':		message = 'Error during sync, if you leave, you will loose some data...'; break;
-			case 'stopped':		if (getTodo() < 0) break;
+			case 'stopped':		if (_getTodo() < 0) break;
 								message = 'Sync is stopped, if you leave, you will loose some data...'; break;
 		}
 		if (message !== '') {
@@ -479,7 +479,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		}
 	};
 
-	//	Save resources to sync, new resources have no _id
+	//	Save resources to sync, new resources have no _id but a tmpId
 	var newResources = {};
 	var dirtyResources = {};
 	var deletedResources = {};
@@ -493,10 +493,10 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 * Add new notes to sync, updated notes...
 	 */
 	var newResource = function (type, resource) {
-		// If first resource of this type, initialize the array
-		if (!newResources[type]) newResources[type] = [];
+		// If first resource of this type, initialize the object
+		if (!newResources[type]) newResources[type] = {};
 		// Sync it
-		newResources[type].push(resource);
+		newResources[type][resource.tmpId] = resource;
 		setStatusSyncing();
 	};
 	var updateResource = function (type, resource) {
@@ -522,9 +522,9 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	/**
 	 * Get the number of actions to do for sync
 	 */
-	var getTodo = function () {
+	var _getTodo = function () {
 		var count = 0;
-		for (var key in newResources) { count += newResources[key].length; }
+		for (var key in newResources) { count += Object.keys(newResources[key]).length; }
 		for (var key in dirtyResources) { count += Object.keys(dirtyResources[key]).length; }
 		for (var key in deletedResources) { count += Object.keys(deletedResources[key]).length; }
 		return count;
@@ -533,13 +533,39 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	/**
 	 * Get the HTTP Resource to sync with
 	 */
-	var getHTTPResource = function (type) {
+	var _getHTTPResource = function (type) {
 		type = type.toLowerCase();
 		if (!httpResources[type]) {
 			httpResources[type] = $injector.get(type + 'Resource');
 		}
 		return httpResources[type];
 	};
+
+	/**
+	 * Remove a resource from syncing (tables and errors)
+	 */
+	var _removeResource = function (resource) {
+		if (resource._id) {
+			for (var key in dirtyResources) {
+				for (var id in dirtyResources[key]) {
+					if (id === resource._id) delete(dirtyResources[key][id])
+				}
+			}
+			for (var key in deletedResources) {
+				for (var id in deletedResources[key]) {
+					if (id === resource._id) delete(deletedResources[key][id])
+				}
+			}
+			delete(syncErrors[resource._id]);
+		} else {
+			for (var key in newResources) {
+				for (var id in newResources[key]) {
+					if (id === resource.tmpId) delete(newResources[key][id])
+				}
+			}
+			delete(syncErrors[resource.tmpId]);
+		}
+	}
 
 	/**
 	 * Sync method
@@ -552,7 +578,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			return;
 		}
 		// Get actions to do, and check if something to do
-		var todo = getTodo();
+		var todo = _getTodo();
 		if (todo === 0) {
 			setStatusSynced();
 			return;
@@ -562,7 +588,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			if (resource._id) {
 				delete(syncErrors[resource._id]);
 			} else {
-				delete(syncErrors.new);
+				delete(syncErrors[resource.tmpId]);
 			}
 			checkEndOfSync();
 		};
@@ -571,13 +597,20 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			if (resource._id) {
 				syncErrors[resource._id] = 1;
 			} else {
-				syncErrors.new = 1;
+				syncErrors[resource.tmpId] = 1;
 			}
 			checkEndOfSync();
-			// Check for conflict
+			// Check for conflict (updated)
 			if (response.status === 409) {
 				$rootScope.syncStatus = 'stopped';
+				_removeResource(resource);
 				$rootScope.$broadcast('CONFLICT', resource, response.data);
+			}
+			// Check for conflict (deleted)
+			if (response.status === 404) {
+				$rootScope.syncStatus = 'stopped';
+				_removeResource(resource);
+				$rootScope.$broadcast('CONFLICT', resource, null);
 			}
 		};
 		// Check if the sync is done, and set the status
@@ -593,9 +626,10 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		}
 		// Handle new resources
 		Object.keys(newResources).forEach(function (type) {
-			var httpResource = getHTTPResource(type);
-			newResources[type].forEach(function (resource, key) {
-				newResources[type].splice(key, 1);
+			var httpResource = _getHTTPResource(type);
+			Object.keys(newResources[type]).forEach(function (id) {
+				var resource = newResources[type][id];
+				delete(newResources[type][id]);
 				var clone = $.extend(true, {}, resource);
 				delete(clone.tmpId);
 				httpResource.save(clone,
@@ -613,7 +647,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		});
 		// Handle dirty resources
 		Object.keys(dirtyResources).forEach(function (type) {
-			var httpResource = getHTTPResource(type);
+			var httpResource = _getHTTPResource(type);
 			Object.keys(dirtyResources[type]).forEach(function (id) {
 				var resource = dirtyResources[type][id];
 				delete(dirtyResources[type][id]);
@@ -630,7 +664,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		});
 		// Handle deleted resources
 		Object.keys(deletedResources).forEach(function (type) {
-			var httpResource = getHTTPResource(type);
+			var httpResource = _getHTTPResource(type);
 			Object.keys(deletedResources[type]).forEach(function (id) {
 				var resource = deletedResources[type][id];
 				delete(deletedResources[type][id]);

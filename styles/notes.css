@@ -49,6 +49,11 @@
 	font-size: 12px;
 }
 
+.no-remote-note-message {
+	padding: 25px;
+	width: 250px;
+}
+
 
 /**
  * Notes elements
