@@ -5,7 +5,7 @@
 /**
  * Login controller
  */
-webApp.controller('LoginCtrl', function ($scope, $location, AuthService) {
+webApp.controller('LoginController', function ($scope, $location, $modal, AuthService, syncService) {
 
 	// Default credentials values
 	$scope.credentials = {
@@ -21,7 +21,17 @@ webApp.controller('LoginCtrl', function ($scope, $location, AuthService) {
 		AuthService.login($scope.credentials).then(
 			// If login success
 			function () {
-				$location.path('/');
+				// If we authenticated from modal
+				if ($modal.isShown('global-login')) {
+					$modal.hide('global-login');
+				}
+				// If we authenticated from form
+				else {
+					// Initialize sync service
+					syncService.init();
+					// Go to home
+					$location.path('/');
+				}
 			},
 			// If login error
 			function (reason) {

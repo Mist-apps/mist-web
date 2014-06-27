@@ -21,7 +21,7 @@ webApp.config(function ($routeProvider, $locationProvider) {
 
 	$routeProvider.when('/login', {
 		templateUrl: 'views/login.html',
-		controller: 'LoginCtrl'
+		controller: 'LoginController'
 	});
 
 	$routeProvider.otherwise({
@@ -79,10 +79,13 @@ webApp.factory('toastr', function() {
  *		- Show/hide all menus
  *		- Logout
  */
-webApp.controller('ApplicationController', function ($scope, $location, $modal, AuthService) {
+webApp.controller('ApplicationController', function ($scope, $location, $modal, AuthService, syncService) {
 
 	// Try to recover the authentication from the session/local storage
 	AuthService.recover().then(function () {
+		// Initialize sync service
+		syncService.init();
+		// Go to home
 		$location.path('/');
 	}, function (reason) {
 		console.log('Unable to recover session: ' + reason);
@@ -162,7 +165,11 @@ webApp.controller('ApplicationController', function ($scope, $location, $modal, 
 	 * Log the user out and redirect it to the login page
 	 */
 	$scope.logout = function () {
+		// Logout
 		AuthService.logout();
+		// Initialize sync service
+		syncService.init();
+		// Go to login page
 		$location.path('/login');
 	};
 
@@ -272,6 +279,8 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 				} else {
 					$sessionStorage.token = data.token;
 				}
+				// Initialize sync service
+
 				// Connected
 				promise.resolve();
 			};
@@ -403,19 +412,23 @@ webApp.run(function ($rootScope, $location, AuthService) {
  */
 webApp.config(function ($httpProvider) {
 
-	$httpProvider.interceptors.push(function ($location, $q, $sessionStorage, $localStorage, Session) {
+	$httpProvider.interceptors.push(function ($rootScope, $location, $q, $sessionStorage, $localStorage, $modal, Session) {
 		return {
 			responseError: function (rejection) {
 				if (rejection.status === 401) {
-					// Destroy session
-					Session.destroy();
+					// If we were authenticated, show modal (does nothing if already shown)
+					if (!!Session.token) {
+						$modal.show('global-login');
+					}
+					// If we were not authenticated, redirect to login form
+					else {
+						$location.path('/login');
+					}
 					// No more send the token on each API request
 					delete($httpProvider.defaults.headers.common['API-Token']);
 					// Delete token in local/session storage
 					delete($sessionStorage.token);
 					delete($localStorage.token);
-					// Redirect to login form
-					$location.path('/login');
 				}
 				return $q.reject(rejection);
 			}
@@ -434,6 +447,17 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 
 	// Sync status is shared
 	$rootScope.syncStatus = 'synced';
+
+	/**
+	 * Initialize the sync service, nothing to sync and status synced
+	 */
+	var init = function () {
+		$rootScope.syncStatus = 'synced';
+		newResources = {};
+		dirtyResources = {};
+		deletedResources = {};
+		syncErrors = {};
+	};
 
 	/**
 	 * Handle sync status
@@ -680,20 +704,12 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		});
 	};
 
-	// Listen if the user is disconnected to stop syncing
-	$rootScope.$watch('user', function (user) {
-		if (user === null) {
-			$rootScope.syncStatus = 'stopped';
-		} else {
-			$rootScope.syncStatus = 'syncing';
-		}
-	})
-
 	// Sync the changes every X seconds
 	var timer = $interval(sync, 2000);
 
 	// Return change handling methods
 	return {
+		init:				init,
 		newResource:		newResource,
 		updateResource:		updateResource,
 		deleteResource:		deleteResource
@@ -711,6 +727,11 @@ webApp.service('$modal', function ($rootScope) {
 	// Modal parameters
 	this.parameters = {};
 
+	// Get the modal url from the name
+	var _getModalUrl = function (name) {
+		return 'modals/' + name + '.html';
+	}
+
 	// Show the modal
 	this.show = function (name, params) {
 		if (!$rootScope.modal) {
@@ -718,15 +739,17 @@ webApp.service('$modal', function ($rootScope) {
 				this.parameters = params;
 			}
 			this.dim();
-			$rootScope.modal = 'modals/' + name + '.html';
+			$rootScope.modal = _getModalUrl(name);
 		}
 	};
 
 	// Hide the modal
-	this.hide = function (name, params) {
-		$rootScope.modal = "";
-		this.clear();
-		this.parameters = {};
+	this.hide = function (name) {
+		if (this.isShown(name)) {
+			$rootScope.modal = "";
+			this.clear();
+			this.parameters = {};
+		}
 	}
 
 	// Dim the screen
@@ -743,6 +766,11 @@ webApp.service('$modal', function ($rootScope) {
 			$('.dim').removeClass('dim-active');
 			$('#nav-search-content input').attr('tabindex', 1);
 		}
+	}
+
+	// Return whether the modal is shown or not
+	this.isShown = function(name) {
+		return $rootScope.modal === _getModalUrl(name);
 	}
 
 	// Export methods
