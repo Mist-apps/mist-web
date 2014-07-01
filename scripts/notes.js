@@ -176,14 +176,20 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 		// "DOWN" key
 		else if ($event.which === 40) {
 			if (target.isCursorOnEndOfTask() && target.parent().next().length) {
-				target.parent().next().find('.note-task-content').focusStart();
+				// Focus out of the digest, because focus has a callback
+				$timeout(function () {
+					target.parent().next().find('.note-task-content').focusStart();
+				});
 				$event.preventDefault();
 			}
 		}
 		// "UP" key
 		else if ($event.which === 38) {
 			if (target.isCursorOnStartOfTask() && target.parent().prev().length) {
-				target.parent().prev().find('.note-task-content').focusEnd();
+				// Focus out of the digest, because focus has a callback
+				$timeout(function () {
+					target.parent().prev().find('.note-task-content').focusEnd();
+				});
 				$event.preventDefault();
 			}
 		}
