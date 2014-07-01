@@ -13,15 +13,24 @@ var webApp = angular.module('webApp', ['ngResource', 'ngRoute', 'ngStorage']);
  */
 webApp.config(function ($routeProvider, $locationProvider) {
 
+	$routeProvider.when('/login', {
+		templateUrl: 'views/login.html',
+		controller: 'LoginController',
+		css: 'styles/login.css'
+	});
+
 	$routeProvider.when('/notes', {
 		templateUrl: 'views/notes.html',
 		controller: 'NotesCtrl',
+		css: ['styles/notes.css', 'libs/icons-notes.css'],
 		authenticated: true
 	});
 
-	$routeProvider.when('/login', {
-		templateUrl: 'views/login.html',
-		controller: 'LoginController'
+	$routeProvider.when('/contacts', {
+		templateUrl: 'views/contacts.html',
+		controller: 'ContactsController',
+		css: ['styles/contacts.css', 'libs/icons-contacts.css'],
+		authenticated: true
 	});
 
 	$routeProvider.otherwise({
@@ -75,6 +84,38 @@ webApp.factory('toastr', function() {
 });
 
 /**
+  * CSS Loader for views
+  */
+webApp.directive('head', function($rootScope, $compile) {
+	return {
+		restrict: 'E',
+		link: function (scope, elem) {
+			var html = '<link rel="stylesheet" ng-repeat="(routeCtrl, cssUrl) in routeStyles" ng-href="{{cssUrl}}" >';
+			elem.append($compile(html)(scope));
+			scope.routeStyles = {};
+			$rootScope.$on('$routeChangeStart', function (e, next, current) {
+				if (current && current.$$route && current.$$route.css) {
+					if (!Array.isArray(current.$$route.css)) {
+						current.$$route.css = [current.$$route.css];
+					}
+					angular.forEach(current.$$route.css, function (sheet) {
+						delete scope.routeStyles[sheet];
+					});
+				}
+				if (next && next.$$route && next.$$route.css) {
+					if (!Array.isArray(next.$$route.css)) {
+						next.$$route.css = [next.$$route.css];
+					}
+					angular.forEach(next.$$route.css, function(sheet) {
+						scope.routeStyles[sheet] = sheet;
+					});
+				}
+			});
+		}
+	};
+});
+
+/**
  * Application controller. It manages:
  *		- Show/hide all menus
  *		- Logout
@@ -90,6 +131,14 @@ webApp.controller('ApplicationController', function ($scope, $rootScope, $locati
 	}, function (reason) {
 		console.log('Unable to recover session: ' + reason);
 	});
+
+	/**
+	 * Navigate to path
+	 */
+
+	$scope.goto = function (path) {
+		$location.path(path);
+	};
 
 	/**
 	 * Hide all menus

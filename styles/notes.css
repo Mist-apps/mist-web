@@ -11,15 +11,6 @@
  * Miscellaneous
  */
 
-#no-notes-message {
-	padding-top: 15px;
-	text-align: center;
-	font-size: 36px;
-	color: #FFF;
-	text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-	cursor: default;
-}
-
 #grid-container {
 	position: relative;
 }

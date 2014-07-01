@@ -1,5 +1,7 @@
 <!doctype html>
 
+<html lang="en" ng-app="webApp">
+
 <head>
 
 	<!-- Meta informations -->
@@ -14,15 +16,12 @@
 
 	<!-- CSS Stylesheets -->
 	<link rel="stylesheet" href="styles/global.css">
-	<link rel="stylesheet" href="styles/notes.css">
-	<link rel="stylesheet" href="styles/login.css">
-	<link rel="stylesheet" href="styles/icons-global.css">
-	<link rel="stylesheet" href="styles/icons-notes.css">
+	<link rel="stylesheet" href="libs/icons-global.css">
 	<link rel="stylesheet" href="libs/toastr.min.css">
 
 </head>
 
-<body ng-app="webApp" ng-controller="ApplicationController">
+<body ng-controller="ApplicationController">
 
 	<!-- Top navigation bar -->
 	<div id="navbar" ng-if="$root.user">
@@ -49,11 +48,11 @@
 			<div id="user-menu-arrow-fill"></div>
 			<div id="user-menu-apps">
 				<div class="icon-global-reader">Reader</div>
-				<div class="icon-global-contacts">Contacts</div>
+				<div class="icon-global-contacts" ng-click="goto('/contacts');">Contacts</div>
 				<div class="icon-global-calendar">Calendar</div>
 				<div class="icon-global-mail">Mail</div>
 				<div class="icon-global-pass">Pass</div>
-				<div class="icon-global-notes">Notes</div>
+				<div class="icon-global-notes" ng-click="goto('/notes');">Notes</div>
 			</div>
 			<div id="user-menu-footer">
 				<div class="icon-global-settings" ng-click="showSettings()">Settings</div>
@@ -85,8 +84,9 @@
 
 	<!-- Custom Javascript -->
 	<script src="scripts/app.js"></script>
-	<script src="scripts/notes.js"></script>
 	<script src="scripts/login.js"></script>
+	<script src="scripts/notes.js"></script>
+	<script src="scripts/contacts.js"></script>
 
 </body>
 
