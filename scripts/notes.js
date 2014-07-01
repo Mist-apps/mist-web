@@ -34,7 +34,7 @@ webApp.directive('resize', function ($timeout, $rootScope) {
 /**
  * Manage grid
  */
-webApp.directive('grid', function ($rootScope, $timeout) {
+webApp.directive('grid', function ($rootScope) {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attrs) {
@@ -47,7 +47,7 @@ webApp.directive('grid', function ($rootScope, $timeout) {
 /**
  * Grid elements
  */
-webApp.directive('gridItem', function ($rootScope, $timeout) {
+webApp.directive('gridItem', function ($rootScope) {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attrs) {
@@ -61,33 +61,12 @@ webApp.directive('gridItem', function ($rootScope, $timeout) {
 	};
 });
 
-/**
- * Notes Controller
- */
-webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, noteResource, toastr, syncService) {
-
-	$scope.location = 'all';
-
-	/**
-	 * Get Notes from API
-	 */
-	$scope.getNotes = function () {
-		var success = function (data, responseHeaders) {
-			$scope.notes = data;
-		};
-		var error = function (httpResponse) {
-			toastr.error('Unable to get notes (' + httpResponse.status + ')');
-		};
-		noteResource.query(success, error);
-	}
-
-	$scope.notes = [];
-	$scope.getNotes();
+webApp.service('NotesWebService', function ($timeout, syncService) {
 
 	/**
 	 * Check and uncheck a task in a todo list
 	 */
-	$scope.toggleTaskDone = function (note, task) {
+	var toggleTaskDone = function (note, task) {
 		// Toggle
 		task.done = !task.done;
 		// Set modification date
@@ -97,26 +76,9 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 	};
 
 	/**
-	 * Filter the notes from the menu selection
-	 */
-	$scope.filterNotes = function (value) {
-		if ($scope.location === 'all') {
-			return !value.deleteDate;
-		} else if ($scope.location === 'notes') {
-			return !value.deleteDate && !value.tasks;
-		} else if ($scope.location === 'todo') {
-			return !value.deleteDate && value.tasks;
-		} else if ($scope.location === 'trash') {
-			return value.deleteDate;
-		} else {
-			return false;
-		}
-	};
-
-	/**
 	 * Listen to key events on the note titles
 	 */
-	$scope.titleKeyListener = function ($event, note) {
+	var titleKeyListener = function ($event, note) {
 		var target = $($event.target);
 		// "ENTER" key
 		if ($event.keyCode === 13) {
@@ -142,7 +104,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 	/**
 	 * Listen to key events on the note contents
 	 */
-	$scope.contentKeyListener = function ($event, note) {
+	var contentKeyListener = function ($event, note) {
 		// Inform sync service and set modification time if necessary
 		if (!_keyMustBeIgnored($event.keyCode)) {
 			note.modificationDate = new Date().getTime();
@@ -153,7 +115,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 	/**
 	 * Listen for key events on the task contents
 	 */
-	$scope.taskKeyListener = function ($event, note, index) {
+	var taskKeyListener = function ($event, note, index) {
 		var target = $($event.target);
 		var tasks = note.tasks;
 
@@ -251,6 +213,80 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 	}
 
 	/**
+	 * Start editing task
+	 */
+	var startEditTask = function ($event) {
+		$($event.target).parent().addClass('note-task-edit');
+	};
+
+	/**
+	 * Stop editing task
+	 */
+	var stopEditTask = function ($event) {
+		$($event.target).parent().removeClass('note-task-edit');
+	};
+
+	// Return methods
+	return {
+		toggleTaskDone:		toggleTaskDone,
+		titleKeyListener:	titleKeyListener,
+		contentKeyListener:	contentKeyListener,
+		taskKeyListener: 	taskKeyListener,
+		startEditTask:		startEditTask,
+		stopEditTask:		stopEditTask
+	};
+
+});
+
+/**
+ * Notes Controller
+ */
+webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, toastr, syncService, NotesWebService) {
+
+	$scope.location = 'all';
+
+	/**
+	 * Get Notes from API
+	 */
+	$scope.getNotes = function () {
+		var success = function (data, responseHeaders) {
+			$scope.notes = data;
+		};
+		var error = function (httpResponse) {
+			toastr.error('Unable to get notes (' + httpResponse.status + ')');
+		};
+		noteResource.query(success, error);
+	}
+
+	$scope.notes = [];
+	$scope.getNotes();
+
+	// Add notes web methods
+	$scope.toggleTaskDone = NotesWebService.toggleTaskDone;
+	$scope.titleKeyListener = NotesWebService.titleKeyListener;
+	$scope.contentKeyListener = NotesWebService.contentKeyListener;
+	$scope.taskKeyListener = NotesWebService.taskKeyListener;
+	$scope.startEditTask = NotesWebService.startEditTask;
+	$scope.stopEditTask = NotesWebService.stopEditTask;
+
+	/**
+	 * Filter the notes from the menu selection
+	 */
+	$scope.filterNotes = function (value) {
+		if ($scope.location === 'all') {
+			return !value.deleteDate;
+		} else if ($scope.location === 'notes') {
+			return !value.deleteDate && !value.tasks;
+		} else if ($scope.location === 'todo') {
+			return !value.deleteDate && value.tasks;
+		} else if ($scope.location === 'trash') {
+			return value.deleteDate;
+		} else {
+			return false;
+		}
+	};
+
+	/**
 	 * Add a new empty note
 	 */
 	$scope.addNewNote = function () {
@@ -317,20 +353,6 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $timeout, $modal, n
 		// Inform sync service
 		syncService.updateResource('NOTE', note);
 	}
-
-	/**
-	 * Start editing task
-	 */
-	$scope.startEditTask = function ($event) {
-		$($event.target).parent().addClass('note-task-edit');
-	};
-
-	/**
-	 * Stop editing task
-	 */
-	$scope.stopEditTask = function ($event) {
-		$($event.target).parent().removeClass('note-task-edit');
-	};
 
 	/**
 	 * Start editing the notes
@@ -433,11 +455,19 @@ webApp.controller('LeftMenuCtrl', function ($scope, $rootScope) {
 /**
  * Conflict controller (modal)
  */
-webApp.controller('ConflictController', function ($scope, $rootScope, $modal, syncService) {
+webApp.controller('ConflictController', function ($scope, $rootScope, $modal, syncService, NotesWebService) {
 
 	// Get conflicted notes
 	$scope.local = $modal.parameters.local;
 	$scope.remote = $modal.parameters.remote;
+
+	// Add notes web methods
+	$scope.toggleTaskDone = NotesWebService.toggleTaskDone;
+	$scope.titleKeyListener = NotesWebService.titleKeyListener;
+	$scope.contentKeyListener = NotesWebService.contentKeyListener;
+	$scope.taskKeyListener = NotesWebService.taskKeyListener;
+	$scope.startEditTask = NotesWebService.startEditTask;
+	$scope.stopEditTask = NotesWebService.stopEditTask;
 
 	/**
 	 * Resolve the conflict
