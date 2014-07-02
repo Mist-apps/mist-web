@@ -42,10 +42,6 @@ module.exports = function (grunt) {
 				files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
 				tasks: ['compass:server', 'autoprefixer']
 			},
-			// styles: {
-			// 	files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-			// 	tasks: ['newer:copy:styles', 'autoprefixer']
-			// },
 			gruntfile: {
 				files: ['Gruntfile.js']
 			},
@@ -72,7 +68,7 @@ module.exports = function (grunt) {
 			livereload: {
 				options: {
 					open: true,
-					middleware: function (connect, options) {
+					middleware: function (connect) {
 						return [
 							modRewrite(['^[^\\.]*$ /index.html [L]']),
 							connect.static('.tmp'),
@@ -85,22 +81,6 @@ module.exports = function (grunt) {
 					}
 				}
 			},
-			// test: {
-			// 	options: {
-			// 		port: 9001,
-			// 		middleware: function (connect) {
-			// 			return [
-			// 				connect.static('.tmp'),
-			// 				connect.static('test'),
-			// 				connect().use(
-			// 					'/bower_components',
-			// 					connect.static('./bower_components')
-			// 				),
-			// 				connect.static(appConfig.app)
-			// 			];
-			// 		}
-			// 	}
-			// },
 			dist: {
 				options: {
 					open: true,
@@ -120,13 +100,7 @@ module.exports = function (grunt) {
 					'Gruntfile.js',
 					'<%= yeoman.app %>/scripts/{,*/}*.js'
 				]
-			},
-			// test: {
-			// 	options: {
-			// 		jshintrc: 'test/.jshintrc'
-			// 	},
-			// 	src: ['test/spec/{,*/}*.js']
-			// }
+			}
 		},
 
 		// Empties folders to start fresh
@@ -273,7 +247,7 @@ module.exports = function (grunt) {
 				files: [{
 					expand: true,
 					cwd: '<%= yeoman.dist %>',
-					src: ['*.html', 'views/{,*/}*.html'],
+					src: ['*.html', 'views/{,*/}*.html', 'modals/{,*/}*.html'],
 					dest: '<%= yeoman.dist %>'
 				}]
 			}
@@ -313,6 +287,7 @@ module.exports = function (grunt) {
 						'.htaccess',
 						'*.html',
 						'views/{,*/}*.html',
+						'modals/{,*/}*.html',
 						'images/{,*/}*.{webp}',
 						'fonts/*'
 					]
@@ -337,12 +312,8 @@ module.exports = function (grunt) {
 				'compass:server'
 				// 'copy:styles'
 			],
-			// test: [
-			// 	'copy:styles'
-			// ],
 			dist: [
 				'compass:dist',
-				// 'copy:styles',
 				'imagemin',
 				'svgmin'
 			]
@@ -366,13 +337,6 @@ module.exports = function (grunt) {
 		]);
 	});
 
-	// grunt.registerTask('test', [
-	// 	'clean:server',
-	// 	'concurrent:test',
-	// 	'autoprefixer',
-	// 	'connect:test'
-	// ]);
-
 	grunt.registerTask('build', [
 		'clean:dist',
 		'wiredep',
@@ -392,7 +356,6 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('default', [
 		'newer:jshint',
-		// 'test',
 		'build'
 	]);
 
