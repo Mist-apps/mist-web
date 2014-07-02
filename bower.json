@@ -1,0 +1,13 @@
+{
+	"name": "mist-web",
+	"version": "0.1.0",
+	"dependencies": {
+		"angular": "~1.2.19",
+		"angular-resource": "~1.2.19",
+		"angular-route": "~1.2.19",
+		"jquery": "~2.1.1",
+		"toastr": "~2.0.3",
+		"ngstorage": "~0.3.0"
+	},
+	"appPath": "app"
+}

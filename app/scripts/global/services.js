@@ -1,56 +1,6 @@
 'use strict';
 
 
-
-var API_URL = {{API_URL}};
-
-
-
-var webApp = angular.module('webApp', ['ngResource', 'ngRoute', 'ngStorage']);
-
-/**
- * Configure the routes
- */
-webApp.config(function ($routeProvider, $locationProvider) {
-
-	$routeProvider.when('/login', {
-		templateUrl: 'views/login.html',
-		controller: 'LoginController',
-		css: 'styles/login.css'
-	});
-
-	$routeProvider.when('/notes', {
-		templateUrl: 'views/notes.html',
-		controller: 'NotesCtrl',
-		css: ['styles/notes.css', 'libs/icons-notes.css'],
-		authenticated: true
-	});
-
-	$routeProvider.when('/contacts', {
-		templateUrl: 'views/contacts.html',
-		controller: 'ContactsController',
-		css: ['styles/contacts.css', 'libs/icons-contacts.css'],
-		authenticated: true
-	});
-
-	$routeProvider.otherwise({
-		redirectTo: '/notes'
-	});
-
-	$locationProvider.html5Mode(true);
-
-});
-
-/**
- * Users resource
- */
-webApp.factory('userResource', ['$resource', function ($resource) {
-	return $resource(API_URL + '/user', {}, {
-		update: {method: 'PUT'},
-		login: {method: 'POST', url: API_URL + '/login'}
-	});
-}]);
-
 /**
  * Toast notifications service
  * This service loads some configuration like, the show duration,
@@ -62,275 +12,25 @@ webApp.factory('userResource', ['$resource', function ($resource) {
  */
 webApp.factory('toastr', function() {
 	toastr.options = {
-		"closeButton": false,
-		"debug": false,
-		"positionClass": "toast-top-right",
-		"onclick": null,
-		"showDuration": "10000",
-		"hideDuration": "1000",
-		"timeOut": "5000",
-		"extendedTimeOut": "1000",
-		"showEasing": "swing",
-		"hideEasing": "linear",
-		"showMethod": "fadeIn",
-		"hideMethod": "fadeOut"
+		'closeButton': false,
+		'debug': false,
+		'positionClass': 'toast-top-right',
+		'onclick': null,
+		'showDuration': 10000,
+		'hideDuration': 1000,
+		'timeOut': 5000,
+		'extendedTimeOut': 1000,
+		'showEasing': 'swing',
+		'hideEasing': 'linear',
+		'showMethod': 'fadeIn',
+		'hideMethod': 'fadeOut'
 	};
 	return {
-		success:	function (message, title) { toastr.success(message, title) },
-		info:		function (message, title) { toastr.info(message, title) },
-		warning:	function (message, title) { toastr.warning(message, title) },
-		error:		function (message, title) { toastr.error(message, title) }
+		success:	function (message, title) { toastr.success(message, title); },
+		info:		function (message, title) { toastr.info(message, title); },
+		warning:	function (message, title) { toastr.warning(message, title); },
+		error:		function (message, title) { toastr.error(message, title); }
 	};
-});
-
-/**
-  * CSS Loader for views
-  */
-webApp.directive('head', function($rootScope, $compile) {
-	return {
-		restrict: 'E',
-		link: function (scope, elem) {
-			var html = '<link rel="stylesheet" ng-repeat="(routeCtrl, cssUrl) in routeStyles" ng-href="{{cssUrl}}" >';
-			elem.append($compile(html)(scope));
-			scope.routeStyles = {};
-			$rootScope.$on('$routeChangeStart', function (e, next, current) {
-				if (current && current.$$route && current.$$route.css) {
-					if (!Array.isArray(current.$$route.css)) {
-						current.$$route.css = [current.$$route.css];
-					}
-					angular.forEach(current.$$route.css, function (sheet) {
-						delete scope.routeStyles[sheet];
-					});
-				}
-				if (next && next.$$route && next.$$route.css) {
-					if (!Array.isArray(next.$$route.css)) {
-						next.$$route.css = [next.$$route.css];
-					}
-					angular.forEach(next.$$route.css, function(sheet) {
-						scope.routeStyles[sheet] = sheet;
-					});
-				}
-			});
-		}
-	};
-});
-
-/**
- * Application controller. It manages:
- *		- Show/hide all menus
- *		- Logout
- */
-webApp.controller('ApplicationController', function ($scope, $rootScope, $location, $modal, AuthService, syncService) {
-
-	// Try to recover the authentication from the session/local storage
-	AuthService.recover().then(function () {
-		// Initialize sync service
-		syncService.init();
-		// Go to home
-		$location.path('/');
-	}, function (reason) {
-		console.log('Unable to recover session: ' + reason);
-	});
-
-	/**
-	 * Navigate to path
-	 */
-
-	$scope.goto = function (path) {
-		$location.path(path);
-	};
-
-	/**
-	 * Hide all menus
-	 */
-	var _hideMenus = function () {
-		$('.menu').removeClass('menu-show');
-		$('#user-menu').hide();
-		$('#add-menu div').hide();
-		$('#add-menu div:first-child').show();
-		$('#add-menu div:first-child div').show();
-		$('html').unbind('click');
-	};
-
-	/**
-	 * Show and hide left menu dynamically
-	 */
-	$scope.toggleLeftMenu = function ($event) {
-		if (!$('.menu').hasClass('menu-show')) {
-			_hideMenus();
-			$('.menu').addClass('menu-show');
-			$('html').click(function () {
-				_hideMenus();
-			});
-			$event.stopPropagation();
-		} else {
-			_hideMenus();
-		}
-	};
-
-	/**
-	 * Show and hide user menu dynamically
-	 */
-	$scope.toggleUserMenu = function ($event) {
-		if ($('#user-menu').is(':hidden')) {
-			_hideMenus();
-			$('#user-menu').show();
-			$('html').click(function () {
-				_hideMenus();
-			});
-			$event.stopPropagation();
-		} else {
-			_hideMenus();
-		}
-	};
-
-	/**
-	 * Show and hide the add menu dynamically
-	 */
-	$scope.toggleAddMenu = function ($event) {
-		if ($('#add-menu div:first-child').is(':visible')) {
-			_hideMenus();
-			$('#add-menu div').show();
-			$('#add-menu div:first-child').hide();
-			$('html').click(function () {
-				_hideMenus();
-			});
-			$event.stopPropagation();
-		}
-	};
-
-	/**
-	 * Show the settings modal and send a broadcast to initialize the
-	 * settings controller.
-	 */
-	$scope.showSettings = function () {
-		// Init the settings modal
-		$scope.$broadcast('INIT_SETTINGS');
-		// Show the user settings modal
-		$modal.show('global-settings');
-	};
-
-	/**
-	 * Log the user out and redirect it to the login page
-	 */
-	$scope.logout = function () {
-		// If status is not synced, show the confirm dialog
-		if ($rootScope.syncStatus !== 'synced') {
-			$modal.show('global-confirm');
-		}
-		// If no confirmation needed, logout and go to the login page
-		else {
-			AuthService.logout();
-			syncService.init();
-			$location.path('/login');
-		}
-	};
-
-});
-
-
-/**
- * Settings controller (modal)
- */
-webApp.controller('SettingsController', function ($scope, $modal, toastr, Session, userResource) {
-
-	// Clone user in a tmp user to update
-	$scope.tmpUser = $.extend(true, {}, Session.user);
-	$scope.tmpUser.password = $scope.tmpUser.password2 = '';
-
-	/**
-	 * Save the settings and remove the settings modal
-	 * If the settings form is not consistent, does nothing
-	 * Show a notification if saved or if an error occurs
-	 */
-	$scope.save = function () {
-		// Check password
-		if ($scope.tmpUser.password !== $scope.tmpUser.password2 || ($scope.tmpUser.password !== '' && $scope.tmpUser.password < 6)) {
-			return;
-		}
-		// Remove login, password2, and password if empty
-		delete($scope.tmpUser.login);
-		delete($scope.tmpUser.password2);
-		if (!$scope.tmpUser.password) {
-			delete($scope.tmpUser.password);
-		}
-		// Update the user
-		userResource.update($scope.tmpUser,
-			function (data) {
-				Session.update(data);
-				toastr.success('Settings saved');
-			}, function () {
-				toastr.error('Unable to save settings');
-			}
-		);
-		// Hide modal
-		$modal.hide('global-settings');
-	};
-
-	/**
-	 * Cancel the settings modifications: hide modal
-	 */
-	$scope.cancel = function () {
-		// Hide modal
-		$modal.hide('global-settings');
-	};
-
-	/**
-	 * Get the image from input, resize it to 85px/85px,
-	 * transform it in base64 and update the temporary user
-	 */
-	$scope.uploadImage = function () {
-		var input = $('#user-image-input').get(0);
-		if (input.files && input.files[0]) {
-			// Create canvas for resizing image
-			var canvas = document.getElementById("user-image-canvas");
-			canvas.width = 85;
-			canvas.height = 85;
-			var ctx = canvas.getContext("2d");
-			// Create image object with base64 upload
-			var image = new Image();
-			reader.onload = function (e) {
-				image.src = e.target.result;
-			};
-			// Read the image from the input in base64
-			var reader = new FileReader();
-			image.onload = function() {
-				ctx.drawImage(image, 0, 0, 85, 85);
-				$scope.tmpUser.image = canvas.toDataURL();
-			};
-			reader.readAsDataURL(input.files[0]);
-		}
-	};
-
-});
-
-/**
- * Confirmation controller (modal)
- */
-webApp.controller('ConfirmController', function ($scope, $location, $modal, syncService, AuthService) {
-
-	/**
-	 * Logout
-	 */
-	$scope.logout = function () {
-		// Logout
-		AuthService.logout();
-		// Initialize sync service
-		syncService.init();
-		// Hide modal
-		$modal.hide('global-confirm');
-		// Go to login page
-		$location.path('/login');
-	};
-
-	/**
-	 * Cancel the logout process
-	 */
-	$scope.cancel = function () {
-		// Hide modal
-		$modal.hide('global-confirm');
-	};
-
 });
 
 /**
@@ -369,9 +69,9 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			// If login attempt fails
 			var error = function (httpResponse) {
 				if (httpResponse.status === 401) {
-					promise.reject({code: 1, message: "Bad credentials"});
+					promise.reject({code: 1, message: 'Bad credentials'});
 				} else {
-					promise.reject({code: 2, message: "Unknown error"});
+					promise.reject({code: 2, message: 'Unknown error'});
 				}
 			};
 			// Try to log in
@@ -422,14 +122,14 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 					// No more send the token on each API request
 					delete($http.defaults.headers.common['API-Token']);
 					// Not connected
-					promise.reject("Unknown error when retrieving user");
+					promise.reject('Unknown error when retrieving user');
 				};
 				userResource.get(success, error);
 			}
 			// If no token found
 			else {
 				$timeout(function () {
-					promise.reject("No token found in storage");
+					promise.reject('No token found in storage');
 				});
 			}
 			// Return a promise
@@ -461,62 +161,8 @@ webApp.service('Session', function ($rootScope) {
 	};
 	this.update = function (user) {
 		this.user = $rootScope.user = user;
-	}
+	};
 	return this;
-});
-
-/**
- * Route Change Listener to check if the user is authenticated where he must be
- */
-webApp.run(function ($rootScope, $location, AuthService) {
-
-	$rootScope.$on('$routeChangeStart', function (event, next, current) {
-		// If not authenticated and asking for an authenticated page
-		if (next.authenticated && !AuthService.isAuthenticated()) {
-			// Stop routing
-			event.preventDefault();
-			// Go to login page
-			$location.path('/login');
-		}
-		// If authenticated and going on the login page
-		else if (AuthService.isAuthenticated() && next.$$route && next.$$route.originalPath === '/login') {
-			// Stop routing
-			event.preventDefault();
-			// Go to home page
-			$location.path('/');
-		}
-	});
-
-});
-
-/**
- * HTTP Interceptor to catch 401 statuses and redirect the user to the /login page.
- */
-webApp.config(function ($httpProvider) {
-
-	$httpProvider.interceptors.push(function ($rootScope, $location, $q, $sessionStorage, $localStorage, $modal, Session) {
-		return {
-			responseError: function (rejection) {
-				if (rejection.status === 401) {
-					// If we were authenticated, show modal (does nothing if already shown)
-					if (!!Session.token) {
-						$modal.show('global-login');
-					}
-					// If we were not authenticated, redirect to login form
-					else {
-						$location.path('/login');
-					}
-					// No more send the token on each API request
-					delete($httpProvider.defaults.headers.common['API-Token']);
-					// Delete token in local/session storage
-					delete($sessionStorage.token);
-					delete($localStorage.token);
-				}
-				return $q.reject(rejection);
-			}
-		};
-	});
-
 });
 
 /**
@@ -546,23 +192,23 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 */
 	var setStatusSyncing = function () {
 		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') return;
+		if ($rootScope.syncStatus === 'stopped') { return; }
 		// If the sync is in error, it is not possible to set it to syncing, wait for good sync before
-		if ($rootScope.syncStatus === 'error') return;
+		if ($rootScope.syncStatus === 'error') { return; }
 		// Set status
 		$rootScope.syncStatus = 'syncing';
 	};
 	var setStatusSynced = function () {
 		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') return;
+		if ($rootScope.syncStatus === 'stopped') { return; }
 		// Set status
 		$rootScope.syncStatus = 'synced';
 	};
 	var setStatusError = function () {
 		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') return;
+		if ($rootScope.syncStatus === 'stopped') { return; }
 		// If the sync pass for the first time in error, show an error notification
-		if ($rootScope.syncStatus !== 'error') toastr.error('Unable to sync');
+		if ($rootScope.syncStatus !== 'error') { toastr.error('Unable to sync'); }
 		// Set status
 		$rootScope.syncStatus = 'error';
 	};
@@ -576,7 +222,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		switch ($rootScope.syncStatus) {
 			case 'syncing':		message = 'Data is syncing, if you leave, you will loose some data...'; break;
 			case 'error':		message = 'Error during sync, if you leave, you will loose some data...'; break;
-			case 'stopped':		if (_getTodo() < 0) break;
+			case 'stopped':		if (_getTodo() < 0) { break; }
 								message = 'Sync is stopped, if you leave, you will loose some data...'; break;
 		}
 		if (message !== '') {
@@ -600,14 +246,14 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 */
 	var newResource = function (type, resource) {
 		// If first resource of this type, initialize the object
-		if (!newResources[type]) newResources[type] = {};
+		if (!newResources[type]) { newResources[type] = {}; }
 		// Sync it
 		newResources[type][resource.tmpId] = resource;
 		setStatusSyncing();
 	};
 	var updateResource = function (type, resource) {
 		// If first resource of this type, initialize the object
-		if (!dirtyResources[type]) dirtyResources[type] = {};
+		if (!dirtyResources[type]) { dirtyResources[type] = {}; }
 		// If the resource is not new and is not already in
 		if (resource._id && !dirtyResources[type][resource._id]) {
 			dirtyResources[type][resource._id] = resource;
@@ -616,7 +262,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	};
 	var deleteResource = function (type, resource) {
 		// If first resource of this type, initialize the object
-		if (!deletedResources[type]) deletedResources[type] = {};
+		if (!deletedResources[type]) { deletedResources[type] = {}; }
 		// If the resource is not new
 		if (resource._id) {
 			delete(dirtyResources[type][resource._id]);
@@ -654,24 +300,24 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		if (resource._id) {
 			for (var key in dirtyResources) {
 				for (var id in dirtyResources[key]) {
-					if (id === resource._id) delete(dirtyResources[key][id])
+					if (id === resource._id) { delete(dirtyResources[key][id]); }
 				}
 			}
 			for (var key in deletedResources) {
 				for (var id in deletedResources[key]) {
-					if (id === resource._id) delete(deletedResources[key][id])
+					if (id === resource._id) { delete(deletedResources[key][id]); }
 				}
 			}
 			delete(syncErrors[resource._id]);
 		} else {
 			for (var key in newResources) {
 				for (var id in newResources[key]) {
-					if (id === resource.tmpId) delete(newResources[key][id])
+					if (id === resource.tmpId) { delete(newResources[key][id]); }
 				}
 			}
 			delete(syncErrors[resource.tmpId]);
 		}
-	}
+	};
 
 	/**
 	 * Sync method
@@ -729,7 +375,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 					setStatusError();
 				}
 			}
-		}
+		};
 		// Handle new resources
 		Object.keys(newResources).forEach(function (type) {
 			var httpResource = _getHTTPResource(type);
@@ -787,7 +433,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	};
 
 	// Sync the changes every X seconds
-	var timer = $interval(sync, 2000);
+	$interval(sync, 2000);
 
 	// Return change handling methods
 	return {
@@ -804,7 +450,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 webApp.service('$modal', function ($rootScope) {
 
 	// Modal template url
-	$rootScope.modal = "";
+	$rootScope.modal = '';
 
 	// Modal parameters
 	this.parameters = {};
@@ -812,7 +458,7 @@ webApp.service('$modal', function ($rootScope) {
 	// Get the modal url from the name
 	var _getModalUrl = function (name) {
 		return 'modals/' + name + '.html';
-	}
+	};
 
 	// Show the modal
 	this.show = function (name, params) {
@@ -828,11 +474,11 @@ webApp.service('$modal', function ($rootScope) {
 	// Hide the modal
 	this.hide = function (name) {
 		if (this.isShown(name)) {
-			$rootScope.modal = "";
+			$rootScope.modal = '';
 			this.clear();
 			this.parameters = {};
 		}
-	}
+	};
 
 	// Dim the screen
 	this.dim = function () {
@@ -840,7 +486,7 @@ webApp.service('$modal', function ($rootScope) {
 			$('#nav-search-content input').attr('tabindex', -1);
 			$('.dim').addClass('dim-active');
 		}
-	}
+	};
 
 	// Clear the screen
 	this.clear = function () {
@@ -848,12 +494,12 @@ webApp.service('$modal', function ($rootScope) {
 			$('.dim').removeClass('dim-active');
 			$('#nav-search-content input').attr('tabindex', 1);
 		}
-	}
+	};
 
 	// Return whether the modal is shown or not
 	this.isShown = function(name) {
 		return $rootScope.modal === _getModalUrl(name);
-	}
+	};
 
 	// Export methods
 	return this;

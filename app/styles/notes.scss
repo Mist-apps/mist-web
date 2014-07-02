@@ -1,9 +1,22 @@
 /**
- * Redefine global components
+ * Global components
  */
 
-#navbar {
+.navbar-notes {
 	background-color: #FFCD35;
+	color: rgba(0, 0, 0, 0.6);
+}
+
+.navbar-notes #nav-menu:hover {
+	color: rgba(0, 0, 0, 0.9);
+}
+
+.navbar-notes #nav-user:hover {
+	color: rgba(0, 0, 0, 0.9);
+}
+
+.navbar-notes #nav-search-content input {
+	color: rgba(0, 0, 0, 0.6);
 }
 
 
