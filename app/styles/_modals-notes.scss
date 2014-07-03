@@ -1,0 +1,32 @@
+/**
+ * Conflict modal
+ */
+
+#modal-notes-conflict {
+
+	.note-conflict-container {
+		text-align: center;
+		display: inline-block;
+		margin-top: 10px;
+		margin-bottom: 15px;
+	}
+
+	button {
+		display: inline-block;
+	}
+
+	.note-conflict-date {
+		font-size: 12px;
+	}
+
+	.note-conflict-version-title {
+		font-weight: bold;
+		font-size: 14px;
+	}
+
+	.note-conflict-no-remote {
+		padding: 25px;
+		width: 250px;
+	}
+
+}

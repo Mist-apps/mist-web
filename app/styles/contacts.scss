@@ -1,20 +1,31 @@
 /**
+ * Variables
+ */
+
+$navbar-color: #3C80F6;
+$navbar-text-color: rgba(255, 255, 255, 1);
+$navbar-text-hover-color: rgba(255, 255, 255, 0.7);
+
+
+/**
  * Global components
  */
 
 .navbar-contacts {
-	background-color: #3C80F6;
-	color: rgba(255, 255, 255, 1);
-}
 
-.navbar-contacts #nav-menu:hover {
-	color: rgba(255, 255, 255, 0.7);
-}
+	background-color: $navbar-color;
+	color: $navbar-text-color;
 
-.navbar-contacts #nav-user:hover {
-	color: rgba(255, 255, 255, 0.7);
-}
+	#nav-menu:hover {
+		color: $navbar-text-hover-color;
+	}
 
-.navbar-contacts #nav-search-content input {
-	color: rgba(255, 255, 255, 1);
+	#nav-user:hover {
+		color: $navbar-text-hover-color;
+	}
+
+	#nav-search-content input {
+		color: $navbar-text-color;
+	}
+
 }

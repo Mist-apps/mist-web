@@ -1,0 +1,46 @@
+/**
+ * User settings modal
+ */
+
+#modal-global-settings {
+
+	.modal-content {
+
+		table {
+			margin-top: 10px;
+			margin-left: 20px;
+		}
+
+		div {
+
+			vertical-align: middle;
+			line-height: 93px;
+
+			img {
+				width: 85px;
+				height: 85px;
+				border: 4px solid rgba(0, 0, 0, 0.15);
+				border-radius: 50%;
+				margin-right: 15px;
+				float: left;
+			}
+
+			canvas {
+				display: none;
+			}
+
+		}
+
+		input[type='file'] {
+			width: auto;
+			height: auto;
+		}
+
+	}
+
+	.modal-footer button {
+		margin-left: 15px;
+		margin-right: 15px;
+	}
+
+}

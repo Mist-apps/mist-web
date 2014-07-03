@@ -1,22 +1,40 @@
 /**
+ * Variables
+ */
+
+$navbar-color: #FFCD35;
+$navbar-text-color: rgba(0, 0, 0, 0.6);
+$navbar-text-hover-color: rgba(0, 0, 0, 0.9);
+
+
+/**
+ * Imports
+ */
+
+@import 'modals-notes';
+
+
+/**
  * Global components
  */
 
 .navbar-notes {
-	background-color: #FFCD35;
-	color: rgba(0, 0, 0, 0.6);
-}
 
-.navbar-notes #nav-menu:hover {
-	color: rgba(0, 0, 0, 0.9);
-}
+	background-color: $navbar-color;
+	color: $navbar-text-color;
 
-.navbar-notes #nav-user:hover {
-	color: rgba(0, 0, 0, 0.9);
-}
+	#nav-menu:hover {
+		color: $navbar-text-hover-color;
+	}
 
-.navbar-notes #nav-search-content input {
-	color: rgba(0, 0, 0, 0.6);
+	#nav-user:hover {
+		color: $navbar-text-hover-color;
+	}
+
+	#nav-search-content input {
+		color: $navbar-text-color;
+	}
+
 }
 
 
@@ -26,36 +44,6 @@
 
 #grid-container {
 	position: relative;
-}
-
-
-/**
- * Conflict modal
- */
-
-.notes-conflict-note {
-	text-align: center;
-	display: inline-block;
-	margin-top: 10px;
-	margin-bottom: 15px;
-}
-
-#modal-notes-conflict button {
-	display: inline-block;
-}
-
-.note-conflict-version-title {
-	font-weight: bold;
-	font-size: 14px;
-}
-
-.note-conflict-date {
-	font-size: 12px;
-}
-
-.no-remote-note-message {
-	padding: 25px;
-	width: 250px;
 }
 
 
@@ -149,6 +137,7 @@
 }
 
 .note-task-icon {
+
 	vertical-align: top;
 	width: 20px;
 	margin-left: 15px;
@@ -156,24 +145,25 @@
 	line-height: 20px;
 	float:left;
 	cursor: pointer;
-}
 
-.note-task-icon:before {
-	font-family: "notes" !important;
-	font-style: normal !important;
-	font-weight: normal !important;
-	font-variant: normal !important;
-	text-transform: none !important;
-	speak: none;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	content: "e";
-	font-size: 20px;
-	color: rgba(0, 0, 0, 0.35);
-}
+	&:before {
+		font-family: "notes" !important;
+		font-style: normal !important;
+		font-weight: normal !important;
+		font-variant: normal !important;
+		text-transform: none !important;
+		speak: none;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		content: "e";
+		font-size: 20px;
+		color: rgba(0, 0, 0, 0.35);
+	}
 
-.note-task-icon:hover:before {
-	color: rgba(0, 0, 0, 0.8);
+	&:hover:before {
+		color: rgba(0, 0, 0, 0.8);
+	}
+
 }
 
 .note-task-done .note-task-content {
@@ -191,6 +181,7 @@
  */
 
 .note-menu {
+
 	background-color: rgba(0, 0, 0, 0.15);
 	height: 0px;
 	width: 100%;
@@ -200,6 +191,34 @@
 	transition-duration: 0.3s;
 	transition-property: height;
 	transition-timing-function: linear;
+
+	div[class^="icon-"] {
+
+		&:before {
+			color: rgba(255, 255, 255, 1);
+			font-size: 25px;
+			cursor: pointer;
+			height: 36px;
+			line-height: 36px;
+		}
+
+		&:hover:before {
+			color: rgba(255, 255, 255, 0.7);
+		}
+
+	}
+
+	div {
+		display: inline-block;
+		margin: 0px 0px 0px 10px;
+	}
+
+	button {
+		position: absolute;
+		right: 3px;
+		bottom: 3px;
+	}
+
 }
 
 .note-menu-active {
@@ -207,29 +226,6 @@
 	line-height: 40px;
 	display: block;
 	vertical-align: middle;
-}
-
-.note-menu div[class^="icon-"]:before {
-	color: rgba(255, 255, 255, 1);
-	font-size: 25px;
-	cursor: pointer;
-	height: 36px;
-	line-height: 36px;
-}
-
-.note-menu div[class^="icon-"]:hover:before {
-	color: rgba(255, 255, 255, 0.7);
-}
-
-.note-menu div {
-	display: inline-block;
-	margin: 0px 0px 0px 10px;
-}
-
-.note-menu button {
-	position: absolute;
-	right: 3px;
-	bottom: 3px;
 }
 
 

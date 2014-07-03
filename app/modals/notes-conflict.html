@@ -17,7 +17,7 @@
 		<br>
 
 		<!-- Local note view -->
-		<div class="notes-conflict-note">
+		<div class="note-conflict-container">
 
 			<div class="note-conflict-version-title">Local version</div>
 
@@ -42,7 +42,7 @@
 		</div>
 
 		<!-- Remote note view -->
-		<div  class="notes-conflict-note">
+		<div  class="note-conflict-container">
 			<div class="note-conflict-version-title">Remote version</div>
 
 			<!-- If remote note -->
@@ -61,7 +61,7 @@
 			<div class="note-conflict-date" ng-if="remote && remote.deleteDate">Deleted on {{remote.deleteDate | date:'short'}}</div>
 
 			<!-- If no remote note -->
-			<div class="no-remote-note-message" ng-if="!remote">
+			<div class="note-conflict-no-remote" ng-if="!remote">
 				No note found on the server.
 			</div>
 
