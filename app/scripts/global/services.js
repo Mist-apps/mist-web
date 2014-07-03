@@ -103,7 +103,7 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			var token = null;
 			if ($sessionStorage.token) {
 				token = $sessionStorage.token;
-			} else if($localStorage.token) {
+			} else if ($localStorage.token) {
 				token = $localStorage.token;
 			}
 			// Send the token on each API request

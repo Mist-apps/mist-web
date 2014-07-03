@@ -8,16 +8,6 @@
  */
 webApp.controller('ApplicationController', function ($scope, $rootScope, $location, $modal, AuthService, syncService) {
 
-	// Try to recover the authentication from the session/local storage
-	AuthService.recover().then(function () {
-		// Initialize sync service
-		syncService.init();
-		// Go to home
-		$location.path('/');
-	}, function (reason) {
-		console.log('Unable to recover session: ' + reason);
-	});
-
 	/**
 	 * Navigate to path
 	 */

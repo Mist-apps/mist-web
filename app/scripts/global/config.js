@@ -27,30 +27,58 @@ webApp.config(function ($routeProvider, $locationProvider) {
 
 /**
  * Route Change Listener to:
- * 		- Check if the user is authenticated where he must be
+ * 		- Recover the user session
+ *		- Check if the user is authenticated where he must be
  *		- Set the application name
  *		- Set the page title
  */
-webApp.run(function ($rootScope, $location, AuthService) {
+webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
 
+	// Recover the user credentials
+	var recover = function (next) {
+		return function () {
+			// Promise to return
+			var promise = $q.defer();
+			// Try to recover the authentication from the session/local storage
+			AuthService.recover().then(function () {
+				// Session recovered
+				console.log('Session recovered');
+				// If asking to go to login
+				if (next.$$route && next.$$route.originalPath === '/login') {
+					$location.path('/');
+				}
+				// Initialize sync service
+				syncService.init();
+				// Done
+				promise.resolve();
+			}, function (reason) {
+				// Unable to recover session
+				console.log('Unable to recover session: ' + reason);
+				// If asking for an authenticated page
+				if (next.authenticated) {
+					// Go to login page
+					$location.path('/login');
+				}
+				// Error
+				promise.reject();
+			});
+			// Send the promise
+			return promise;
+		};
+	};
+
+	// Listen to route changes
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
 		// Set application name
 		$rootScope.appName = next.appName;
 		// Set the page title
 		$rootScope.title = next.title;
-		// If not authenticated and asking for an authenticated page
-		if (next.authenticated && !AuthService.isAuthenticated()) {
-			// Stop routing
-			event.preventDefault();
-			// Go to login page
-			$location.path('/login');
-		}
-		// If authenticated and going on the login page
-		else if (AuthService.isAuthenticated() && next.$$route && next.$$route.originalPath === '/login') {
-			// Stop routing
-			event.preventDefault();
-			// Go to home page
-			$location.path('/');
+		// If not authenticated
+		if (!AuthService.isAuthenticated()) {
+			// Add a resolve method to try to recover authentication
+			next.resolve = angular.extend(next.resolve || {}, {
+				__authenticating__: recover(next)
+			});
 		}
 	});
 
