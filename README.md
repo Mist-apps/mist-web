@@ -19,13 +19,15 @@ It's done ! You may access the web application on http://localhost, change the s
 
 #### For a development installation:
 * install nodejs: `sudo apt-get install nodejs`
+* install the grunt client: `sudo npm install -g grunt-cli`
+* install bower: `sudo npm install -g bower`
+* install compass: `sudo gem install compass`
 * clone the repository where you want: `git clone https://github.com/Mist-apps/mist-web.git /path/to/sources`
-* install the grunt client, and bower: `sudo npm install -g grunt-cli bower`
 * go into the sources folder: `cd /path/to/sources`
 * install the bower dependencies: `bower install`
 * install the node dependencies: `npm install`
 
 It's done ! You may start develop the web application:
-* The web application sources are in the `app` folder
-* To use a built-in web server and watch changes in the sources, use `grunt serve` in the root folder
-* To build a distribution release of the application, use `grunt` in the root folder. The release will be generated in the `dist` folder.
+* the web application sources are in the `app` folder
+* to use a built-in web server and watch changes in the sources, use `grunt serve` in the root folder and the app will be served on http://localhost:9000/
+* to build a distribution release of the application, use `grunt` in the root folder. The release will be generated in the `dist` folder.
