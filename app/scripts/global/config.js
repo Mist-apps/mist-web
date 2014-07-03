@@ -13,7 +13,8 @@ webApp.config(function ($routeProvider, $locationProvider) {
 
 	$routeProvider.when('/login', {
 		templateUrl: 'views/login.html',
-		controller: 'LoginController'
+		controller: 'LoginController',
+		title: 'Login'
 	});
 
 	$routeProvider.otherwise({
@@ -28,12 +29,15 @@ webApp.config(function ($routeProvider, $locationProvider) {
  * Route Change Listener to:
  * 		- Check if the user is authenticated where he must be
  *		- Set the application name
+ *		- Set the page title
  */
 webApp.run(function ($rootScope, $location, AuthService) {
 
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
 		// Set application name
 		$rootScope.appName = next.appName;
+		// Set the page title
+		$rootScope.title = next.title;
 		// If not authenticated and asking for an authenticated page
 		if (next.authenticated && !AuthService.isAuthenticated()) {
 			// Stop routing

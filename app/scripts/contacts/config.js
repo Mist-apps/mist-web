@@ -10,7 +10,8 @@ webApp.config(function ($routeProvider) {
 		templateUrl: 'views/contacts.html',
 		controller: 'ContactsController',
 		authenticated: true,
-		appName: 'contacts'
+		appName: 'contacts',
+		title: 'Contacts'
 	});
 
 });

@@ -10,7 +10,8 @@ webApp.config(function ($routeProvider) {
 		templateUrl: 'views/notes.html',
 		controller: 'NotesCtrl',
 		authenticated: true,
-		appName: 'notes'
+		appName: 'notes',
+		title: 'Notes'
 	});
 
 });
