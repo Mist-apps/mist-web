@@ -181,10 +181,8 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 */
 	var init = function () {
 		$rootScope.syncStatus = 'synced';
-		newResources = {};
-		dirtyResources = {};
-		deletedResources = {};
-		syncErrors = {};
+		resources = {};
+		metadata = {};
 	};
 
 	/**
@@ -222,7 +220,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		switch ($rootScope.syncStatus) {
 			case 'syncing':		message = 'Data is syncing, if you leave, you will loose some data...'; break;
 			case 'error':		message = 'Error during sync, if you leave, you will loose some data...'; break;
-			case 'stopped':		if (_getTodo() < 0) { break; }
+			case 'stopped':		if (_isSynced()) { break; }
 								message = 'Sync is stopped, if you leave, you will loose some data...'; break;
 		}
 		if (message !== '') {
@@ -232,54 +230,68 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	};
 
 	//	Save resources to sync, new resources have no _id but a tmpId
-	var newResources = {};
-	var dirtyResources = {};
-	var deletedResources = {};
-	// Save the sync errors
-	var syncErrors = {};
+	var resources = {};
+	var metadata = {};
 	// Save the HTTP resources dynamically injected
 	var httpResources = {};
 
 	/**
-	 * Handle note modifications.
-	 * Add new notes to sync, updated notes...
+	 * Handle resource modifications.
+	 * Add new recources to sync, updated...
 	 */
 	var newResource = function (type, resource) {
-		// If first resource of this type, initialize the object
-		if (!newResources[type]) { newResources[type] = {}; }
-		// Sync it
-		newResources[type][resource.tmpId] = resource;
+		resources[resource.tmpId] = resource;
+		metadata[resource.tmpId] = {type: type, status: 'ready', action: 'insert'};
 		setStatusSyncing();
 	};
 	var updateResource = function (type, resource) {
-		// If first resource of this type, initialize the object
-		if (!dirtyResources[type]) { dirtyResources[type] = {}; }
 		// If the resource is not new and is not already in
-		if (resource._id && !dirtyResources[type][resource._id]) {
-			dirtyResources[type][resource._id] = resource;
+		if (resource._id && !resources[resource._id]) {
+			// Add resource to sync
+			resources[resource._id] = resource;
+			// If the resource is syncing
+			if (metadata[resource._id] && metadata[resource._id].syncing) {
+				metadata[resource._id].action = 'update';
+				metadata[resource._id].dirty = true;
+			}
+			// If not syncing
+			else {
+				metadata[resource._id] = {type: type, syncing: false, action: 'update'};
+			}
+			// Set syncing
 			setStatusSyncing();
 		}
 	};
 	var deleteResource = function (type, resource) {
-		// If first resource of this type, initialize the object
-		if (!deletedResources[type]) { deletedResources[type] = {}; }
 		// If the resource is not new
 		if (resource._id) {
-			delete(dirtyResources[type][resource._id]);
-			deletedResources[type][resource._id] = resource;
+			// Add resource to sync
+			resources[resource._id] = resource;
+			// If the resource is syncing
+			if (metadata[resource._id] && metadata[resource._id].syncing) {
+				metadata[resource._id].action = 'delete';
+				metadata[resource._id].dirty = true;
+			}
+			// If not syncing
+			else {
+				metadata[resource._id] = {type: type, syncing: false, action: 'delete'};
+			}
+			// Set syncing
 			setStatusSyncing();
 		}
 	};
 
 	/**
-	 * Get the number of actions to do for sync
+	 * Get sync deep status
 	 */
-	var _getTodo = function () {
-		var count = 0;
-		for (var key in newResources) { count += Object.keys(newResources[key]).length; }
-		for (var key in dirtyResources) { count += Object.keys(dirtyResources[key]).length; }
-		for (var key in deletedResources) { count += Object.keys(deletedResources[key]).length; }
-		return count;
+	var _isSynced = function () {
+		return Object.keys(metadata).length === 0;
+	};
+	var _isSyncError = function () {
+		for (var key in metadata) {
+			if (metadata[key].error) { return true; }
+		}
+		return false;
 	};
 
 	/**
@@ -297,61 +309,45 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 * Remove a resource from syncing (tables and errors)
 	 */
 	var _removeResource = function (resource) {
-		if (resource._id) {
-			for (var key in dirtyResources) {
-				for (var id in dirtyResources[key]) {
-					if (id === resource._id) { delete(dirtyResources[key][id]); }
-				}
-			}
-			for (var key in deletedResources) {
-				for (var id in deletedResources[key]) {
-					if (id === resource._id) { delete(deletedResources[key][id]); }
-				}
-			}
-			delete(syncErrors[resource._id]);
-		} else {
-			for (var key in newResources) {
-				for (var id in newResources[key]) {
-					if (id === resource.tmpId) { delete(newResources[key][id]); }
-				}
-			}
-			delete(syncErrors[resource.tmpId]);
-		}
+		var id = resource._id ? resource._id : resource.tmpId;
+		delete(resources[id]);
+		delete(metadata[id]);
 	};
 
 	/**
 	 * Sync method
-	 * When error occurs, the resources in error are added in a syncErrors
-	 * object.
 	 */
-	var sync = function () {
+	var _sync = function () {
 		// Do not sync if stopped
 		if ($rootScope.syncStatus === 'stopped') {
 			return;
 		}
-		// Get actions to do, and check if something to do
-		var todo = _getTodo();
-		if (todo === 0) {
+		// Check if something to do
+		if (_isSynced()) {
 			setStatusSynced();
 			return;
 		}
 		// If a resource sync success
-		var success = function (resource) {
-			if (resource._id) {
-				delete(syncErrors[resource._id]);
-			} else {
-				delete(syncErrors[resource.tmpId]);
+		var _success = function (resource) {
+			var id = resource._id ? resource._id : resource.tmpId;
+			// If dirty resource, remove error and set no more syncing
+			if (metadata[id].dirty) {
+				metadata[id].syncing = false;
+				metadata[id].error = false;
 			}
-			checkEndOfSync();
+			// If the sync in done, remove totally the resource
+			else {
+				_removeResource(resource);
+			}
+			// Check end of sync
+			_checkEndOfSync();
 		};
 		// If a resource sync error
-		var error = function (response, resource) {
-			if (resource._id) {
-				syncErrors[resource._id] = 1;
-			} else {
-				syncErrors[resource.tmpId] = 1;
-			}
-			checkEndOfSync();
+		var _error = function (response, resource, action) {
+			_checkEndOfSync();
+			// Set error and retry
+			var id = resource._id ? resource._id : resource.tmpId;
+			metadata[id] = {type: metadata[id].type, syncing: false, action: action};
 			// Check for conflict (updated)
 			if (response.status === 409) {
 				$rootScope.syncStatus = 'stopped';
@@ -366,74 +362,58 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			}
 		};
 		// Check if the sync is done, and set the status
-		var checkEndOfSync = function () {
-			todo--;
-			if (todo === 0) {
-				if (Object.keys(syncErrors).length === 0) {
-					setStatusSynced();
-				} else {
-					setStatusError();
-				}
+		var _checkEndOfSync = function () {
+			if (_isSynced()) {
+				setStatusSynced();
+			} else if (_isSyncError()) {
+				setStatusError();
 			}
 		};
-		// Handle new resources
-		Object.keys(newResources).forEach(function (type) {
-			var httpResource = _getHTTPResource(type);
-			Object.keys(newResources[type]).forEach(function (id) {
-				var resource = newResources[type][id];
-				delete(newResources[type][id]);
+		// Handle resources
+		Object.keys(resources).forEach(function (id) {
+			var httpResource = _getHTTPResource(metadata[id].type);
+			var resource = resources[id];
+			// Insert resource
+			if (metadata[id].action === 'insert') {
 				var clone = $.extend(true, {}, resource);
 				delete(clone.tmpId);
 				httpResource.save(clone,
 					function (data) {
-						success(resource);
+						_success(resource);
 						resource._id = data._id;
 						resource._revision = data._revision;
 						delete(resource.tmpId);
 					}, function (httpResponse) {
-						newResource('NOTE', resource);
-						error(httpResponse, resource);
+						_error(httpResponse, resource, 'insert');
 					}
 				);
-			});
-		});
-		// Handle dirty resources
-		Object.keys(dirtyResources).forEach(function (type) {
-			var httpResource = _getHTTPResource(type);
-			Object.keys(dirtyResources[type]).forEach(function (id) {
-				var resource = dirtyResources[type][id];
-				delete(dirtyResources[type][id]);
+			}
+			// Update resource
+			else if (metadata[id].action === 'update') {
 				httpResource.update({id: id}, resource,
 					function (data) {
-						success(resource);
+						_success(resource);
 						resource._revision = data._revision;
 					}, function (httpResponse) {
-						updateResource('NOTE', resource);
-						error(httpResponse, resource);
+						_error(httpResponse, resource, 'update');
 					}
 				);
-			});
-		});
-		// Handle deleted resources
-		Object.keys(deletedResources).forEach(function (type) {
-			var httpResource = _getHTTPResource(type);
-			Object.keys(deletedResources[type]).forEach(function (id) {
-				var resource = deletedResources[type][id];
-				delete(deletedResources[type][id]);
+			}
+			// Delete resource
+			else if (metadata[id].action === 'delete') {
 				httpResource.delete({id: id},
 					function () {
-						success(resource);
+						_success(resource);
 					}, function (httpResponse) {
-						deleteResource('NOTE', resource);
-						error(httpResponse, resource);
+						_error(httpResponse, resource, 'delete');
 					}
 				);
-			});
+			}
 		});
 	};
 
 	// Sync the changes every X seconds
-	$interval(sync, 2000);
+	$interval(_sync, 2000);
 
 	// Return change handling methods
 	return {
