@@ -204,11 +204,14 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 /**
  * Left-menu controller
  */
-webApp.controller('LeftMenuCtrl', function ($scope) {
+webApp.controller('LeftMenuCtrl', function ($scope, $timeout) {
 
 	$scope.goto = function (location) {
 		$scope.location = $scope.$parent.location = location;
-		$('#nav-menu').html($('#menu-item-' + location).html());
+		// Wait for navbar loaded
+		$timeout(function () {
+			$('#nav-menu').html($('#menu-item-' + location).html());
+		});
 	};
 
 	$scope.goto('all');
