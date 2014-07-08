@@ -189,17 +189,17 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	/**
 	 * Drag and drop
 	 */
-	$scope.within_enter = false;
 	$scope.handleDragStart = function($event, note) {
-		$($event.target).parent().css('opacity', 0.4);
+		$($event.target).css('opacity', 0.4);
 		$event.originalEvent.dataTransfer.effectAllowed = 'move';
 		$event.originalEvent.dataTransfer.setData('application/json', JSON.stringify(note));
 	};
 	$scope.handleDragEnd = function($event) {
-		$($event.target).parent().css('opacity', 1);
+		$($event.target).css('opacity', 1);
 	};
 	$scope.handleDrop = function($event, noteB) {
-/*		// Find noteA
+		console.log('drop');
+		// Find noteA
 		var noteA = JSON.parse($event.originalEvent.dataTransfer.getData('application/json'));
 		for (var key in $scope.notes) {
 			// If the note has an id, search if id match, else, search if tmpId match
@@ -225,57 +225,11 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		console.log(noteA.order + ' -> ' + save);
 		noteA.order = save;
 		// Draw grid
-		$rootScope.masonry.draw();*/
-	};
-	$scope.handleDragEnter = function ($event, noteB) {
-		$event.preventDefault();
-		$scope.within_enter = true;
-		setTimeout(function() { $scope.within_enter = false; }, 0);
-		$event.originalEvent.dataTransfer.dropEffect = 'move';
-		console.log('enter');
-		// Find noteA, and ignore
-		var noteA = JSON.parse($event.originalEvent.dataTransfer.getData('application/json'));
-		if ((noteA._id && noteB._id === noteA._id) || (!noteA._id && noteB.tmpId === noteA.tmpId)) {
-			return;
-		}
-		for (var key in $scope.notes) {
-			// If the note has an id, search if id match, else, search if tmpId match
-			if ((noteA._id && $scope.notes[key]._id === noteA._id) || (!noteA._id && $scope.notes[key].tmpId === noteA.tmpId)) {
-				noteA = $scope.notes[key];
-				break;
-			}
-		}
-
-		console.log('A: ' + noteA._id + ' ' + noteA.order);
-		console.log('B: ' + noteB._id + ' ' + noteB.order);
-		console.log('==================================');
-
-		// Change order
-		var save = noteB.order;
-		for (var key in $scope.notes) {
-			// If noteA is before noteB
-			if (noteA.order < noteB.order && $scope.notes[key].order > noteA.order && $scope.notes[key].order <= noteB.order) {
-				$scope.notes[key].order--;
-			}
-			// If noteA is after noteB
-			if (noteA.order > noteB.order && $scope.notes[key].order < noteA.order && $scope.notes[key].order >= noteB.order) {
-				$scope.notes[key].order++;
-			}
-		}
-		noteA.order = save;
-		// Draw grid
 		$rootScope.masonry.draw();
 	};
 	$scope.handleDragOver = function($event) {
 		$event.preventDefault();
-		console.log('over');
-	};
-	$scope.handleDragLeave = function($event) {
-		$event.preventDefault();
-		if (!$scope.within_enter) {
-			console.log('leave');
-		}
-		$scope.within_enter = false;
+		$event.originalEvent.dataTransfer.dropEffect = 'move';
 	};
 
 	/**

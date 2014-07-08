@@ -22,10 +22,7 @@
 <div id="grid-container" grid>
 
 	<!-- Notes view -->
-	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:'order'" droppable="true" ng-dragenter="handleDragEnter($event, note);" ng-dragover="handleDragOver($event, note);" ng-dragleave="handleDragLeave($event, note);" ng-drop="handleDrop($event, note);" grid-item>
-
-		<!-- Drag and drop handle -->
-		<div class="handle icon-global-handle" draggable="true" ng-dragstart="handleDragStart($event, note);" ng-dragend="handleDragEnd($event);"></div>
+	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:'order'" droppable="true" ng-dragover="handleDragOver($event, note);" ng-drop="handleDrop($event, note);" draggable="true" ng-dragstart="handleDragStart($event, note);" ng-dragend="handleDragEnd($event);" grid-item>
 
 		<!-- Title -->
 		<input class="note-title" type="text" placeholder="Title" tabindex="-1" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />
