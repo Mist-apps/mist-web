@@ -98,3 +98,6 @@
 .icon-global-user:before {
   content: "t";
 }
+.icon-global-handle:before {
+  content: "u";
+}

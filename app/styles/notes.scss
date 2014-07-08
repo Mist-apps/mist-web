@@ -52,6 +52,7 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
  */
 
 .note {
+
 	vertical-align: top;
 	background-color: #FFF;
 	border-radius: 1px;
@@ -72,6 +73,21 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 	-o-transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
 	-ms-transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
 	transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
+
+	.handle {
+		color: grey;
+		position: absolute;
+		top: 1px;
+		right: 2px;
+		cursor: move;
+		display: none;
+		font-size: 16px;
+	}
+
+	&:hover .handle {
+		display: block;
+	}
+
 }
 
 .note-visible {
@@ -87,6 +103,10 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 .note-edit {
 	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
 	z-index: 960;
+
+	&:hover .handle {
+		display: none;
+	}
 }
 
 .note-conflict {
