@@ -475,9 +475,16 @@ body {
 	}
 
 	.modal-content {
+
 		padding: 20px 15px;
 		font-size: 14px;
 		text-align: left;
+
+		.modal-content-column {
+			text-align: center;
+			display: inline-block;
+		}
+
 	}
 
 	.modal-footer {

@@ -194,6 +194,13 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	};
 
 	/**
+	 * Import/Export
+	 */
+	$scope.importExport = function () {
+		$modal.show('notes-import');
+	};
+
+	/**
 	 * Drag and drop
 	 */
 	var lastMove = {};
@@ -346,6 +353,43 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
 		$rootScope.syncStatus = 'syncing';
 		// Hide modal
 		$modal.hide('notes-conflict');
+	};
+
+});
+
+/**
+ * Import/Export controller (modal)
+ */
+webApp.controller('ImportController', function ($scope, $modal, $window, toastr, noteResource) {
+
+	$scope.exportType = 'json';
+
+	$scope.import = function () {
+		// Hide modal
+		$modal.hide('notes-import');
+	};
+
+	$scope.export = function () {
+		// Export from server
+		if ($scope.exportType === 'json') {
+			noteResource.exportJSON(
+				function (data) {
+					console.log('success');
+				}, function (httpResponse) {
+					$modal.hide('notes-import');
+					toastr.error('Error during notes export');
+				}
+			);	
+		} else if ($scope.exportType === 'xml') {
+			noteResource.exportXML(
+				function (data) {
+					console.log('success');
+				}, function (httpResponse) {
+					$modal.hide('notes-import');
+					toastr.error('Error during notes export');
+				}
+			);
+		}
 	};
 
 });

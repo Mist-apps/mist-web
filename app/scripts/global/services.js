@@ -16,7 +16,7 @@ webApp.factory('toastr', function() {
 		'debug': false,
 		'positionClass': 'toast-top-right',
 		'onclick': null,
-		'showDuration': 10000,
+		'showDuration': 500,
 		'hideDuration': 1000,
 		'timeOut': 5000,
 		'extendedTimeOut': 1000,

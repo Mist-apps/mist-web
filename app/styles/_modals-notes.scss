@@ -4,13 +4,6 @@
 
 #modal-notes-conflict {
 
-	.note-conflict-container {
-		text-align: center;
-		display: inline-block;
-		margin-top: 10px;
-		margin-bottom: 15px;
-	}
-
 	button {
 		display: inline-block;
 	}
@@ -27,6 +20,63 @@
 	.note-conflict-no-remote {
 		padding: 25px;
 		width: 250px;
+	}
+
+}
+
+/**
+ * Import modal
+ */
+
+#modal-notes-import {
+
+	input {
+		margin-top: 8px;
+	}
+
+	button {
+		display: inline-block;
+	}
+
+	.modal-content-column {
+
+		div[class^="icon-global-"] {
+			font-size: 80px;
+		}
+
+		&:nth-child(1) {
+
+			border-right: 1px solid rgba(0, 0, 0, 0.3);
+			padding-left: 15px;
+			padding-right: 25px;
+
+			button {
+				margin-top: 13px;
+			}
+
+		}
+
+		&:nth-child(2) {
+			padding-left: 25px;
+			padding-right: 15px;
+		}
+
+		.import-file input {
+			width: 150px;
+		}
+
+		.export-type {
+
+			text-align: left;
+
+			input {
+				width: auto;
+				margin-right: 10px;
+				margin-left: 30px;
+			}
+
+		}
+
 	}
 
 }

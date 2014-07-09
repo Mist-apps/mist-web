@@ -1,0 +1,42 @@
+<div id="modal-notes-import" class="modal" ng-controller="ImportController">
+
+	<!-- Header -->
+	<div class="modal-header icon-global-import">
+		Import - Export
+	</div>
+
+	<!-- Content -->
+	<div class="modal-content">
+
+		<!-- Import -->
+		<div class="modal-content-column">
+
+			<div class="icon-global-import"></div>
+
+			Please choose a file to import<br>
+
+			<div class="import-file"><input type="file" tabindex="1"></div>
+
+			<br>
+
+			<button tabindex="2" ng-click="import();">Import</button>
+		</div>
+
+		<!-- Export -->
+		<div class="modal-content-column">
+
+			<div class="icon-global-export"></div>
+
+			Please choose the export file type<br>
+
+			<div class="export-type"><input type="radio" ng-model="exportType" tabindex="3" value="json">JSON</div>
+			<div class="export-type"><input type="radio" ng-model="exportType" tabindex="3" value="xml">XML</div>
+
+			<br>
+
+			<button tabindex="5" ng-click="export();">Export</button>
+		</div>
+
+	</div>
+
+</div>
