@@ -200,10 +200,14 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		$modal.show('notes-import');
 	};
 
+	$scope.moveNote = function (note) {
+		console.log('moveNote ' + note);
+	};
+
 	/**
 	 * Drag and drop
 	 */
-	var lastMove = {};
+/*	var lastMove = {};
 	$scope.handleDragStart = function($event, note) {
 		$($event.target).parent().css('opacity', 0.4);
 		$event.originalEvent.dataTransfer.effectAllowed = 'move';
@@ -260,7 +264,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		noteA.order = save;
 		// Draw grid
 		$rootScope.masonry.draw();
-	};
+	};*/
 
 	/**
 	 * When a conflict is detected, stop edit the note and show modal
