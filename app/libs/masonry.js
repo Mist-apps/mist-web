@@ -74,7 +74,7 @@ var Masonry = function (container) {
 	var dragging = false;
 	var interval;
 	var mouse;
-	var afterItem;
+	var afterItem = undefined;
 
 	this.dragStart = function ($event) {
 		// Get note
@@ -103,16 +103,20 @@ var Masonry = function (container) {
 	this.dragEnd = function ($event, callback) {
 		// Stop listening to mouse move
 		$(document).unbind('mousemove');
-		// Stop moving other items
-		clearInterval(interval);
-		interval = null;
 		// Get note
 		var note = $($event.target).parent();
 		// Remove note from front
 		note.removeClass('note-edit note-dragging');
-		// Cancel click event if dragged
+		// If we were dragging
 		if (dragging) {
+			// We are no more dragging
 			dragging = false;
+			// Clear some variables
+			afterItem = undefined;
+			// Stop moving other items
+			clearInterval(interval);
+			interval = null;
+			// Cancel click event if dragged
 			$($event.target).one('click', false);
 			callback();
 		}
@@ -125,14 +129,10 @@ var Masonry = function (container) {
 		}
 		// Set each item position
 		var items = container.children;
-		var lastDrawn = null;
+		var lastDrawn = undefined;
+		var skipped = false;
 		for (var i = 0; i < items.length; i++) {
-			if (afterItem) {
-				console.log('after: ' + $(afterItem).find('input[name=id]').val());
-			} else if (afterItem === null) {
-				console.log('after: nothing');
-			}
-			// Skip the dropping item
+			// Skip the dragging item
 			if (note.get(0) === items[i]) {
 				continue;
 			}
@@ -144,22 +144,46 @@ var Masonry = function (container) {
 			var itemX = ((itemWidth + gap) * col);
 			var itemY = columns[col];
 			var noteItemHeight = note.height();
-			// Check if we are in a note place to skip the place
+			// If the mouse is in a place where a note can be drawn, skip the place
 			if (mouseX >= itemX && mouseX <= itemX + itemWidth && mouseY >= itemY && mouseY <= itemY + noteItemHeight) {
+				// Add the note in the column (without drawing it, so it is skipped)
 				columns[col] += gap + noteItemHeight;
+				// Redraw the current element we have not drawn
 				i--;
-				afterItem = lastDrawn;
-				lastDrawn = null;
+				// The dragged note is just after the last drawn item
+				afterItem = lastDrawn ? lastDrawn : null;
+				// No note drawn this time
+				lastDrawn = undefined;
+				// A note place has been skipped
+				skipped = true;
+			}
+			// If
+			else if (afterItem !== undefined && afterItem === lastDrawn) {
+				// Add the note in the column (without drawing it, so it is skipped)
+				columns[col] += gap + noteItemHeight;
+				// Redraw the current element we have not drawn
+				i--;
+				// No note drawn this time
+				lastDrawn = undefined;
+				// A note place has been skipped
+				skipped = true;
 			}
 			// Draw item
 			else {
+				// Set position and css
 				items[i].style.top = itemY + 'px';
 				items[i].style.left = itemX + 'px';
 				$(items[i]).addClass('note-visible');
+				// Add the note height in the column
 				columns[col] += gap + $(items[i]).height();
+				// Keep the last item drawn
 				lastDrawn = items[i];
 			}
-		}	
+		}
+		// If no place for note were skipped, then the note must be set at the end of the grid
+		if (!skipped) {
+			afterItem = lastDrawn;
+		}
 	}
 
 };
