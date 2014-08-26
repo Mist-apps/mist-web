@@ -485,3 +485,22 @@ webApp.service('$modal', function ($rootScope) {
 	return this;
 
 });
+
+/**
+ * Download service
+ */
+webApp.service('$download', function () {
+
+	// Return whether the modal is shown or not
+	this.download = function(name, data) {
+		var link = $('#download-link').get(0);
+		link.href = data;
+		link.target = '_blank';
+		link.download = name;
+		link.click();
+	};
+
+	// Export methods
+	return this;
+
+});

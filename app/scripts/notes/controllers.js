@@ -330,7 +330,7 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
 /**
  * Import/Export controller (modal)
  */
-webApp.controller('ImportController', function ($scope, $modal, $window, toastr, noteResource) {
+webApp.controller('ImportController', function ($scope, $modal, $download, toastr, noteResource) {
 
 	$scope.exportType = 'json';
 
@@ -344,7 +344,8 @@ webApp.controller('ImportController', function ($scope, $modal, $window, toastr,
 		if ($scope.exportType === 'json') {
 			noteResource.exportJSON(
 				function (data) {
-					console.log('success');
+					$modal.hide('notes-import');
+					$download.download('notes.json', 'data:application/json,' + JSON.stringify(data));
 				}, function (httpResponse) {
 					$modal.hide('notes-import');
 					toastr.error('Error during notes export');
@@ -353,7 +354,8 @@ webApp.controller('ImportController', function ($scope, $modal, $window, toastr,
 		} else if ($scope.exportType === 'xml') {
 			noteResource.exportXML(
 				function (data) {
-					console.log('success');
+					$modal.hide('notes-import');
+					$download.download('notes.xml', 'data:application/xml,' + data);
 				}, function (httpResponse) {
 					$modal.hide('notes-import');
 					toastr.error('Error during notes export');
