@@ -335,12 +335,10 @@ webApp.controller('ImportController', function ($scope, $modal, $download, toast
 	$scope.exportType = 'json';
 
 	$scope.import = function () {
-		// Hide modal
 		$modal.hide('notes-import');
 	};
 
 	$scope.export = function () {
-		// Export from server
 		if ($scope.exportType === 'json') {
 			noteResource.exportJSON(
 				function (data) {

@@ -498,6 +498,9 @@ webApp.service('$download', function () {
 		link.target = '_blank';
 		link.download = name;
 		link.click();
+		link.href = '';
+		link.target = '';
+		link.download = '';
 	};
 
 	// Export methods
