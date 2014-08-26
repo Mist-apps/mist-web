@@ -200,71 +200,37 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		$modal.show('notes-import');
 	};
 
-	$scope.moveNote = function (note) {
-		console.log('moveNote ' + note);
-	};
-
 	/**
-	 * Drag and drop
+	 * Move the note after the "previous" note.
+	 * The arguments are the order position of the notes.
 	 */
-/*	var lastMove = {};
-	$scope.handleDragStart = function($event, note) {
-		$($event.target).parent().css('opacity', 0.4);
-		$event.originalEvent.dataTransfer.effectAllowed = 'move';
-		$event.originalEvent.dataTransfer.setData('application/json', JSON.stringify(note));
-	};
-	$scope.handleDragEnd = function($event) {
-		$($event.target).parent().css('opacity', 1);
-	};
-	$scope.handleDragOver = function($event, noteB) {
-		$event.preventDefault();
-		$event.originalEvent.dataTransfer.dropEffect = 'move';
-		if (lastMove.date && (new Date().getTime()) - lastMove.date.getTime() > 200) {
-			lastMove = {};
-		}
-		_tryMove($event, noteB);
-	};
-	$scope.handleDragEnter = function($event, noteB) {
-		_tryMove($event, noteB);
-	};
-	$scope.handleDragLeave = function($event) {
-		lastMove = {};
-	};
-	var _tryMove = function ($event, noteB) {
-		// Get noteA
-		var noteA = JSON.parse($event.originalEvent.dataTransfer.getData('application/json'));
+	$scope.moveNote = function (AOrder, BOrder) {
+		// Set notes order
 		for (var key in $scope.notes) {
-			// If the note has an id, search if id match, else, search if tmpId match
-			if ((noteA._id && $scope.notes[key]._id === noteA._id) || (!noteA._id && $scope.notes[key].tmpId === noteA.tmpId)) {
-				noteA = $scope.notes[key];
-				break;
+			var note = $scope.notes[key];
+			// Set the note to the right position
+			if (note.order === AOrder) {
+				if (AOrder <= BOrder) {
+					note.order = BOrder;
+				} else {
+					note.order = BOrder + 1;
+				}
+				syncService.updateResource('NOTE', note);
+			}
+			// Push all the notes between the previous and the note one position to the right
+			else if (note.order < AOrder && note.order > BOrder) {
+				note.order++;
+				syncService.updateResource('NOTE', note);
+			}
+			// Push all the notes between the note and the previous one position to the left
+			else if (note.order > AOrder && note.order <= BOrder) {
+				note.order--;
+				syncService.updateResource('NOTE', note);
 			}
 		}
-		// Check if move necessary
-		if (noteA.order === noteB.order) {
-			return;
-		}
-		if (noteA.order === lastMove.end && noteB.order === lastMove.start) {
-			return;
-		}
-		lastMove = {start: noteA.order, end: noteB.order, date: new Date()};
-
-		// Change order
-		var save = noteB.order;
-		for (var key in $scope.notes) {
-			// If noteA is before noteB
-			if (noteA.order < noteB.order && $scope.notes[key].order > noteA.order && $scope.notes[key].order <= noteB.order) {
-				$scope.notes[key].order--;
-			}
-			// If noteA is after noteB
-			if (noteA.order > noteB.order && $scope.notes[key].order < noteA.order && $scope.notes[key].order >= noteB.order) {
-				$scope.notes[key].order++;
-			}
-		}
-		noteA.order = save;
 		// Draw grid
 		$rootScope.masonry.draw();
-	};*/
+	};
 
 	/**
 	 * When a conflict is detected, stop edit the note and show modal

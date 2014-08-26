@@ -109,6 +109,8 @@ var Masonry = function (container) {
 		note.removeClass('note-edit note-dragging');
 		// If we were dragging
 		if (dragging) {
+			// Save afterItem
+			var previous = afterItem;
 			// We are no more dragging
 			dragging = false;
 			// Clear some variables
@@ -118,7 +120,15 @@ var Masonry = function (container) {
 			interval = null;
 			// Cancel click event if dragged
 			$($event.target).one('click', false);
-			callback();
+			// Callback
+			if (callback) {
+				var noteOrder = parseInt($(note).find('input[name="order"]').val());
+				var previousOrder = parseInt($(previous).find('input[name="order"]').val());
+				if (isNaN(previousOrder)) {
+					previousOrder = 0;
+				}
+				callback(noteOrder, previousOrder);
+			}
 		}
 	};
 
