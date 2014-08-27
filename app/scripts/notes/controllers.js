@@ -360,7 +360,7 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 				} else if (input.files[0].type === 'text/xml') {
 					noteResource.importXML(e.target.result, success, error);
 				} else {
-					console.log('wrong file type');
+					toastr.error('Wrong file type');
 				}
 			};
 			// Read the file
