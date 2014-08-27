@@ -330,7 +330,7 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
 /**
  * Import/Export controller (modal)
  */
-webApp.controller('ImportController', function ($scope, $modal, $download, toastr, noteResource) {
+webApp.controller('ImportController', function ($scope, $http, $modal, $download, toastr, noteResource) {
 
 	$scope.exportType = 'json';
 
@@ -350,15 +350,15 @@ webApp.controller('ImportController', function ($scope, $modal, $download, toast
 				}
 			);	
 		} else if ($scope.exportType === 'xml') {
-			noteResource.exportXML(
-				function (data) {
+			$http.get(API_URL + '/note/export', {headers: {'Accept': 'application/xml'}})
+				.success(function (data) {
 					$modal.hide('notes-import');
 					$download.download('notes.xml', 'data:application/xml,' + data);
-				}, function (httpResponse) {
+				})
+				.error(function (httpResponse) {
 					$modal.hide('notes-import');
 					toastr.error('Error during notes export');
-				}
-			);
+				});
 		}
 	};
 
