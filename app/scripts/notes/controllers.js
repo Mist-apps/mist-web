@@ -342,18 +342,26 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 		if (input.files && input.files[0]) {
 			// Prepare reader
 			var reader = new FileReader();
+			// Import when file read
 			reader.onload = function (e) {
-				// Import when file read
-				noteResource.importJSON(e.target.result,
-					function (data) {
-						$modal.hide('notes-import');
-						toastr.success('Notes import successful, ' + data.number + ' notes imported.');
-						$rootScope.$broadcast('REFRESH');
-					}, function (httpResponse) {
-						$modal.hide('notes-import');
-						toastr.error('Error during notes import');
-					}
-				);
+				// Callbacks
+				var success = function (data) {
+					$modal.hide('notes-import');
+					toastr.success('Notes import successful, ' + data.number + ' notes imported.');
+					$rootScope.$broadcast('REFRESH');
+				};
+				var error = function (httpResponse) {
+					$modal.hide('notes-import');
+					toastr.error('Error during notes import');
+				};
+				// Import
+				if (input.files[0].type === 'application/json') {
+					noteResource.importJSON(e.target.result, success, error);
+				} else if (input.files[0].type === 'text/xml') {
+					noteResource.importXML(e.target.result, success, error);
+				} else {
+					console.log('wrong file type');
+				}
 			};
 			// Read the file
 			reader.readAsText(input.files[0]);
