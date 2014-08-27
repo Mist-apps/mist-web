@@ -249,6 +249,9 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 			}
 		}
 	});
+	$scope.$on('REFRESH', function (event) {
+		$scope.getNotes();
+	});
 
 });
 
@@ -330,12 +333,31 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
 /**
  * Import/Export controller (modal)
  */
-webApp.controller('ImportController', function ($scope, $http, $modal, $download, toastr, noteResource) {
+webApp.controller('ImportController', function ($rootScope, $scope, $http, $modal, $download, toastr, noteResource) {
 
 	$scope.exportType = 'json';
 
 	$scope.import = function () {
-		$modal.hide('notes-import');
+		var input = $('#modal-notes-import .import-file input').get(0);
+		if (input.files && input.files[0]) {
+			// Prepare reader
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				// Import when file read
+				noteResource.importJSON(e.target.result,
+					function (data) {
+						$modal.hide('notes-import');
+						toastr.success('Notes import successful, ' + data.number + ' notes imported.');
+						$rootScope.$broadcast('REFRESH');
+					}, function (httpResponse) {
+						$modal.hide('notes-import');
+						toastr.error('Error during notes import');
+					}
+				);
+			};
+			// Read the file
+			reader.readAsText(input.files[0]);
+		}
 	};
 
 	$scope.export = function () {
