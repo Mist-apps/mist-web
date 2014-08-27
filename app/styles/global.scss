@@ -472,6 +472,19 @@ body {
 			margin-right: 8px;
 		}
 
+		.modal-header-close {
+
+			display: inline-block;
+			font-size: 28px;
+			float: right;
+			margin-top: -6px;
+			cursor: pointer;
+
+			&:hover {
+				color: rgba(0, 0, 0, 0.9);
+			}
+		}
+
 	}
 
 	.modal-content {

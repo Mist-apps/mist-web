@@ -392,4 +392,9 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 		}
 	};
 
+	$scope.close = function () {
+		// Hide modal
+		$modal.hide('notes-import');
+	};
+
 });
