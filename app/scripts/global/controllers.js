@@ -15,9 +15,8 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 
 	$rootScope.$watch('location', function () {
 		var interval = setInterval(function () {
-			console.log('try');
 			var title = $('#menu-item-' + $rootScope.location).html();
-			if (title) {
+			if (title && $('#nav-menu').html() !== undefined) {
 				$('#nav-menu').html(title);
 				clearInterval(interval);
 			}
