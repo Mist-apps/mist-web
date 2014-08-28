@@ -17,6 +17,11 @@ body {
 	z-index: 100;
 }
 
+.fa {
+	line-height: 1;
+	vertical-align: middle;
+}
+
 
 /**
  * Navbar
@@ -89,7 +94,7 @@ body {
 }
 
 #nav-search-icon {
-	margin: 0px 15px;
+	margin: 3px 15px;
 	float: left;
 	width: 16px;
 	cursor: default;
@@ -108,7 +113,7 @@ body {
 }
 
 #nav-search-stop {
-	margin: 0px 5px;
+	margin: 3px 5px;
 	position: relative;
 	top: -22px;
 	right: 0px;
