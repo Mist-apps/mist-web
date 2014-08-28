@@ -1,18 +1,18 @@
 <!-- Left menu -->
 <div class="menu">
 	<!-- Items -->
-	<div id="menu-item-all" ng-click="$root.location = 'all'" ng-class="{'menu-item-active': $root.location=='all'}" class="menu-item icon-notes-all">All</div>
-	<div id="menu-item-notes" ng-click="$root.location = 'notes'" ng-class="{'menu-item-active': $root.location=='notes'}" class="menu-item icon-notes-notes">Notes</div>
-	<div id="menu-item-todo" ng-click="$root.location = 'todo'" ng-class="{'menu-item-active': $root.location=='todo'}" class="menu-item icon-notes-todo">Todo lists</div>
+	<div id="menu-item-all" ng-click="$root.location = 'all'" ng-class="{'menu-item-active': $root.location=='all'}" class="menu-item"><span class="fa fa-th fa-lg"></span>All</div>
+	<div id="menu-item-notes" ng-click="$root.location = 'notes'" ng-class="{'menu-item-active': $root.location=='notes'}" class="menu-item"><span class="fa fa-lightbulb-o fa-lg"></span>Notes</div>
+	<div id="menu-item-todo" ng-click="$root.location = 'todo'" ng-class="{'menu-item-active': $root.location=='todo'}" class="menu-item"><span class="fa fa-check fa-lg"></span>Todo lists</div>
 	<div class="menu-separator"></div>
-	<div id="menu-item-trash" ng-click="$root.location = 'trash'" ng-class="{'menu-item-active': $root.location=='trash'}" class="menu-item icon-notes-trash">Trash</div>
+	<div id="menu-item-trash" ng-click="$root.location = 'trash'" ng-class="{'menu-item-active': $root.location=='trash'}" class="menu-item"><span class="fa fa-trash-o fa-lg"></span>Trash</div>
 	<!-- Sync status -->
 	<div class="menu-bottom">
 		<div id="menu-sync">
-			<div class="icon-global-sync" ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'">Syncing</div>
-			<div class="icon-global-ok" ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'">Synced</div>
-			<div class="icon-global-warning" ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'">Sync error</div>
-			<div class="icon-global-warning" ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'">Sync stopped</div>
+			<div ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-refresh fa-lg"></span>Syncing</div>
+			<div ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-check fa-lg"></span>Synced</div>
+			<div ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-warning fa-lg"></span>Sync error</div>
+			<div ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'"><span class="fa fa-warning fa-lg"></span>Sync stopped</div>
 		</div>
 	</div>
 </div>
@@ -60,8 +60,8 @@
 
 <!-- Bottom add menu -->
 <div id="add-menu">
-	<div><div class="icon-global-add" ng-click="$parent.toggleAddMenu($event)"></div></div>
-	<div><span>Import/export</span><div class="icon-global-import" ng-click="importExport();"></div></div>
-	<div><span>New todo list</span><div class="icon-notes-todo" ng-click="addNewTodo();"></div></div>
-	<div><span>New note</span><div class="icon-notes-notes" ng-click="addNewNote();"></div></div>
+	<div><div class="fa fa-plus" ng-click="$parent.toggleAddMenu($event)"></div></div>
+	<div><span>Import/export</span><div class="fa fa-cloud-upload" ng-click="importExport();"></div></div>
+	<div><span>New todo list</span><div class="fa fa-check" ng-click="addNewTodo();"></div></div>
+	<div><span>New note</span><div class="fa fa-lightbulb-o" ng-click="addNewNote();"></div></div>
 </div>

@@ -17,11 +17,6 @@ body {
 	z-index: 100;
 }
 
-.fa {
-	line-height: 1;
-	vertical-align: middle;
-}
-
 
 /**
  * Navbar
@@ -245,21 +240,19 @@ body {
 
 .menu-item {
 
-	height: 24px;
-	line-height: 24px;
-	padding: 13px 30px 13px 30px;
+	padding: 13px 20px 13px 20px;
 	cursor: pointer;
 	color: rgba(0, 0, 0, 0.6);
 	font-size: 15px;
 
-	&:before {
-		margin-right: 13px;
-		font-size: 150%;
-	}
-
 	&:hover {
 		background-color: rgba(0, 0, 0, 0.02);
 		color: rgba(0, 0, 0, 0.9);
+	}
+
+	.fa {
+		width: 2em;
+		text-align: center;
 	}
 
 }
@@ -307,9 +300,8 @@ body {
 			font-weight: bold;
 		}
 
-		&:before {
+		span {
 			margin-right: 10px;
-			font-size: 130%;
 		}
 
 	}
@@ -334,8 +326,6 @@ body {
 
 	div {
 
-		font-size: 11px;
-		font-weight: bold;
 		display: none;
 		height: 52px;
 		margin: 4px 4px 4px 10px;
@@ -376,6 +366,11 @@ body {
 			background-color: #3C80F6;
 		}
 
+	}
+
+	div span {
+		font-size: 11px;
+		font-weight: bold;
 	}
 
 	div div {
@@ -460,7 +455,7 @@ body {
  */
 
 .modal {
-	
+
 	background-color: #FFF;
 	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.3);
 	z-index: 960;
