@@ -52,6 +52,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		for (var j in order) {
 			if (order[j].order !== i) {
 				order[j].order = i;
+				// Inform sync service
 				syncService.updateResource('NOTE', order[j]);
 			}
 			i++;
@@ -60,6 +61,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		for (var j in other) {
 			if (other[j].order !== i) {
 				other[j].order = i;
+				// Inform sync service
 				syncService.updateResource('NOTE', other[j]);
 			}
 			i++;
@@ -146,7 +148,10 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 		// Pack the order numbers
 		for (var key in $scope.notes) {
 			if ($scope.notes[key].order > note.order) {
+				// Change order number
 				$scope.notes[key].order--;
+				// Inform sync service
+				syncService.updateResource('NOTE', $scope.notes[key]);
 			}
 		}
 		// Stop edit the note
