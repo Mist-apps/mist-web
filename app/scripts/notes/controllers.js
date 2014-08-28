@@ -14,6 +14,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	$scope.getNotes = function () {
 		var success = function (data, responseHeaders) {
 			$scope.notes = data;
+			_checkNotesOrder();
 		};
 		var error = function (httpResponse) {
 			toastr.error('Unable to get notes (' + httpResponse.status + ')');
@@ -23,6 +24,47 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 
 	$scope.notes = [];
 	$scope.getNotes();
+
+	/**
+	 * Check the notes order for gaps, or duplicates
+	 */
+	var _checkNotesOrder = function () {
+		// Check order
+		var order = [];
+		var other = [];
+		// Split ordered and others
+		for (var i in $scope.notes) {
+			// If no order
+			if (!$scope.notes[i].order) {
+				other.push($scope.notes[i]);
+			}
+			// If place taken
+			else if (order[$scope.notes[i].order]) {
+				other.push($scope.notes[i]);
+			}
+			// Set in the ordered list
+			else {
+				order[$scope.notes[i].order] = $scope.notes[i];
+			}
+		}
+		// Pack the ordered list
+		var i = 1;
+		for (var j in order) {
+			if (order[j].order !== i) {
+				order[j].order = i;
+				syncService.updateResource('NOTE', order[j]);
+			}
+			i++;
+		}
+		// Add the unordered to the end
+		for (var j in other) {
+			if (other[j].order !== i) {
+				other[j].order = i;
+				syncService.updateResource('NOTE', other[j]);
+			}
+			i++;
+		}
+	};
 
 	// Add notes web methods
 	$scope.toggleTaskDone = NotesWebService.toggleTaskDone;
