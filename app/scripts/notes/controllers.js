@@ -6,8 +6,6 @@
  */
 webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, toastr, syncService, NotesWebService) {
 
-	$scope.location = 'all';
-
 	/**
 	 * Get Notes from API
 	 */
@@ -80,13 +78,13 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	 * Filter the notes from the menu selection
 	 */
 	$scope.filterNotes = function (value) {
-		if ($scope.location === 'all') {
+		if ($rootScope.location === 'all') {
 			return !value.deleteDate;
-		} else if ($scope.location === 'notes') {
+		} else if ($rootScope.location === 'notes') {
 			return !value.deleteDate && !value.tasks;
-		} else if ($scope.location === 'todo') {
+		} else if ($rootScope.location === 'todo') {
 			return !value.deleteDate && value.tasks;
-		} else if ($scope.location === 'trash') {
+		} else if ($rootScope.location === 'trash') {
 			return value.deleteDate;
 		} else {
 			return false;
@@ -299,23 +297,6 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResourc
 	$scope.$on('REFRESH', function (event) {
 		$scope.getNotes();
 	});
-
-});
-
-/**
- * Left-menu controller
- */
-webApp.controller('LeftMenuCtrl', function ($scope, $timeout) {
-
-	$scope.goto = function (location) {
-		$scope.location = $scope.$parent.location = location;
-		// Wait for navbar loaded
-		$timeout(function () {
-			$('#nav-menu').html($('#menu-item-' + location).html());
-		});
-	};
-
-	$scope.goto('all');
 
 });
 

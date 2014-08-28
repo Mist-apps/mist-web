@@ -6,12 +6,27 @@
  *		- Show/hide all menus
  *		- Logout
  */
-webApp.controller('ApplicationController', function ($scope, $rootScope, $location, $modal, AuthService, syncService) {
+webApp.controller('ApplicationController', function ($scope, $timeout, $rootScope, $location, $modal, AuthService, syncService) {
+
+	/**
+	 * Left menu location 
+	 */
+	$rootScope.location = 'all';
+
+	$rootScope.$watch('location', function () {
+		var interval = setInterval(function () {
+			console.log('try');
+			var title = $('#menu-item-' + $rootScope.location).html();
+			if (title) {
+				$('#nav-menu').html(title);
+				clearInterval(interval);
+			}
+		}, 100);
+	});
 
 	/**
 	 * Navigate to path
 	 */
-
 	$scope.goto = function (path) {
 		$location.path(path);
 	};

@@ -1,11 +1,11 @@
 <!-- Left menu -->
-<div class="menu" ng-controller="LeftMenuCtrl">
+<div class="menu">
 	<!-- Items -->
-	<div id="menu-item-all" ng-click="goto('all')" ng-class="{'menu-item-active': location=='all'}" class="menu-item icon-notes-all">All</div>
-	<div id="menu-item-notes" ng-click="goto('notes')" ng-class="{'menu-item-active': location=='notes'}" class="menu-item icon-notes-notes">Notes</div>
-	<div id="menu-item-todo" ng-click="goto('todo')" ng-class="{'menu-item-active': location=='todo'}" class="menu-item icon-notes-todo">Todo lists</div>
+	<div id="menu-item-all" ng-click="$root.location = 'all'" ng-class="{'menu-item-active': $root.location=='all'}" class="menu-item icon-notes-all">All</div>
+	<div id="menu-item-notes" ng-click="$root.location = 'notes'" ng-class="{'menu-item-active': $root.location=='notes'}" class="menu-item icon-notes-notes">Notes</div>
+	<div id="menu-item-todo" ng-click="$root.location = 'todo'" ng-class="{'menu-item-active': $root.location=='todo'}" class="menu-item icon-notes-todo">Todo lists</div>
 	<div class="menu-separator"></div>
-	<div id="menu-item-trash" ng-click="goto('trash')" ng-class="{'menu-item-active': location=='trash'}" class="menu-item icon-notes-trash">Trash</div>
+	<div id="menu-item-trash" ng-click="$root.location = 'trash'" ng-class="{'menu-item-active': $root.location=='trash'}" class="menu-item icon-notes-trash">Trash</div>
 	<!-- Sync status -->
 	<div class="menu-bottom">
 		<div id="menu-sync">
