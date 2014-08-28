@@ -43,9 +43,9 @@
 
 		<!-- Menu -->
 		<div class="note-menu">
-			<div class="icon-notes-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
-			<div class="icon-notes-delete" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
-			<div class="icon-notes-restore" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
+			<div class="fa fa-trash-o" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
+			<div class="fa fa-remove" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
+			<div class="fa fa-undo" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
 			<button ng-click="stopEditNotes();">OK</button>
 		</div>
 

@@ -46,11 +46,14 @@ body {
 	cursor: pointer;
 	font-size: 16px;
 	float: left;
+	line-height: $navbar-height;
 
-	&:before {
+	.fa {
 		margin-right: 10px;
 		font-size: 150%;
+		line-height: $navbar-height;
 	}
+
 }
 
 #nav-user {

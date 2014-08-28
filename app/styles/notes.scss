@@ -201,17 +201,15 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 	transition-property: height;
 	transition-timing-function: linear;
 
-	div[class^="icon-"] {
+	.fa {
 
-		&:before {
-			color: rgba(255, 255, 255, 1);
-			font-size: 25px;
-			cursor: pointer;
-			height: 36px;
-			line-height: 36px;
-		}
+		color: rgba(255, 255, 255, 1);
+		font-size: 25px;
+		cursor: pointer;
+		height: 36px;
+		line-height: 36px;
 
-		&:hover:before {
+		&:hover {
 			color: rgba(255, 255, 255, 0.7);
 		}
 
