@@ -156,15 +156,13 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 	cursor: pointer;
 
 	&:before {
-		font-family: "notes" !important;
-		font-style: normal !important;
-		font-weight: normal !important;
-		font-variant: normal !important;
-		text-transform: none !important;
-		speak: none;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-		content: "e";
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: inherit;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+		content: "\f096";
 		font-size: 20px;
 		color: rgba(0, 0, 0, 0.35);
 	}
@@ -181,7 +179,7 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 }
 
 .note-task-done .note-task-icon:before {
-	content: "d";
+	content: "\f046";
 }
 
 

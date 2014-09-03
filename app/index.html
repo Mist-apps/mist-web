@@ -60,16 +60,16 @@
 			<div id="user-menu-arrow"></div>
 			<div id="user-menu-arrow-fill"></div>
 			<div id="user-menu-apps">
-				<div class="icon-global-reader">Reader</div>
-				<div class="icon-global-contacts" ng-click="goto('/contacts');">Contacts</div>
-				<div class="icon-global-calendar">Calendar</div>
-				<div class="icon-global-mail">Mail</div>
-				<div class="icon-global-pass">Pass</div>
-				<div class="icon-global-notes" ng-click="goto('/notes');">Notes</div>
+				<div><span class="fa fa-rss"></span>Reader</div>
+				<div><span class="fa fa-users" ng-click="goto('/contacts');"></span>Contacts</div>
+				<div><span class="fa fa-calendar"></span>Calendar</div>
+				<div><span class="fa fa-envelope"></span>Mail</div>
+				<div><span class="fa fa-lock"></span>Pass</div>
+				<div><span class="fa fa-lightbulb-o" ng-click="goto('/notes');"></span>Notes</div>
 			</div>
 			<div id="user-menu-footer">
-				<div class="icon-global-settings" ng-click="showSettings()">Settings</div>
-				<div class="icon-global-logout" ng-click="logout()">Logout</div>
+				<div ng-click="showSettings()"><span class="fa fa-cogs"></span><span>Settings</span></div>
+				<div ng-click="logout()"><span class="fa fa-power-off"></span><span>Logout</span></div>
 			</div>
 		</div>
 

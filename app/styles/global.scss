@@ -176,7 +176,7 @@ body {
 		display: inline-block;
 		cursor: pointer;
 
-		&:before {
+		.fa {
 			font-size: 36px;
 			display: block;
 		}
@@ -202,9 +202,15 @@ body {
 		display: inline-block;
 		cursor: pointer;
 
-		&:before {
+		.fa {
 			margin-right: 10px;
 			font-size: 150%;
+		}
+
+		span {
+			display: inline-block;
+			line-height: 20px;
+			float: left;
 		}
 
 		&:hover {
