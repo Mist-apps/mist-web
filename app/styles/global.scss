@@ -48,10 +48,14 @@ body {
 	float: left;
 	line-height: $navbar-height;
 
+	span {
+		line-height: $navbar-height;
+		float: left;
+	}
+
 	.fa {
 		margin-right: 10px;
 		font-size: 150%;
-		line-height: $navbar-height;
 	}
 
 }
