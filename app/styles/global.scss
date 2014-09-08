@@ -479,12 +479,15 @@ body {
 	.modal-header {
 
 		font-weight: bold;
-		padding: 12px 15px 8px 15px;
+		padding: 10px 15px 10px 15px;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+		font-size: 120%;
 
-		&:before {
-			font-size: 150%;
-			margin-right: 8px;
+		.fa {
+			display: inline-block;
+			font-size: 130%;
+			float: left;
+			margin-right: 13px;
 		}
 
 		.modal-header-close {

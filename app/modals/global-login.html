@@ -1,7 +1,8 @@
 <div id="modal-global-login" class="modal" ng-controller="LoginController">
 
 	<!-- Header -->
-	<div class="modal-header icon-global-pass">
+	<div class="modal-header">
+		<span class="fa fa-lock"></span>
 		Log-in
 	</div>
 
@@ -13,15 +14,15 @@
 		<br>
 
 		<div class="login-form-input">
-			<div class="icon-global-user"></div>
+			<div class="fa fa-user fa-fw"></div>
 			<input type="text" placeholder="Login" tabindex="1" ng-model="credentials.login">
 		</div>
 
 		<br>
 
 		<div class="login-form-input">
-			<div class="icon-global-pass"></div>
-			<input type="password" placeholder="Password" tabindex="1" ng-model="credentials.password">
+			<div class="fa fa-lock fa-fw"></div>
+			<input type="password" placeholder="Password"  tabindex="1" ng-model="credentials.password">
 		</div>
 
 		<br>

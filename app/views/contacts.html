@@ -1,23 +1,23 @@
 <!-- Left menu -->
-<div class="menu" ng-controller="LeftMenuCtrl">
+<div class="menu">
 	<!-- Items -->
-	<div class="menu-item icon-contacts-all">All</div>
-	<div class="menu-item icon-contacts-star">Starred</div>
-	<div class="menu-item icon-contacts-group">Grouped</div>
-	<div class="menu-item icon-contacts-nogroup">Ungrouped</div>
+	<div class="menu-item"><span class="fa fa-th fa-lg"></span>All</div>
+	<div class="menu-item"><span class="fa fa-star fa-lg"></span>Starred</div>
+	<div class="menu-item"><span class="fa fa-users fa-lg"></span>Grouped</div>
+	<div class="menu-item"><span class="fa fa-question fa-lg"></span>Ungrouped</div>
 	<div class="menu-separator"></div>
-	<div class="menu-item icon-contacts-group">Friends</div>
-	<div class="menu-item icon-contacts-home">Family</div>
-	<div class="menu-item icon-contacts-work">Work</div>
+	<div class="menu-item"><span class="fa fa-users fa-lg"></span>Friends</div>
+	<div class="menu-item"><span class="fa fa-home fa-lg"></span>Family</div>
+	<div class="menu-item"><span class="fa fa-briefcase fa-lg"></span>Work</div>
 	<div class="menu-separator"></div>
-	<div class="menu-item icon-contacts-trash">Trash</div>
+	<div class="menu-item"><span class="fa fa-trash fa-lg"></span>Trash</div>
 	<!-- Sync status -->
 	<div class="menu-bottom">
 		<div id="menu-sync">
-			<div class="icon-global-sync" ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'">Syncing</div>
-			<div class="icon-global-ok" ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'">Synced</div>
-			<div class="icon-global-warning" ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'">Sync error</div>
-			<div class="icon-global-warning" ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'">Sync stopped</div>
+			<div ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-refresh fa-lg"></span>Syncing</div>
+			<div ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-check fa-lg"></span>Synced</div>
+			<div ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-warning fa-lg"></span>Sync error</div>
+			<div ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'"><span class="fa fa-warning fa-lg"></span>Sync stopped</div>
 		</div>
 	</div>
 </div>
@@ -29,8 +29,8 @@
 
 <!-- Bottom add menu -->
 <div id="add-menu">
-	<div><div class="icon-global-add" ng-click="$parent.toggleAddMenu($event)"></div></div>
-	<div><span>Import/export</span><div class="icon-global-import"></div></div>
-	<div><span>New group</span><div class="icon-contacts-group" ng-click=""></div></div>
-	<div><span>New contact</span><div class="icon-contacts-contact" ng-click=""></div></div>
+	<div><div class="fa fa-plus" ng-click="$parent.toggleAddMenu($event)"></div></div>
+	<div><span>Import/export</span><div class="fa fa-cloud-upload" ng-click=""></div></div>
+	<div><span>New group</span><div class="fa fa-users" ng-click=""></div></div>
+	<div><span>New contact</span><div class="fa fa-user" ng-click=""></div></div>
 </div>

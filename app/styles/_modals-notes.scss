@@ -40,7 +40,8 @@
 
 	.modal-content-column {
 
-		div[class^="icon-global-"] {
+		.fa {
+			display: block;
 			font-size: 80px;
 		}
 
