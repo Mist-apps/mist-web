@@ -369,6 +369,20 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 				setStatusError();
 			}
 		};
+		// Copy response data in resource
+		var _copyDataToResource = function (resource, data) {
+			// Copy from data to resource
+			for (var property in data) {
+				resource[property] = data[property];
+			}
+			// Delete old properties in resource
+			for (var property in resource) {
+				// If the property starts not with $ and is not in data, delete it
+				if (resource.hasOwnProperty(property) && property.charAt(0) !== '$' && !data.hasOwnProperty(property)) {
+					delete(resource[property]);
+				}
+			}
+		};
 		// Handle resources
 		Object.keys(resources).forEach(function (id) {
 			var httpResource = _getHTTPResource(metadata[id].type);
@@ -380,9 +394,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 				httpResource.save(clone,
 					function (data) {
 						_success(resource);
-						resource._id = data._id;
-						resource._revision = data._revision;
-						delete(resource.tmpId);
+						_copyDataToResource(resource, data);
 					}, function (httpResponse) {
 						_error(httpResponse, resource, 'insert');
 					}
@@ -393,7 +405,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 				httpResource.update({id: id}, resource,
 					function (data) {
 						_success(resource);
-						resource._revision = data._revision;
+						_copyDataToResource(resource, data);
 					}, function (httpResponse) {
 						_error(httpResponse, resource, 'update');
 					}
