@@ -75,32 +75,39 @@ var Masonry = function (container) {
 	var interval;
 	var mouse;
 	var afterItem = undefined;
+	var SENSITIVITY = 100;
+	var senseTimeout;
 
 	this.dragStart = function ($event) {
-		// Get note
-		var note = $($event.target).parent();
-		// Set note in front and disable transitions
-		note.addClass('note-edit note-dragging');
-		// Save relative position of the note from the mouse
-		var relX = $event.pageX - note.offset().left;
-		var relY = $event.pageY - note.offset().top;
-		// Listen to mouse move
-		$(document).bind('mousemove', function (event) {
-			dragging = true;
-			var diffX = event.pageX - relX - offsetLeft;
-			var diffY = event.pageY - relY - offsetTop;
-			note.css('left', diffX + 'px').css('top', diffY + 'px');
-			mouse = {x: event.pageX, y: event.pageY};
-			// Start moving other items
-			if (!interval) {
-				interval = setInterval(function () {
-					_move(note);
-				}, 50);
-			}
-		});
+		// Wait sensitivity before start dragging
+		senseTimeout = setTimeout(function () {
+			// Get note
+			var note = $($event.target).parent();
+			// Set note in front and disable transitions
+			note.addClass('note-edit note-dragging');
+			// Save relative position of the note from the mouse
+			var relX = $event.pageX - note.offset().left;
+			var relY = $event.pageY - note.offset().top;
+			// Listen to mouse move
+			$(document).bind('mousemove', function (event) {
+				dragging = true;
+				var diffX = event.pageX - relX - offsetLeft;
+				var diffY = event.pageY - relY - offsetTop;
+				note.css('left', diffX + 'px').css('top', diffY + 'px');
+				mouse = {x: event.pageX, y: event.pageY};
+				// Start moving other items
+				if (!interval) {
+					interval = setInterval(function () {
+						_move(note);
+					}, 50);
+				}
+			});
+		}, SENSITIVITY);
 	};
 
 	this.dragEnd = function ($event, callback) {
+		// Clear the timeout if needed
+		clearTimeout(senseTimeout);
 		// Stop listening to mouse move
 		$(document).unbind('mousemove');
 		// Get note
