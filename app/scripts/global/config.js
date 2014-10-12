@@ -58,12 +58,15 @@ webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
 				if (next.authenticated) {
 					// Go to login page
 					$location.path('/login');
+					// Error
+					promise.reject();
+				} else {
+					// No problem
+					promise.resolve();
 				}
-				// Error
-				promise.reject();
 			});
 			// Send the promise
-			return promise;
+			return promise.promise;
 		};
 	};
 

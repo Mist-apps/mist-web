@@ -452,13 +452,24 @@ body {
 	text-align: center;
 }
 
-#nothing-message {
+#nothing-message, .loader {
+
 	padding-top: 15px;
 	text-align: center;
 	font-size: 36px;
 	color: #FFF;
 	text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 	cursor: default;
+
+		span {
+			font-size: 100px;
+		}
+}
+
+.loader {
+	position: absolute;
+	top: 80px;
+	width: 100%;
 }
 
 

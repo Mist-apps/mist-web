@@ -4,20 +4,23 @@
 /**
  * Notes Controller
  */
-webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, toastr, syncService, NotesWebService) {
+webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, toastr, syncService, NotesWebService, $loader) {
 
 	/**
 	 * Get Notes from API
 	 */
 	$scope.getNotes = function () {
 		var success = function (data, responseHeaders) {
+			$loader.stop('NotesCtrl.getNotes');
 			$scope.notes = data;
 			_checkNotesOrder();
 		};
 		var error = function (httpResponse) {
+			$loader.stop('NotesCtrl.getNotes');
 			toastr.error('Unable to get notes (' + httpResponse.status + ')');
 		};
 		noteResource.query(success, error);
+		$loader.start('NotesCtrl.getNotes');
 	};
 
 	$scope.notes = [];
@@ -406,7 +409,7 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 					$modal.hide('notes-import');
 					toastr.error('Error during notes export');
 				}
-			);	
+			);
 		} else if ($scope.exportType === 'xml') {
 			$http.get(API_URL + '/note/export', {headers: {'Accept': 'application/xml'}})
 				.success(function (data) {

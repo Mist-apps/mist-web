@@ -55,7 +55,7 @@
 
 
 <!-- No notes message -->
-<div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0" id="nothing-message">No notes here...</div>
+<div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0 && !loading" id="nothing-message">No notes here...</div>
 
 
 <!-- Bottom add menu -->

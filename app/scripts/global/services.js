@@ -36,7 +36,7 @@ webApp.factory('toastr', function() {
 /**
  * Authentication service to login/logout and manage the Session.
  */
-webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $localStorage, userResource, Session) {
+webApp.factory('AuthService', function ($loader, $http, $q, $timeout, $sessionStorage, $localStorage, userResource, Session) {
 
 	return {
 
@@ -51,6 +51,8 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			var promise = $q.defer();
 			// If login attempt success
 			var success = function (data, responseHeaders) {
+				// Stop loading
+				$loader.stop('AuthService.login');
 				// Create the session
 				Session.create(data.token, data.user);
 				// Send the token on each API request
@@ -68,6 +70,8 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			};
 			// If login attempt fails
 			var error = function (httpResponse) {
+				// Stop loading
+				$loader.stop('AuthService.login');
 				if (httpResponse.status === 401) {
 					promise.reject({code: 1, message: 'Bad credentials'});
 				} else {
@@ -76,6 +80,8 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			};
 			// Try to log in
 			userResource.login(credentials, success, error);
+			// Start loading
+			$loader.start('AuthService.login');
 			// Return a promise
 			return promise.promise;
 		},
@@ -112,6 +118,8 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 			if (token) {
 				// If user information retrieval success
 				var success = function (data, responseHeaders) {
+					// Stop loading
+					$loader.stop('AuthService.recover');
 					// Create the session
 					Session.create(token, data);
 					// Connected
@@ -119,11 +127,15 @@ webApp.factory('AuthService', function ($http, $q, $timeout, $sessionStorage, $l
 				};
 				// If user information retrieval fails
 				var error = function (httpResponse) {
+					// Stop loading
+					$loader.stop('AuthService.recover');
 					// No more send the token on each API request
 					delete($http.defaults.headers.common['API-Token']);
 					// Not connected
 					promise.reject('Unknown error when retrieving user');
 				};
+				// Start loading
+				$loader.start('AuthService.recover');
 				userResource.get(success, error);
 			}
 			// If no token found
@@ -489,7 +501,7 @@ webApp.service('$modal', function ($rootScope) {
 	};
 
 	// Return whether the modal is shown or not
-	this.isShown = function(name) {
+	this.isShown = function (name) {
 		return $rootScope.modal === _getModalUrl(name);
 	};
 
@@ -504,7 +516,7 @@ webApp.service('$modal', function ($rootScope) {
 webApp.service('$download', function () {
 
 	// Return whether the modal is shown or not
-	this.download = function(name, data) {
+	this.download = function (name, data) {
 		var link = $('#download-link').get(0);
 		link.href = data;
 		link.target = '_blank';
@@ -513,6 +525,35 @@ webApp.service('$download', function () {
 		link.href = '';
 		link.target = '';
 		link.download = '';
+	};
+
+	// Export methods
+	return this;
+
+});
+
+/**
+ * Loader service, shows a loading icon
+ */
+webApp.service('$loader', function ($rootScope) {
+
+	var loader = {};
+
+	this.start = function (name) {
+		loader[name] = true;
+		$rootScope.loading = this.isLoading();
+	};
+
+	this.stop = function (name) {
+		delete(loader[name]);
+		$rootScope.loading = this.isLoading();
+	};
+
+	this.isLoading = function (name) {
+		if (!name) {
+			return Object.keys(loader).length > 0;
+		}
+		return loader[name] === true;
 	};
 
 	// Export methods
