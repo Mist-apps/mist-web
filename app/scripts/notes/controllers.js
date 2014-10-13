@@ -404,7 +404,7 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 			noteResource.exportJSON(
 				function (data) {
 					$modal.hide('notes-import');
-					$download.download('notes.json', 'data:application/json,' + JSON.stringify(data));
+					$download.download('notes.json', 'data:application/json;base64,' + btoa(JSON.stringify(data)));
 				}, function (httpResponse) {
 					$modal.hide('notes-import');
 					toastr.error('Error during notes export');
@@ -414,7 +414,7 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 			$http.get(API_URL + '/note/export', {headers: {'Accept': 'application/xml'}})
 				.success(function (data) {
 					$modal.hide('notes-import');
-					$download.download('notes.xml', 'data:application/xml,' + data);
+					$download.download('notes.xml', 'data:application/xml;base64,' + btoa(data));
 				})
 				.error(function (httpResponse) {
 					$modal.hide('notes-import');
