@@ -40,6 +40,8 @@ var Masonry = function (container) {
 			$(items[i]).addClass('note-visible');
 			columns[col] += gap + $(items[i]).height();
 		}
+		// Set container size
+		container.style.height = (columns[_getHighestCol(columns)] - gap) + 'px';
 	};
 
 	var _getSmallestCol = function (columns) {
@@ -52,6 +54,18 @@ var Masonry = function (container) {
 			}
 		}
 		return smallestCol;
+	};
+
+	var _getHighestCol = function (columns) {
+		var highestCol = 0;
+		var maxColSize = 0;
+		for (var key in columns) {
+			if (columns[key] > maxColSize) {
+				maxColSize = columns[key];
+				highestCol = key;
+			}
+		}
+		return highestCol;
 	};
 
 	// Check window resizing
