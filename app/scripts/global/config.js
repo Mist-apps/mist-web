@@ -72,9 +72,8 @@ webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
 
 	// Listen to route changes
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
-		// Set application name
+		// Set application name, page-title...
 		$rootScope.appName = next.appName;
-		// Set the page title
 		$rootScope.title = next.title;
 		// If not authenticated
 		if (!AuthService.isAuthenticated()) {

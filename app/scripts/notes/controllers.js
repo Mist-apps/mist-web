@@ -4,27 +4,19 @@
 /**
  * Notes Controller
  */
-webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, noteResource, toastr, syncService, NotesWebService, $loader) {
+webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syncService, NotesWebService) {
 
 	/**
 	 * Get Notes from API
 	 */
-	$scope.getNotes = function () {
-		var success = function (data, responseHeaders) {
-			$loader.stop('NotesCtrl.getNotes');
-			$scope.notes = data;
-			_checkNotesOrder();
-		};
-		var error = function (httpResponse) {
-			$loader.stop('NotesCtrl.getNotes');
-			toastr.error('Unable to get notes (' + httpResponse.status + ')');
-		};
-		noteResource.query(success, error);
-		$loader.start('NotesCtrl.getNotes');
-	};
-
 	$scope.notes = [];
-	$scope.getNotes();
+	syncService.getResources('NOTE', function (err, data) {
+		if (err) {
+			toastr.error('Unable to get notes (' + err.message + ')');
+		} else {
+			$scope.notes = data;
+		}
+	});
 
 	/**
 	 * Check the notes order for gaps, or duplicates

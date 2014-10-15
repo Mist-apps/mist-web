@@ -2,7 +2,7 @@
 
 
 /**
- * Nots web service to handle the web behaviour of the notes
+ * Notes web service to handle the web behaviour of the notes
  * This service show methods that can be re-used in other controllers
  */
 webApp.service('NotesWebService', function ($timeout, syncService) {

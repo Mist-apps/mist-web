@@ -23,6 +23,9 @@
 </div>
 
 
+<div class="contact" ng-repeat="contact in contacts | filter:$root.search">{{contact.firstName}} {{contact.lastName}}</div>
+
+
 <!-- No contacts message -->
 <div ng-if="(contacts | filter:$root.search).length === 0" id="nothing-message">No contacts here...</div>
 

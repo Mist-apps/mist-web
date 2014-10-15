@@ -183,7 +183,7 @@ webApp.service('Session', function ($rootScope) {
  * This service is generic so you may pass any resource you want to sync.
  * Keep in mind a Resource provider must be present and named: "{{type}}Resource"
  */
-webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr) {
+webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr, $loader) {
 
 	// Sync status is shared
 	$rootScope.syncStatus = 'synced';
@@ -436,6 +436,24 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		});
 	};
 
+	/**
+	 * Get resources from server and give it through the callback
+	 * The callback return an error, or null and the data.
+	 */
+	var getResources = function (type, callback) {
+		var httpResource = _getHTTPResource(type);
+		var success = function (data, responseHeaders) {
+			$loader.stop('syncService.get' + type);
+			callback(null, data);
+		};
+		var error = function (httpResponse) {
+			$loader.stop('syncService.get' + type);
+			callback(new Error(httpResponse.status));
+		};
+		httpResource.query(success, error);
+		$loader.start('syncService.get' + type);
+	};
+
 	// Sync the changes every X seconds
 	$interval(_sync, 2000);
 
@@ -444,7 +462,8 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		init:				init,
 		newResource:		newResource,
 		updateResource:		updateResource,
-		deleteResource:		deleteResource
+		deleteResource:		deleteResource,
+		getResources:		getResources
 	};
 });
 
