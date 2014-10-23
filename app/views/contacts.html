@@ -23,8 +23,14 @@
 </div>
 
 
-<div class="contact" ng-repeat="contact in contacts | filter:$root.search">{{contact.firstName}} {{contact.lastName}}</div>
-
+<div class="contacts">
+	<div class="contact" ng-repeat="contact in contacts | filter:$root.search">
+		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
+		<div class="name">{{contact.firstName}} {{contact.lastName}}</div>
+		<div class="mail">{{contact.mails[0].address}}</div>
+		<div class="mail">{{contact.phones[0].number}}</div>
+	</div>
+</div>
 
 <!-- No contacts message -->
 <div ng-if="(contacts | filter:$root.search).length === 0" id="nothing-message">No contacts here...</div>
