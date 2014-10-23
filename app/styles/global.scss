@@ -32,21 +32,22 @@ body {
 	top: 0px;
 	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
 	z-index: 600;
-	text-align: center;
 	vertical-align: middle;
 }
 
 #nav-menu {
 
-	text-align: left;
 	display: inline-block;
 	height: 100%;
-	width: 250px;
-	margin-left: 30px;
+	margin-left: 25px;
 	cursor: pointer;
 	font-size: 16px;
 	float: left;
 	line-height: $navbar-height;
+
+	@media (max-width: 600px) {
+		margin-left: 10px;
+	}
 
 	span {
 		line-height: $navbar-height;
@@ -61,63 +62,126 @@ body {
 }
 
 #nav-user {
-	text-align: right;
+
 	display: inline-block;
 	height: 100%;
-	width: 250px;
-	margin-right: 20px;
+	margin-right: 25px;
 	cursor: pointer;
 	float: right;
 	font-size: 14px;
-}
 
-#user-image {
-	width: 32px;
-	height: 32px;
-	vertical-align: middle;
-	margin-right: 8px;
-	border: 2px solid rgba(255, 255, 255, 0.6);
-	border-radius: 50%;
+	@media (max-width: 600px) {
+		margin-right: 10px;
+	}
+
+	span {
+
+		@media (max-width: 600px) {
+			display: none;
+		}
+
+	}
+
+	#user-image {
+		width: 32px;
+		height: 32px;
+		vertical-align: middle;
+		margin-right: 8px;
+		border: 2px solid rgba(255, 255, 255, 0.6);
+		border-radius: 50%;
+	}
+
 }
 
 #nav-search {
-	text-align: left;
+
 	display: inline-block;
 	background-color: rgba(255, 255, 255, 0.3);
-	width: 450px;
+	width: 442px;
 	height: 22px;
 	line-height: 22px;
 	vertical-align: middle;
 	padding: 4px;
 	border-radius: 4px;
-}
+	position: absolute;
+	left: 50%;
+	top: 7px;
+	margin-left: -221px;
 
-#nav-search-icon {
-	margin: 3px 15px;
-	float: left;
-	width: 16px;
-	cursor: default;
-}
+	@media (max-width: 1025px) and (min-width: 825px) {
+		width: 242px;
+		margin-left: -121px;
+	}
 
-#nav-search-content {
+	@media (min-width: 600px) and (max-width: 825px) {
+		width: 142px;
+		margin-left: -71px;
+	}
 
-	margin: 0px 25px 0px 46px;
-	display: block;
-	vertical-align: middle;
+	@media (max-width: 600px) {
+		display: none;
+		background-color: white;
+		left: 0px;
+		top: 0px;
+		margin: 0px;
+		box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+		border-radius: 0px;
+		padding: 6px 0px;
+		width: 100%;
+	}
 
-	input {
-		height: 22px;
+	#nav-search-icon {
+		margin: 3px 15px;
+		float: left;
+		width: 16px;
+		cursor: default;
+	}
+
+	#nav-search-content {
+
+		margin: 0px 25px 0px 46px;
+		display: block;
+		vertical-align: middle;
+
+		input {
+			height: 22px;
+		}
+
+		@media (max-width: 600px) {
+			margin-right: 36px;
+		}
+
+	}
+
+	#nav-search-stop {
+
+		margin: 3px 5px;
+		position: relative;
+		top: -22px;
+		right: 0px;
+		float: right;
+		cursor: pointer;
+
+		@media (max-width: 600px) {
+			margin-right: 16px;
+		}
+
 	}
 
 }
 
-#nav-search-stop {
-	margin: 3px 5px;
-	position: relative;
-	top: -22px;
-	right: 0px;
-	float: right;
+#nav-search-button {
+
+	display: inline-block;
 	cursor: pointer;
+	font-size: 20px;
+	float: right;
+	margin-right: 10px;
+
+	@media (min-width: 600px) {
+		display: none;
+	}
+
 }
 
 
@@ -420,10 +484,16 @@ body {
  */
 
 #container {
+
 	position: relative;
 	top: $navbar-height;
 	padding: 35px;
 	min-height: 100px;
+
+	@media (max-width: 600px) {
+		padding: 20px 10px;
+	}
+
 }
 
 .dim {

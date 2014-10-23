@@ -35,6 +35,10 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 		color: $navbar-text-color;
 	}
 
+	#nav-search-button:hover {
+		color: $navbar-text-hover-color;
+	}
+
 }
 
 
@@ -44,6 +48,7 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 
 #grid-container {
 	position: relative;
+	margin: auto;
 }
 
 

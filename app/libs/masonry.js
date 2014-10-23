@@ -12,7 +12,7 @@ var Masonry = function (container) {
 	var timeout;
 
 	var init = function () {
-		pageWidth = $(container).width();
+		pageWidth = $(container).parent().width();
 		columnNumber = Math.floor((pageWidth + gap) / (itemWidth + gap));
 		if (columnNumber < 1) {
 			columnNumber = 1;
@@ -42,6 +42,7 @@ var Masonry = function (container) {
 		}
 		// Set container size
 		container.style.height = (columns[_getHighestCol(columns)] - gap) + 'px';
+		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
 	};
 
 	var _getSmallestCol = function (columns) {

@@ -45,11 +45,14 @@
 			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search" tabindex="1"></div>
 			<span id="nav-search-stop" class="fa fa-remove" ng-show="$root.search && $root.search !== ''" ng-click="$root.search = '';" ></span>
 		</div>
+		<div id="nav-search-button" ng-click="toggleSearchMenu($event);">
+			<span class="fa fa-search"></span>
+		</div>
 
 		<!-- User navbar menu -->
 		<div id="nav-user" ng-click="toggleUserMenu($event);">
 			<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
-			{{$root.user.firstName}} {{$root.user.lastName}} &nbsp;&nbsp;&#9662;
+			<span>{{$root.user.firstName}} {{$root.user.lastName}} &nbsp;&nbsp;&#9662;</span>
 		</div>
 
 		<!-- User dropdown menu -->

@@ -9,7 +9,7 @@
 webApp.controller('ApplicationController', function ($scope, $timeout, $rootScope, $location, $modal, AuthService, syncService) {
 
 	/**
-	 * Left menu location 
+	 * Left menu location
 	 */
 	$rootScope.location = 'all';
 
@@ -36,6 +36,7 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 	var _hideMenus = function () {
 		$('.menu').removeClass('menu-show');
 		$('#user-menu').hide();
+		$('#nav-search').css('display', '');	// Remove manually display to recover the class value
 		$('#add-menu div').hide();
 		$('#add-menu div:first-child').show();
 		$('#add-menu div:first-child div').show();
@@ -113,6 +114,25 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 			AuthService.logout();
 			syncService.init();
 			$location.path('/login');
+		}
+	};
+
+	/**
+	 * Show and hide the search menu dynamically (small screens)
+	 */
+	$scope.toggleSearchMenu = function ($event) {
+		if ($('#nav-search').is(':hidden')) {
+			_hideMenus();
+			$('#nav-search').show();
+			$('html').click(function (event) {
+				// Check if we clicked outside of the nav menu
+				if ($(event.target).parents('#nav-search').length !== 1) {
+					_hideMenus();
+				}
+			});
+			$event.stopPropagation();
+		} else {
+			_hideMenus();
 		}
 	};
 
