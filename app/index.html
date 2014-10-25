@@ -39,6 +39,12 @@
 		<!-- Left menu icon -->
 		<div id="nav-menu" ng-click="toggleLeftMenu($event);"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
 
+		<!-- User navbar menu -->
+		<div id="nav-user" ng-click="toggleUserMenu($event);">
+			<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
+			<span>{{$root.user.firstName}} {{$root.user.lastName}} &nbsp;&nbsp;&#9662;</span>
+		</div>
+
 		<!-- Search menu -->
 		<div id="nav-search">
 			<span id="nav-search-icon" class="fa fa-search"></span>
@@ -47,12 +53,6 @@
 		</div>
 		<div id="nav-search-button" ng-click="toggleSearchMenu($event);">
 			<span class="fa fa-search"></span>
-		</div>
-
-		<!-- User navbar menu -->
-		<div id="nav-user" ng-click="toggleUserMenu($event);">
-			<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
-			<span>{{$root.user.firstName}} {{$root.user.lastName}} &nbsp;&nbsp;&#9662;</span>
 		</div>
 
 		<!-- User dropdown menu -->

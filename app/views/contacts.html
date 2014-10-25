@@ -27,8 +27,10 @@
 	<div class="contact" ng-repeat="contact in contacts | filter:$root.search">
 		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
 		<div class="name">{{contact.firstName}} {{contact.lastName}}</div>
-		<div class="mail">{{contact.mails[0].address}}</div>
-		<div class="mail">{{contact.phones[0].number}}</div>
+		<div class="sample-mail">{{contact.mails[0].address}} <span ng-if="contact.mails.length > 1">(+{{contact.mails.length -1}})</span></div>
+		<div class="sample-phone">{{contact.phones[0].number}} <span ng-if="contact.phones.length > 1">(+{{contact.phones.length -1}})</span></div>
+		<div class="sample-address">{{contact.addresses[0] | formatInlineAddress}} <span ng-if="contact.addresses.length > 1">(+{{contact.addresses.length -1}})</span></div>
+		<div class="sample-note">{{contact.note}}</div>
 	</div>
 </div>
 

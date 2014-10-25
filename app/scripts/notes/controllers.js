@@ -166,7 +166,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 	};
 
 	/**
-	 * Start editing the notes
+	 * Start editing a note
 	 */
 	$scope.startEditNote = function (event) {
 		if (event.target.className !== '' && event.target.className !== 'note-task-icon') {

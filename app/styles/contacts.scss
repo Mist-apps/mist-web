@@ -54,12 +54,22 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 	cursor: pointer;
 
 	div {
+
 		display: inline-block;
-		padding-right: 25px;
+		padding-right: 50px;
 		line-height: 29px;
 		vertical-align: middle;
-		width: 250px;
+		width: 225px;
 		font-size: 13px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		margin: 0px;
+
+		span {
+			color: rgba(0, 0, 0, 0.3);
+		}
+
 	}
 
 	.name {
@@ -72,6 +82,30 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 		height: 29px;
 		float: left;
 		border-radius: 50%;
+	}
+
+	@media (max-width: 1566px) {
+		.sample-note {
+			display: none;
+		}
+	}
+
+	@media (max-width: 1287px) {
+		.sample-address {
+			display: none;
+		}
+	}
+
+	@media (max-width: 1008px) {
+		.sample-phone {
+			display: none;
+		}
+	}
+
+	@media (max-width: 729px) {
+		.sample-mail {
+			display: none;
+		}
 	}
 
 }
