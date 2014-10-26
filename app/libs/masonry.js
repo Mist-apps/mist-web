@@ -100,6 +100,9 @@ var Masonry = function (container) {
 			var note = $($event.target).parent();
 			// Set note in front and disable transitions
 			note.addClass('note-edit note-dragging');
+			// Save offsets
+			offsetTop = note.parent().offset().top;
+			offsetLeft = note.parent().offset().left;
 			// Save relative position of the note from the mouse
 			var relX = $event.pageX - note.offset().left;
 			var relY = $event.pageY - note.offset().top;
