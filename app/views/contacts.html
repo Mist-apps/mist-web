@@ -23,7 +23,7 @@
 </div>
 
 
-<div class="contacts">
+<div class="contacts" ng-if="(contacts | filter:$root.search).length > 0 && !loading">
 	<div class="contact" ng-repeat="contact in contacts | filter:$root.search">
 		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
 		<div class="name">{{contact.firstName}} {{contact.lastName}}</div>
@@ -35,7 +35,7 @@
 </div>
 
 <!-- No contacts message -->
-<div ng-if="(contacts | filter:$root.search).length === 0" id="nothing-message">No contacts here...</div>
+<div ng-if="(contacts | filter:$root.search).length === 0 && !loading" id="nothing-message">No contacts here...</div>
 
 
 <!-- Bottom add menu -->
