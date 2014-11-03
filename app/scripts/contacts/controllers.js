@@ -24,20 +24,17 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 	 */
 	$scope.showFullContact = function (event) {
 		var target = $(event.target);
-		// If menu, return
-		if (target.hasClass('edit')) {
+		// If menu or link, return
+		if (target.hasClass('edit') || target.is('a')) {
 			return;
 		}
 		// If input, start edit contact
-		if ((target.is('.name span') || target.is('input') || target.hasClass('address-show')) && $(this).hasClass('contact-full')) {
+		if ((target.is('.name span') || target.is('input') || target.hasClass('address-show') || target.hasClass('mail-show') || target.hasClass('website-show')) && $(this).hasClass('contact-full')) {
 			$scope.startEditContact(event);
 			return;
 		}
-		// If already fully shown
-		if ($(this).hasClass('contact-full')) {
-			// Stop showing contacts full data
-			$scope.stopFullContacts();
-		} else {
+		// If the contact is not fully shown
+		if (!$(this).hasClass('contact-full')) {
 			// Stop showing other contacts full data
 			$scope.stopFullContacts();
 			// Show full data
@@ -102,6 +99,34 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 			$scope.stopFullContacts(event);
 		}
 	};
+
+	/**
+	 * Check whether the key must be ignored or not for informing
+	 * the sync service
+	 */
+	var _keyMustBeIgnored = function (keyCode) {
+		var keysToIgnore = [
+			37, 38, 39, 40,		// Arrows
+			16, 17, 18, 27,		// Shift Control Alt Escape
+			9, 19, 91, 92,		// Tab Pause WindowsLeft WindowsRight
+			20, 144, 145,		// CapsLock NumLock ScrollLock
+			33, 34, 35, 36,		// PageUp PageDown End Home
+			45, 93,				// Insert Select
+			112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123	// F1 -> F12
+		];
+		return keysToIgnore.indexOf(keyCode) !== -1;
+	};
+
+	/**
+	 * Listen to field modifications and inform sync service
+	 */
+	$scope.fieldKeyListener = function ($event, contact) {
+		// Inform sync service and set modification time if necessary
+		if (!_keyMustBeIgnored($event.keyCode)) {
+			contact.modificationDate = new Date().getTime();
+			syncService.updateResource('CONTACT', contact);
+		}
+	}
 
 });
 

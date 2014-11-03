@@ -53,6 +53,17 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 	cursor: pointer;
 
+	a {
+
+		color: rgba(0, 0, 0, 0.8);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+
+	}
+
 	[class^='sample-'], .name {
 
 		display: inline-block;
@@ -129,6 +140,7 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 
 .contact-full {
 
+	cursor: default;
 	position: relative;
 	min-height: 75px;
 	background-color: rgb(247, 247, 247);
@@ -199,9 +211,8 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 			margin-bottom: 5px;
 			width: 250px;
 			cursor: text;
-			overflow: hidden;
-			white-space: nowrap;
 			text-overflow: ellipsis;
+			word-wrap: break-word;
 		}
 
 		.fa {
@@ -227,8 +238,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 }
 
 .contact-edit {
-
-	cursor: default;
 
 	.edit-menu {
 

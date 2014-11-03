@@ -34,8 +34,8 @@
 		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
 		<div class="name">
 			<span>{{contact.firstName}} {{contact.lastName}}</span>
-			<input type="text" ng-model="contact.firstName" placeholder="Firstname" />
-			<input type="text" ng-model="contact.lastName" placeholder="Lastname" />
+			<input type="text" ng-model="contact.firstName" placeholder="Firstname" ng-keydown="fieldKeyListener($event, contact);" />
+			<input type="text" ng-model="contact.lastName" placeholder="Lastname" ng-keydown="fieldKeyListener($event, contact);" />
 		</div>
 		<!-- Samples -->
 		<div class="sample-mail">{{contact.mails[0].address}} <span ng-if="contact.mails.length > 1">(+{{contact.mails.length -1}})</span></div>
@@ -46,12 +46,14 @@
 		<hr>
 		<div class="full-mails">
 			<div class="mail" ng-repeat="mail in contact.mails">
-				<div class="fa fa-lg fa-envelope"></div><input type="text" ng-model="mail.address" placeholder="E-mail" />
+				<div class="fa fa-lg fa-envelope"></div>
+				<div class="mail-show"><a ng-href="mailto:{{mail.address}}">{{mail.address}}</a></div>
+				<div class="mail-edit"><input type="text" ng-model="mail.address" placeholder="E-mail" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
 		</div>
 		<div class="full-phones">
 			<div class="phone" ng-repeat="phone in contact.phones">
-				<div class="fa fa-lg"  ng-class="{'fa-phone': phone.type=='home', 'fa-building': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager'}"></div><input type="text" ng-model="phone.number" placeholder="Phone number" />
+				<div class="fa fa-lg"  ng-class="{'fa-phone': phone.type=='home', 'fa-building': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager'}"></div><input type="text" ng-model="phone.number" placeholder="Phone number" ng-keydown="fieldKeyListener($event, contact);" />
 			</div>
 		</div>
 		<div class="full-addresses">
@@ -63,20 +65,28 @@
 					{{address.country}}
 				</div>
 				<div class="address-edit">
-					<input type="text" ng-model="address.street" placeholder="Street" />
-					<input type="text" ng-model="address.number" placeholder="Number" />
+					<input type="text" ng-model="address.street" placeholder="Street" ng-keydown="fieldKeyListener($event, contact);" />
+					<input type="text" ng-model="address.number" placeholder="Number" ng-keydown="fieldKeyListener($event, contact);" />
 					<br>
-					<input type="text" ng-model="address.postalCode" placeholder="Zip" />
-					<input type="text" ng-model="address.locality" placeholder="City" />
+					<input type="text" ng-model="address.postalCode" placeholder="Zip" ng-keydown="fieldKeyListener($event, contact);" />
+					<input type="text" ng-model="address.locality" placeholder="City" ng-keydown="fieldKeyListener($event, contact);" />
 					<br>
-					<input type="text" ng-model="address.country" placeholder="Country" />
+					<input type="text" ng-model="address.country" placeholder="Country" ng-keydown="fieldKeyListener($event, contact);" />
 				</div>
 			</div>
 		</div>
 		<div class="full-info">
-			<div class="birthday"><div class="fa fa-lg fa-birthday-cake"></div><input type="text" ng-model="contact.birthday" placeholder="BirthDay" /></div>
-			<div class="website"><div class="fa fa-lg fa-globe"></div><input type="text" ng-model="contact.url" placeholder="Website" /></div>
-			<div class="public-key"><div class="fa fa-lg fa-key"></div><input type="text" ng-model="contact.pubKey" placeholder="Public Key" /></div>
+			<div class="birthday">
+				<div class="fa fa-lg fa-birthday-cake"></div><input type="text" ng-model="contact.birthday" placeholder="BirthDay" ng-keydown="fieldKeyListener($event, contact);" />
+			</div>
+			<div class="website">
+				<div class="fa fa-lg fa-globe"></div>
+				<div class="website-show"><a ng-href="{{contact.url}}" target="_blank">{{contact.url}}</a></div>
+				<div class="website-edit"><input type="text" ng-model="contact.url" placeholder="Website" ng-keydown="fieldKeyListener($event, contact);" /></div>
+			</div>
+			<div class="public-key">
+				<div class="fa fa-lg fa-key"></div><input type="text" ng-model="contact.pubKey" placeholder="Public Key" ng-keydown="fieldKeyListener($event, contact);" />
+			</div>
 		</div>
 	</div>
 </div>
