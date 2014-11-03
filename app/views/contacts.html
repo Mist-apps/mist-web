@@ -25,12 +25,59 @@
 
 <div class="contacts" ng-if="(contacts | filter:$root.search).length > 0 && !loading">
 	<div class="contact" ng-repeat="contact in contacts | filter:$root.search">
+		<!-- Menu -->
+		<div class="edit-menu">
+			<div class="edit fa fa-lg fa-pencil"></div>
+			<div class="ok fa fa-lg fa-check"></div>
+		</div>
+		<!-- Common data -->
 		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
-		<div class="name">{{contact.firstName}} {{contact.lastName}}</div>
+		<div class="name">
+			<span>{{contact.firstName}} {{contact.lastName}}</span>
+			<input type="text" ng-model="contact.firstName" placeholder="Firstname" />
+			<input type="text" ng-model="contact.lastName" placeholder="Lastname" />
+		</div>
+		<!-- Samples -->
 		<div class="sample-mail">{{contact.mails[0].address}} <span ng-if="contact.mails.length > 1">(+{{contact.mails.length -1}})</span></div>
 		<div class="sample-phone">{{contact.phones[0].number}} <span ng-if="contact.phones.length > 1">(+{{contact.phones.length -1}})</span></div>
 		<div class="sample-address">{{contact.addresses[0] | formatInlineAddress}} <span ng-if="contact.addresses.length > 1">(+{{contact.addresses.length -1}})</span></div>
 		<div class="sample-note">{{contact.note}}</div>
+		<!-- Full data -->
+		<hr>
+		<div class="full-mails">
+			<div class="mail" ng-repeat="mail in contact.mails">
+				<div class="fa fa-lg fa-envelope"></div><input type="text" ng-model="mail.address" placeholder="E-mail" />
+			</div>
+		</div>
+		<div class="full-phones">
+			<div class="phone" ng-repeat="phone in contact.phones">
+				<div class="fa fa-lg"  ng-class="{'fa-phone': phone.type=='home', 'fa-building': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager'}"></div><input type="text" ng-model="phone.number" placeholder="Phone number" />
+			</div>
+		</div>
+		<div class="full-addresses">
+			<div class="address" ng-repeat="address in contact.addresses">
+				<div class="fa fa-lg" ng-class="{'fa-home': address.type=='home', 'fa-building': address.type=='work'}"></div>
+				<div class="address-show">
+					{{address.street}} {{address.number}}<br>
+					{{address.postalCode}} {{address.locality}}<br>
+					{{address.country}}
+				</div>
+				<div class="address-edit">
+					<input type="text" ng-model="address.street" placeholder="Street" />
+					<input type="text" ng-model="address.number" placeholder="Number" />
+					<br>
+					<input type="text" ng-model="address.postalCode" placeholder="Zip" />
+					<input type="text" ng-model="address.locality" placeholder="City" />
+					<br>
+					<input type="text" ng-model="address.country" placeholder="Country" />
+				</div>
+			</div>
+		</div>
+		<div class="full-info">
+			<div class="birthday"><div class="fa fa-lg fa-birthday-cake"></div><input type="text" ng-model="contact.birthday" placeholder="BirthDay" /></div>
+			<div class="website"><div class="fa fa-lg fa-globe"></div><input type="text" ng-model="contact.url" placeholder="Website" /></div>
+			<div class="public-key"><div class="fa fa-lg fa-key"></div><input type="text" ng-model="contact.pubKey" placeholder="Public Key" /></div>
+		</div>
 	</div>
 </div>
 
