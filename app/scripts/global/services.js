@@ -385,7 +385,34 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 		var _copyDataToResource = function (resource, data) {
 			// Copy from data to resource
 			for (var property in data) {
-				resource[property] = data[property];
+				// If Array
+				if (Array.isArray(data[property]) && resource[property]) {
+					// If same length, copy each item
+					if (resource[property].length === data[property].length) {
+						for (var key in data[property]) {
+							// If Object or array, copy it fully
+							if (Array.isArray(data[property][key]) || (typeof data[property][key] === 'object' && data[property][key].toString() === '[object Object]')) {
+								_copyDataToResource(resource[property][key], data[property][key]);
+							}
+							// If normal field
+							else {
+								resource[property][key] = data[property][key];
+							}
+						}
+					}
+					// If not same length, overwrite the array
+					else {
+						resource[property] = data[property];
+					}
+				}
+				// If Object
+				else if (typeof data[property] === 'object' && data[property].toString() === '[object Object]' && resource[property]) {
+					_copyDataToResource(resource[property], data[property]);
+				}
+				// If normal field
+				else {
+					resource[property] = data[property];
+				}
 			}
 			// Delete old properties in resource
 			for (var property in resource) {
