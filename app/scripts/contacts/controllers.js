@@ -18,27 +18,25 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 		}
 	});
 
+	// Store the active contact, currently fully shown
+	$scope.activeContact = undefined;
+
 	/**
 	 * Show the full data of a contact
 	 * Warning ! $(event.target) != $(this)
 	 */
-	$scope.showFullContact = function (event) {
-		var target = $(event.target);
-		// If menu or link, return
-		if (target.hasClass('edit') || target.is('a')) {
-			return;
+	$scope.showFullContact = function ($event, contact) {
+		// Get the contact DOM object
+		var target = $($event.target);
+		if (!target.hasClass('contact')) {
+			target = target.parents('.contact')
 		}
-		// If input, start edit contact
-		if ((target.is('.name span') || target.is('input') || target.hasClass('address-show') || target.hasClass('mail-show') || target.hasClass('website-show')) && $(this).hasClass('contact-full')) {
-			$scope.startEditContact(event);
-			return;
-		}
-		// If the contact is not fully shown
-		if (!$(this).hasClass('contact-full')) {
+		// If the contact is not fully shown and no current edit
+		if ($scope.activeContact !== contact && !$scope.editing && !target.hasClass('contact-full')) {
 			// Stop showing other contacts full data
 			$scope.stopFullContacts();
-			// Show full data
-			$(this).addClass('contact-full');
+			// Set active contact
+			$scope.activeContact = contact;
 			// Listen to escape key
 			$('body').on('keydown', _escapeKeyListenerFull);
 		}
@@ -48,42 +46,103 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 	 * Stop showing the full data of the contacts
 	 */
 	$scope.stopFullContacts = function (event) {
-		// Remove full data
-		$('.contact').removeClass('contact-full');
+		// Remove active contact
+		$scope.activeContact = undefined;
 		// Remove the binding to listen to escape key
 		$('body').off('keydown', _escapeKeyListenerFull);
 	};
 
+	// Store whether the active contact is edited or not
+	$scope.editing = false;
+
 	/**
 	 * Start editing a contact
 	 */
-	$scope.startEditContact = function (event) {
-		// Stop listening to editing or show full demands
-		$('body').off('click', '.contact', $scope.showFullContact);
-		$('body').off('keydown', _escapeKeyListenerFull);
-		// Show editor
-		$(event.target).parents('.contact').addClass('contact-edit');
-		// Listen to escape key
-		$('body').on('keydown', _escapeKeyListenerEdit);
+	$scope.startEditContact = function ($event, contact) {
+		// Check if we clicked on a link
+		if ($($event.target).is('a')) {
+			return;
+		}
+		// If the contact is active and we are not editing already
+		if ($scope.activeContact === contact && !$scope.editing) {
+			// Save current edited contact
+			$scope.editing = true;
+			// Remove the binding to listen to escape key
+			$('body').off('keydown', _escapeKeyListenerFull);
+			// Listen to escape key
+			$('body').on('keydown', _escapeKeyListenerEdit);
+		}
 	};
 
 	/**
 	 * Stop editing the contacts
 	 */
 	$scope.stopEditContacts = function (event) {
-		// Remove editor
-		$('.contact').removeClass('contact-edit');
 		// Remove the binding to listen to escape key
 		$('body').off('keydown', _escapeKeyListenerEdit);
 		// Listen to escape key for full
 		$('body').on('keydown', _escapeKeyListenerFull);
-		// Re-start listening to editing or show full demands
-		$('body').on('click', '.contact', $scope.showFullContact);
+		// Check if some fields are empty
+		_removeEmptyFields($scope.activeContact);
+		// Remove current edit
+		$scope.editing = false;
 	};
 
+	/**
+	 * Check in the current contact if some fields are empty and remove it.
+	 */
+	var _removeEmptyFields = function (contact) {
+		var mustSync = false;
+		// Check fields
+		for (var field in contact) {
+			if (contact.hasOwnProperty(field)) {
+				// Check normal fields
+				if (contact[field] === '') {
+					mustSync = true;
+					delete(contact[field]);
+				}
+				// Check phones
+				else if (field === 'phones') {
+					for (var phone in contact.phones) {
+						if (!contact.phones[phone].number || contact.phones[phone].number === '') {
+							mustSync = true;
+							contact.phones.splice(phone, 1);
+						}
+					}
+				}
+				// Check mails
+				else if (field === 'mails') {
+					for (var mail in contact.mails) {
+						if (!contact.mails[mail].address || contact.mails[mail].address === '') {
+							mustSync = true;
+							contact.mails.splice(mail, 1);
+						}
+					}
+				}
+				// Check address
+				else if (field === 'addresses') {
+					for (var address in contact.addresses) {
+						if ((!contact.addresses[address].street || contact.addresses[address].street === '')
+							&& (!contact.addresses[address].number || contact.addresses[address].number === '')
+							&& (!contact.addresses[address].locality || contact.addresses[address].locality === '')
+							&& (!contact.addresses[address].region || contact.addresses[address].region === '')
+							&& (!contact.addresses[address].postalCode || contact.addresses[address].postalCode === '')
+							&& (!contact.addresses[address].country || contact.addresses[address].country === '')) {
+							mustSync = true;
+							contact.addresses.splice(address, 1);
+						}
+					}
+				}
+			}
+		}
+		// Sync contact if necessary
+		if (mustSync) {
+			contact.modificationDate = new Date().getTime();
+			syncService.updateResource('CONTACT', contact);
+		}
+	}
+
 	// Listen to clicks to start edit it or show full data
-	$('body').on('click', '.contact', $scope.showFullContact);
-	$('body').on('click', '.contact .edit', $scope.startEditContact);
 	$('body').on('click', '.contact .ok', $scope.stopEditContacts);
 
 	/**
@@ -92,11 +151,13 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 	var _escapeKeyListenerEdit = function (event) {
 		if (event.which === 27) {
 			$scope.stopEditContacts(event);
+			$scope.$apply();
 		}
 	};
 	var _escapeKeyListenerFull = function (event) {
 		if (event.which === 27) {
 			$scope.stopFullContacts(event);
+			$scope.$apply();
 		}
 	};
 
