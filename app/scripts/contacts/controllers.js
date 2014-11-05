@@ -4,7 +4,7 @@
 /**
  * Contacts controller
  */
-webApp.controller('ContactsController', function ($scope, syncService) {
+webApp.controller('ContactsController', function ($rootScope, $scope, syncService) {
 
 	/**
 	 * Get Contacts from API
@@ -18,6 +18,77 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 		}
 	});
 
+	/**
+	 * Filter the contacts from the menu selection
+	 */
+	$scope.filterContacts = function (value) {
+		if ($rootScope.location === 'all') {
+			return !value.deleteDate;
+		} else if ($rootScope.location === 'trash') {
+			return value.deleteDate;
+		} else {
+			return false;
+		}
+	};
+
+	/**
+	 * Add a new empty contact
+	 */
+	$scope.addNewContact = function () {
+		// Add new contact
+		var date = new Date().getTime();
+		var tmpId = '' + date + Math.floor(Math.random() * 1000000);
+		var contact = {tmpId: tmpId, creationDate: date};
+		$scope.contacts.push(contact);
+		// Inform sync service
+		syncService.newResource('CONTACT', contact);
+	};
+
+	/**
+	 * Delete a contact
+	 */
+	$scope.deleteContact = function (contact) {
+		// Update contact
+		contact.deleteDate = new Date().getTime();
+		// Stop edit the contact
+		$scope.stopEditContacts();
+		$scope.stopFullContacts();
+		// Inform sync service
+		syncService.updateResource('CONTACT', contact);
+	};
+
+	/**
+	 * Delete definitively a contact
+	 */
+	$scope.destroyContact = function (contact) {
+		// Search for contact to delete
+		for (var key in $scope.contacts) {
+			// If the contact has an id, search if id match, else, search if tmpId match
+			if ((contact._id && $scope.contacts[key]._id === contact._id) || (!contact._id && $scope.contacts[key].tmpId === contact.tmpId)) {
+				$scope.contacts.splice(key, 1);
+				break;
+			}
+		}
+		// Stop edit the contact
+		$scope.stopEditContacts();
+		$scope.stopFullContacts();
+		// Inform sync service
+		syncService.deleteResource('CONTACT', contact);
+	};
+
+	/**
+	 * Restore a deleted contact
+	 */
+	$scope.restoreContact = function (contact) {
+		// Update contact
+		delete(contact.deleteDate);
+		// Stop edit the contact
+		$scope.stopEditContacts();
+		$scope.stopFullContacts();
+		// Inform sync service
+		syncService.updateResource('CONTACT', contact);
+	};
+
 	// Store the active contact, currently fully shown
 	$scope.activeContact = undefined;
 
@@ -25,14 +96,9 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 	 * Show the full data of a contact
 	 * Warning ! $(event.target) != $(this)
 	 */
-	$scope.showFullContact = function ($event, contact) {
-		// Get the contact DOM object
-		var target = $($event.target);
-		if (!target.hasClass('contact')) {
-			target = target.parents('.contact')
-		}
+	$scope.showFullContact = function (contact) {
 		// If the contact is not fully shown and no current edit
-		if ($scope.activeContact !== contact && !$scope.editing && !target.hasClass('contact-full')) {
+		if ($scope.activeContact !== contact && !$scope.editing) {
 			// Stop showing other contacts full data
 			$scope.stopFullContacts();
 			// Set active contact
@@ -45,7 +111,7 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 	/**
 	 * Stop showing the full data of the contacts
 	 */
-	$scope.stopFullContacts = function (event) {
+	$scope.stopFullContacts = function () {
 		// Remove active contact
 		$scope.activeContact = undefined;
 		// Remove the binding to listen to escape key
@@ -63,8 +129,8 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 		if ($($event.target).is('a')) {
 			return;
 		}
-		// If the contact is active and we are not editing already
-		if ($scope.activeContact === contact && !$scope.editing) {
+		// If the contact is active and we are not editing already and it is not deleted
+		if ($scope.activeContact === contact && !$scope.editing && !contact.deleteDate) {
 			// Save current edited contact
 			$scope.editing = true;
 			// Remove the binding to listen to escape key
@@ -77,7 +143,7 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 	/**
 	 * Stop editing the contacts
 	 */
-	$scope.stopEditContacts = function (event) {
+	$scope.stopEditContacts = function () {
 		// Remove the binding to listen to escape key
 		$('body').off('keydown', _escapeKeyListenerEdit);
 		// Listen to escape key for full
@@ -142,21 +208,18 @@ webApp.controller('ContactsController', function ($scope, syncService) {
 		}
 	}
 
-	// Listen to clicks to start edit it or show full data
-	$('body').on('click', '.contact .ok', $scope.stopEditContacts);
-
 	/**
 	 * Custom listeners
 	 */
 	var _escapeKeyListenerEdit = function (event) {
 		if (event.which === 27) {
-			$scope.stopEditContacts(event);
+			$scope.stopEditContacts();
 			$scope.$apply();
 		}
 	};
 	var _escapeKeyListenerFull = function (event) {
 		if (event.which === 27) {
-			$scope.stopFullContacts(event);
+			$scope.stopFullContacts();
 			$scope.$apply();
 		}
 	};

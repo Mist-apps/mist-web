@@ -167,12 +167,14 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 		color: rgba(0, 0, 0, 0.2);
 		cursor: pointer;
 
-		div:hover {
-			color: rgba(0, 0, 0, 0.3);
-		}
+		div {
 
-		.ok {
-			display: none;
+			margin-left: 10px;
+
+			&:hover {
+				color: rgba(0, 0, 0, 0.3);
+			}
+
 		}
 
 	}
@@ -239,18 +241,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 }
 
 .contact-edit {
-
-	.edit-menu {
-
-		.edit {
-			display: none;
-		}
-
-		.ok {
-			display: inline-block;
-		}
-
-	}
 
 	.name {
 
