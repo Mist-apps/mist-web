@@ -161,8 +161,7 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 			_removeEmptyFields($scope.activeContact);
 			// Check if the contact is empty
 			if (_isContactEmpty($scope.activeContact)) {
-				console.log('destroy');
-				//$scope.destroyContact($scope.activeContact);
+				$scope.destroyContact($scope.activeContact);
 			}
 		}
 	};
