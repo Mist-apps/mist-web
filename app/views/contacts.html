@@ -24,14 +24,16 @@
 
 <div class="contacts" ng-if="(contacts | filter:filterContacts | filter:$root.search).length > 0 && !loading">
 	<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search" ng-click="showFullContact(contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
+
 		<!-- Menu -->
 		<div class="edit-menu">
 			<div class="fa fa-lg fa-remove" ng-if="contact.deleteDate" ng-click="destroyContact(contact);"></div>
 			<div class="fa fa-lg fa-undo" ng-if="contact.deleteDate" ng-click="restoreContact(contact);"></div>
 			<div class="fa fa-lg fa-trash" ng-if="!contact.deleteDate" ng-click="deleteContact(contact);"></div>
 			<div class="fa fa-lg fa-pencil" ng-if="!editing && !contact.deleteDate" ng-click="startEditContact($event, contact);"></div>
-			<div class="fa fa-lg fa-check" ng-if="editing" ng-click="stopEditContacts();"></div>
+			<div class="fa fa-lg fa-check" ng-if="editing" ng-click="stopEditContact();"></div>
 		</div>
+
 		<!-- Common data -->
 		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
 		<div class="name">
@@ -39,13 +41,14 @@
 			<input type="text" ng-model="contact.firstName" placeholder="Firstname" ng-keydown="fieldKeyListener($event, contact);" />
 			<input type="text" ng-model="contact.lastName" placeholder="Lastname" ng-keydown="fieldKeyListener($event, contact);" />
 		</div>
+
 		<!-- Samples -->
 		<div class="sample-mail">{{contact.mails[0].address}} <span ng-if="contact.mails.length > 1">(+{{contact.mails.length -1}})</span></div>
 		<div class="sample-phone">{{contact.phones[0].number}} <span ng-if="contact.phones.length > 1">(+{{contact.phones.length -1}})</span></div>
 		<div class="sample-address">{{contact.addresses[0] | formatInlineAddress}} <span ng-if="contact.addresses.length > 1">(+{{contact.addresses.length -1}})</span></div>
 		<div class="sample-note">{{contact.note}}</div>
+
 		<!-- Full data -->
-		<hr>
 		<div class="full-mails" ng-if="contact.mails && contact.mails.length > 0">
 			<div class="mail" ng-repeat="mail in contact.mails">
 				<div class="fa fa-lg fa-envelope"></div>
@@ -90,6 +93,7 @@
 				<div class="fa fa-lg fa-key"></div><input type="text" ng-model="contact.pubKey" placeholder="Public Key" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
 			</div>
 		</div>
+
 	</div>
 </div>
 
@@ -102,5 +106,5 @@
 	<div><div class="fa fa-plus" ng-click="$parent.toggleAddMenu($event)"></div></div>
 	<div><span>Import/export</span><div class="fa fa-cloud-upload" ng-click=""></div></div>
 	<div><span>New group</span><div class="fa fa-users" ng-click=""></div></div>
-	<div><span>New contact</span><div class="fa fa-user" ng-click=""></div></div>
+	<div><span>New contact</span><div class="fa fa-user" ng-click="addNewContact();"></div></div>
 </div>

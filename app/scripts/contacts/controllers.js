@@ -35,6 +35,9 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 	 * Add a new empty contact
 	 */
 	$scope.addNewContact = function () {
+		// Stop edit another contact
+		$scope.stopEditContact();
+		$scope.stopFullContact();
 		// Add new contact
 		var date = new Date().getTime();
 		var tmpId = '' + date + Math.floor(Math.random() * 1000000);
@@ -42,6 +45,9 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		$scope.contacts.push(contact);
 		// Inform sync service
 		syncService.newResource('CONTACT', contact);
+		// Start edit the new contact
+		$scope.showFullContact(contact);
+		$scope.startEditContact(null, contact);
 	};
 
 	/**
@@ -51,8 +57,8 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		// Update contact
 		contact.deleteDate = new Date().getTime();
 		// Stop edit the contact
-		$scope.stopEditContacts();
-		$scope.stopFullContacts();
+		$scope.stopEditContact();
+		$scope.stopFullContact();
 		// Inform sync service
 		syncService.updateResource('CONTACT', contact);
 	};
@@ -70,8 +76,8 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 			}
 		}
 		// Stop edit the contact
-		$scope.stopEditContacts();
-		$scope.stopFullContacts();
+		$scope.stopEditContact();
+		$scope.stopFullContact();
 		// Inform sync service
 		syncService.deleteResource('CONTACT', contact);
 	};
@@ -83,8 +89,8 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		// Update contact
 		delete(contact.deleteDate);
 		// Stop edit the contact
-		$scope.stopEditContacts();
-		$scope.stopFullContacts();
+		$scope.stopEditContact();
+		$scope.stopFullContact();
 		// Inform sync service
 		syncService.updateResource('CONTACT', contact);
 	};
@@ -100,7 +106,7 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		// If the contact is not fully shown and no current edit
 		if ($scope.activeContact !== contact && !$scope.editing) {
 			// Stop showing other contacts full data
-			$scope.stopFullContacts();
+			$scope.stopFullContact();
 			// Set active contact
 			$scope.activeContact = contact;
 			// Listen to escape key
@@ -111,7 +117,7 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 	/**
 	 * Stop showing the full data of the contacts
 	 */
-	$scope.stopFullContacts = function () {
+	$scope.stopFullContact = function () {
 		// Remove active contact
 		$scope.activeContact = undefined;
 		// Remove the binding to listen to escape key
@@ -126,7 +132,7 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 	 */
 	$scope.startEditContact = function ($event, contact) {
 		// Check if we clicked on a link
-		if ($($event.target).is('a')) {
+		if ($event && $($event.target).is('a')) {
 			return;
 		}
 		// If the contact is active and we are not editing already and it is not deleted
@@ -143,15 +149,22 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 	/**
 	 * Stop editing the contacts
 	 */
-	$scope.stopEditContacts = function () {
-		// Remove the binding to listen to escape key
-		$('body').off('keydown', _escapeKeyListenerEdit);
-		// Listen to escape key for full
-		$('body').on('keydown', _escapeKeyListenerFull);
-		// Check if some fields are empty
-		_removeEmptyFields($scope.activeContact);
-		// Remove current edit
-		$scope.editing = false;
+	$scope.stopEditContact = function () {
+		if ($scope.activeContact && $scope.editing) {
+			// Remove current edit
+			$scope.editing = false;
+			// Remove the binding to listen to escape key
+			$('body').off('keydown', _escapeKeyListenerEdit);
+			// Listen to escape key for full
+			$('body').on('keydown', _escapeKeyListenerFull);
+			// Check if some fields are empty
+			_removeEmptyFields($scope.activeContact);
+			// Check if the contact is empty
+			if (_isContactEmpty($scope.activeContact)) {
+				console.log('destroy');
+				//$scope.destroyContact($scope.activeContact);
+			}
+		}
 	};
 
 	/**
@@ -206,20 +219,41 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 			contact.modificationDate = new Date().getTime();
 			syncService.updateResource('CONTACT', contact);
 		}
-	}
+	};
+
+	var _isContactEmpty = function (contact) {
+		for (var field in contact) {
+			if (contact.hasOwnProperty(field)
+				&& !field.startsWith('_')
+				&& !field.startsWith('$')
+				&& field !== 'creationDate' && field !== 'modificationDate' && field !== 'deleteDate') {
+				// If array, check if it is empty
+				if (Array.isArray(contact[field])) {
+					if (contact[field].length > 0) {
+						return false;
+					}
+				}
+				// If simple field
+				else if (contact[field]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	};
 
 	/**
 	 * Custom listeners
 	 */
 	var _escapeKeyListenerEdit = function (event) {
 		if (event.which === 27) {
-			$scope.stopEditContacts();
+			$scope.stopEditContact();
 			$scope.$apply();
 		}
 	};
 	var _escapeKeyListenerFull = function (event) {
 		if (event.which === 27) {
-			$scope.stopFullContacts();
+			$scope.stopFullContact();
 			$scope.$apply();
 		}
 	};
@@ -250,7 +284,7 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 			contact.modificationDate = new Date().getTime();
 			syncService.updateResource('CONTACT', contact);
 		}
-	}
+	};
 
 });
 
@@ -260,6 +294,9 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
  */
 webApp.filter('formatInlineAddress', function () {
 	return function (address) {
-		return address.street + ' ' + address.number + ' - ' + address.postalCode + ' ' + address.locality + ' - ' + address.country;
+		if (address) {
+			return address.street + ' ' + address.number + ' - ' + address.postalCode + ' ' + address.locality + ' - ' + address.country;
+		}
+		return '';
 	};
 });

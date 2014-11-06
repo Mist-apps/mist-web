@@ -80,6 +80,7 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 
 		span {
 			color: rgba(0, 0, 0, 0.3);
+			display: inline-block;
 		}
 
 	}
@@ -92,6 +93,7 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 
 		span {
 			font-size: 16px;
+			min-width: 150px;
 			color: rgba(0, 0, 0, 0.8);
 		}
 
@@ -109,7 +111,7 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 		border-radius: 50%;
 	}
 
-	hr, .edit-menu {
+	.edit-menu {
 		display: none;
 	}
 
@@ -149,7 +151,10 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 	[class^='full-'] {
 		vertical-align: top;
 		display: inline-block;
+		border-top: 1px solid rgba(0, 0, 0, 0.05);
 		margin-right: 50px;
+		padding-top: 15px;
+		margin-top: 15px;
 		height: 100%;
 		font-size: 13px;
 	}
@@ -188,6 +193,7 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 		span {
 			cursor: text;
 			font-size: 25px;
+			height: 75px;
 		}
 
 	}
@@ -195,13 +201,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 	.image {
 		width: 75px;
 		height: 75px;
-	}
-
-	hr {
-		display: block;
-		border: none;
-		border-top: 1px solid rgba(0, 0, 0, 0.05);
-		margin: 20px 0px 15px 0px;
 	}
 
 	.mail, .phone, .address, .birthday, .website, .public-key {
