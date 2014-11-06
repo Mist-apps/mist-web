@@ -291,6 +291,10 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			// Set syncing
 			setStatusSyncing();
 		}
+		// If the resource is new
+		else {
+			_removeResource(resource);
+		}
 	};
 
 	/**
