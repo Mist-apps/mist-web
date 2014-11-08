@@ -119,6 +119,23 @@ webApp.config(function ($httpProvider) {
 /**
  * Auto remove shake class
  */
-$('body').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', '.shake', function() {
+$('body').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', '.shake', function () {
 	$(this).removeClass('shake');
+});
+
+/**
+ * Auto shown/hide the dropdowns on click on the related buttons
+ */
+$('body').on('click', '.dropdown-button', function () {
+	// Get the dropdown
+	var dropdown = $(this).find('.dropdown');
+	// Check if the dropdown is not already shown
+	if (!dropdown.is(':visible')) {
+		// Show the dropdown
+		dropdown.show();
+		// Remove on next click
+		$('body').one('click', function () {
+			dropdown.hide();
+		});
+	}
 });

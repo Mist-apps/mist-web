@@ -699,6 +699,84 @@ textarea {
 	right: 0px;
 }
 
+.dropdown-button {
+	position: relative;
+}
+
+.dropdown {
+
+	line-height: 1;
+	background-color: #FFF;
+	position: absolute;
+	z-index: 900;
+	left: -16px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+	border-radius: 2px 2px 2px 2px;
+	color: rgba(0, 0, 0, 0.6);
+	padding: 10px;
+	display: none;
+	font-family: arial,sans-serif;
+	font-size: 14px;
+	list-style-type: none;
+
+	.dropdown-arrow {
+		border-color: transparent transparent rgba(0, 0, 0, 0.2);
+		border-style: dashed dashed solid;
+		border-width: 0px 8px 8px;
+		position: absolute;
+		left: 15px;
+		top: -8px;
+		z-index: 900;
+	}
+
+	.dropdown-arrow-fill {
+		border-color: transparent transparent rgb(255, 255, 255);
+		border-style: dashed dashed solid;
+		border-width: 0px 8px 8px;
+		position: absolute;
+		left: 15px;
+		top: -7px;
+		z-index: 901;
+	}
+
+	li {
+
+		padding: 7px;
+		white-space: nowrap;
+
+		.fa {
+			width: 20px;
+		}
+
+		&:hover {
+			background-color: rgba(0, 0, 0, 0.02);
+			color: rgba(0, 0, 0, 0.9);
+		}
+
+	}
+
+}
+
+.dropdown-right {
+
+	right: -16px;
+	left: initial;
+
+	.dropdown-arrow {
+		right: 15px;
+		left: initial;
+	}
+
+	.dropdown-arrow-fill {
+		right: 15px;
+		left: initial;
+	}
+
+}
+
 
 /**
  * Imports

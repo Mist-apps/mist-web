@@ -167,6 +167,28 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 	};
 
 	/**
+	 * Add fields in contact
+	 */
+	$scope.addPhone = function () {
+		if (!$scope.activeContact.phones) {
+			$scope.activeContact.phones = [];
+		}
+		$scope.activeContact.phones.push({'type': 'home'});
+	};
+	$scope.addMail = function () {
+		if (!$scope.activeContact.mails) {
+			$scope.activeContact.mails = [];
+		}
+		$scope.activeContact.mails.push({'type': 'personnal'});
+	};
+	$scope.addAddress = function () {
+		if (!$scope.activeContact.addresses) {
+			$scope.activeContact.addresses = [];
+		}
+		$scope.activeContact.addresses.push({'type': 'home'});
+	};
+
+	/**
 	 * Check in the current contact if some fields are empty and remove it.
 	 */
 	var _removeEmptyFields = function (contact) {
@@ -292,9 +314,20 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
  * Format an address in a one line way
  */
 webApp.filter('formatInlineAddress', function () {
+	// Print a field only if not undefined or null
+	var _print = function (field) {
+		if (field) {
+			return field;
+		}
+		return '';
+	};
+	// Clean an address to remove unused spaces and '-' characters
+	var _clean = function (address) {
+		return address.replace(/-\s+-/g, ' ').replace(/\s{2,}/g, ' ').trim().replace(/-$/, '').trim();
+	};
 	return function (address) {
 		if (address) {
-			return address.street + ' ' + address.number + ' - ' + address.postalCode + ' ' + address.locality + ' - ' + address.country;
+			return _clean(_print(address.street) + ' ' + _print(address.number) + ' - ' + _print(address.postalCode) + ' ' + _print(address.locality) + ' - ' + _print(address.country));
 		}
 		return '';
 	};

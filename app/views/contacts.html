@@ -27,6 +27,18 @@
 
 		<!-- Menu -->
 		<div class="edit-menu">
+			<div class="fa fa-lg fa-plus dropdown-button" ng-if="editing">
+				<ul class="dropdown dropdown-right">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<li ng-click="addPhone();"><div class="fa fa-phone"></div>Phone number</li>
+					<li ng-click="addMail();"><div class="fa fa-envelope"></div>E-mail address</li>
+					<li ng-click="addAddress();"><div class="fa fa-home"></div>Postal address</li>
+					<li ng-if="contact.birthday===undefined" ng-click="contact.birthday='';"><div class="fa fa-birthday-cake"></div>Birthday</li>
+					<li ng-if="contact.url===undefined" ng-click="contact.url='';"><div class="fa fa-globe"></div>Website</li>
+					<li ng-if="contact.pubKey===undefined" ng-click="contact.pubKey='';"><div class="fa fa-key"></div>Public Key</li>
+				</ul>
+			</div>
 			<div class="fa fa-lg fa-remove" ng-if="contact.deleteDate" ng-click="destroyContact(contact);"></div>
 			<div class="fa fa-lg fa-undo" ng-if="contact.deleteDate" ng-click="restoreContact(contact);"></div>
 			<div class="fa fa-lg fa-trash" ng-if="!contact.deleteDate" ng-click="deleteContact(contact);"></div>
@@ -89,7 +101,7 @@
 				<div class="website-show" ng-click="startEditContact($event, contact);"><a ng-href="{{contact.url}}" target="_blank">{{contact.url}}</a></div>
 				<div class="website-edit"><input type="text" ng-model="contact.url" placeholder="Website" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
-			<div class="public-key" ng-if="contact[public-key]!==undefined">
+			<div class="public-key" ng-if="contact.pubKey!==undefined">
 				<div class="fa fa-lg fa-key"></div><input type="text" ng-model="contact.pubKey" placeholder="Public Key" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
 			</div>
 		</div>
