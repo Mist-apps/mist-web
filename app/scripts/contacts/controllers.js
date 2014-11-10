@@ -139,6 +139,18 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		if ($scope.activeContact === contact && !$scope.editing && !contact.deleteDate) {
 			// Save current edited contact
 			$scope.editing = true;
+			// Set Date
+			if ($scope.activeContact.birthday) {
+				var tmp = new Date(parseInt($scope.activeContact.birthday));
+				$scope.date = {
+					day:	tmp.getDate(),
+					month:	tmp.getMonth() + 1,
+					year:	tmp.getFullYear()
+				};
+				console.log(JSON.stringify($scope.date))
+			} else {
+				$scope.date = {};
+			}
 			// Remove the binding to listen to escape key
 			$('body').off('keydown', _escapeKeyListenerFull);
 			// Listen to escape key
@@ -330,5 +342,16 @@ webApp.filter('formatInlineAddress', function () {
 			return _clean(_print(address.street) + ' ' + _print(address.number) + ' - ' + _print(address.postalCode) + ' ' + _print(address.locality) + ' - ' + _print(address.country));
 		}
 		return '';
+	};
+});
+
+webApp.filter('range', function () {
+	return function (input, min, max) {
+		min = parseInt(min);
+		max = parseInt(max);
+		for (var i=min; i<=max; i++) {
+			input.push(i);
+		}
+		return input;
 	};
 });

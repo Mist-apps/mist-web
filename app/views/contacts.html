@@ -27,8 +27,9 @@
 
 		<!-- Menu -->
 		<div class="edit-menu">
-			<div class="fa fa-lg fa-plus dropdown-button" ng-if="editing">
-				<ul class="dropdown dropdown-right">
+			<div class="dropdown dropdown-right" ng-if="editing">
+				<div class="fa fa-lg fa-plus dropdown-button"></div>
+				<ul class="dropdown-menu">
 					<div class="dropdown-arrow"></div>
 					<div class="dropdown-arrow-fill"></div>
 					<li ng-click="addPhone();"><div class="fa fa-phone"></div>Phone number</li>
@@ -41,7 +42,7 @@
 			</div>
 			<div class="fa fa-lg fa-remove" ng-if="contact.deleteDate" ng-click="destroyContact(contact);"></div>
 			<div class="fa fa-lg fa-undo" ng-if="contact.deleteDate" ng-click="restoreContact(contact);"></div>
-			<div class="fa fa-lg fa-trash" ng-if="!contact.deleteDate" ng-click="deleteContact(contact);"></div>
+			<div class="fa fa-lg fa-trash" ng-if="!editing && !contact.deleteDate" ng-click="deleteContact(contact);"></div>
 			<div class="fa fa-lg fa-pencil" ng-if="!editing && !contact.deleteDate" ng-click="startEditContact($event, contact);"></div>
 			<div class="fa fa-lg fa-check" ng-if="editing" ng-click="stopEditContact();"></div>
 		</div>
@@ -94,7 +95,13 @@
 		</div>
 		<div class="full-info"  ng-if="contact.birthday!==undefined || contact.url!==undefined || contact[public-key]!==undefined">
 			<div class="birthday" ng-if="contact.birthday!==undefined">
-				<div class="fa fa-lg fa-birthday-cake"></div><input type="text" ng-model="contact.birthday" placeholder="BirthDay" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
+				<div class="fa fa-lg fa-birthday-cake"></div>
+				<div class="birthday-show">{{contact.birthday | date : shortDate}}</div>
+				<div class="birthday-edit">
+					<select ng-model="date.day" ng-options="label for label in [] | range:1:31"></select>
+					<select ng-model="date.month" ng-options="label for label in [] | range:1:12"></select>
+					<select ng-model="date.year" ng-options="label for label in [] | range:1900:2014"></select>
+				</div>
 			</div>
 			<div class="website" ng-if="contact.url!==undefined">
 				<div class="fa fa-lg fa-globe"></div>

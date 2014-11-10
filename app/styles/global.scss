@@ -699,11 +699,11 @@ textarea {
 	right: 0px;
 }
 
-.dropdown-button {
+.dropdown {
 	position: relative;
 }
 
-.dropdown {
+.dropdown .dropdown-menu {
 
 	line-height: 1;
 	background-color: #FFF;
@@ -760,7 +760,7 @@ textarea {
 
 }
 
-.dropdown-right {
+.dropdown-right .dropdown-menu {
 
 	right: -16px;
 	left: initial;

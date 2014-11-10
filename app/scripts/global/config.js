@@ -128,7 +128,7 @@ $('body').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', '.s
  */
 $('body').on('click', '.dropdown-button', function () {
 	// Get the dropdown
-	var dropdown = $(this).find('.dropdown');
+	var dropdown = $(this).next();
 	// Check if the dropdown is not already shown
 	if (!dropdown.is(':visible')) {
 		// Show the dropdown
@@ -137,5 +137,8 @@ $('body').on('click', '.dropdown-button', function () {
 		$('body').one('click', function () {
 			dropdown.hide();
 		});
+		$('body').one('keydown', function (event) {
+			dropdown.hide();
+		})
 	}
 });
