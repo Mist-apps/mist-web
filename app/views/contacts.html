@@ -93,15 +93,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="full-info"  ng-if="contact.birthday!==undefined || contact.url!==undefined || contact[public-key]!==undefined">
+		<div class="full-info"  ng-if="contact.birthday!==undefined || contact.url!==undefined || contact.pubKey!==undefined">
 			<div class="birthday" ng-if="contact.birthday!==undefined">
 				<div class="fa fa-lg fa-birthday-cake"></div>
-				<div class="birthday-show">{{contact.birthday | date : shortDate}}</div>
-				<div class="birthday-edit">
-					<select ng-model="date.day" ng-options="label for label in [] | range:1:31"></select>
-					<select ng-model="date.month" ng-options="label for label in [] | range:1:12"></select>
-					<select ng-model="date.year" ng-options="label for label in [] | range:1900:2014"></select>
-				</div>
+				<div class="birthday-show" ng-click="startEditContact($event, contact);">{{contact.birthday | date:shortDay}}</div>
+				<div class="birthday-edit"><input type="date" ng-model="$parent.$parent.$parent.$parent.tmpDate" placeholder="BirthDay" /></div>
 			</div>
 			<div class="website" ng-if="contact.url!==undefined">
 				<div class="fa fa-lg fa-globe"></div>

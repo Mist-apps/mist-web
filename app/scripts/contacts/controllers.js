@@ -139,17 +139,14 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		if ($scope.activeContact === contact && !$scope.editing && !contact.deleteDate) {
 			// Save current edited contact
 			$scope.editing = true;
-			// Set Date
+			// Set tmpDate
 			if ($scope.activeContact.birthday) {
 				var tmp = new Date(parseInt($scope.activeContact.birthday));
-				$scope.date = {
-					day:	tmp.getDate(),
-					month:	tmp.getMonth() + 1,
-					year:	tmp.getFullYear()
-				};
-				console.log(JSON.stringify($scope.date))
-			} else {
-				$scope.date = {};
+				var _zero = function (number) {
+					if (number <= 9) return '0' + number
+					else return number;
+				}
+				$scope.tmpDate = tmp.getFullYear() + '-' + _zero(tmp.getMonth() + 1) + '-' + _zero(tmp.getDate());
 			}
 			// Remove the binding to listen to escape key
 			$('body').off('keydown', _escapeKeyListenerFull);
@@ -165,6 +162,16 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 		if ($scope.activeContact && $scope.editing) {
 			// Remove current edit
 			$scope.editing = false;
+			// Set birthday
+			if ($scope.tmpDate) {
+				var tmp = Date.parse($scope.tmpDate);
+				if (tmp !== $scope.activeContact.birthday) {
+					$scope.activeContact.birthday = tmp;
+					syncService.updateResource('CONTACT', $scope.activeContact);
+				}
+			} else {
+				$scope.activeContact.birthday = '';
+			}
 			// Remove the binding to listen to escape key
 			$('body').off('keydown', _escapeKeyListenerEdit);
 			// Listen to escape key for full
