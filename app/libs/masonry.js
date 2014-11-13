@@ -38,7 +38,12 @@ var Masonry = function (container) {
 			items[i].style.top = columns[col] + 'px';
 			items[i].style.left = ((itemWidth + gap) * col) + 'px';
 			$(items[i]).addClass('note-visible');
-			columns[col] += gap + $(items[i]).height();
+			// Remove the menu height if necessary
+			if ($(items[i]).find('.note-menu').is(':visible')) {
+				columns[col] += gap + $(items[i]).height() - $(items[i]).find('.note-menu').height();
+			} else {
+				columns[col] += gap + $(items[i]).height();
+			}
 		}
 		// Set container size
 		container.style.height = (columns[_getHighestCol(columns)] - gap) + 'px';
