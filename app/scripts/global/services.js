@@ -438,10 +438,6 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	// Sync the changes every X seconds
 	$interval(_sync, 2000);
 
-	// Resources that are synced periodically
-	var syncedRes;
-	var timer;
-
 	/**
 	 * Get resources from server and give it through the callback.
 	 * The callback return an error, or null and the data.
@@ -455,135 +451,16 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	var getResources = function (type, callback) {
 		var success = function (data, responseHeaders) {
 			$loader.stop('syncService.get' + type);
-			syncedRes = data;
 			callback(null, data);
 		};
 		var error = function (httpResponse) {
 			$loader.stop('syncService.get' + type);
 			callback(new Error(httpResponse.status));
 		};
-		// Check if some resources are already synced
-		if (timer) {
-			$interval.cancel(timer);
-			timer = undefined;
-		}
 		// Ask for resources
 		var httpResource = _getHTTPResource(type);
 		httpResource.query(success, error);
 		$loader.start('syncService.get' + type);
-		// Sync response method
-		var _syncSuccess = function (data, responseHeaders) {
-			if (syncedRes && $rootScope.syncStatus === 'synced') {
-				_copyDataArrayToResources(syncedRes, data);
-			}
-		};
-		// Start sync periodically
-		timer = $interval(function () {
-			// sync if status is synced
-			if (syncedRes && $rootScope.syncStatus === 'synced') {
-				httpResource.query(_syncSuccess);
-			}
-		}, 3000);
-	};
-
-	// Copy response data in resource
-	var _copyDataToResource = function (resource, data) {
-		// Copy from data to resource
-		for (var property in data) {
-			// If Array
-			if (Array.isArray(data[property]) && resource[property]) {
-				// If same length, copy each item
-				if (resource[property].length === data[property].length) {
-					for (var key in data[property]) {
-						// If Object or array, copy it fully
-						if (Array.isArray(data[property][key]) || (typeof data[property][key] === 'object' && data[property][key].toString() === '[object Object]')) {
-							_copyDataToResource(resource[property][key], data[property][key]);
-						}
-						// If normal field
-						else {
-							// Check if may write
-							if (metadata[resource._id]) { return; }
-							// Write
-							resource[property][key] = data[property][key];
-						}
-					}
-				}
-				// If not same length, overwrite the array
-				else {
-					// Check if may write
-					if (metadata[resource._id]) { return; }
-					// Write
-					resource[property] = data[property];
-				}
-			}
-			// If Object
-			else if (typeof data[property] === 'object' && data[property].toString() === '[object Object]' && resource[property]) {
-				_copyDataToResource(resource[property], data[property]);
-			}
-			// If normal field
-			else {
-				// Check if may write
-				if (metadata[resource._id]) { return; }
-				// Write
-				resource[property] = data[property];
-			}
-		}
-		// Delete old properties in resource
-		for (var property in resource) {
-			// If the property starts not with $ and is not in data, delete it
-			if (resource.hasOwnProperty(property) && property.charAt(0) !== '$' && !data.hasOwnProperty(property)) {
-				// Check if may write
-				if (metadata[resource._id]) { return; }
-				// Write
-				delete(resource[property]);
-			}
-		}
-	};
-
-	// Copy array of response data in array of resources
-	var _copyDataArrayToResources = function (resources, data) {
-		// Copy data to resources
-		for (var i in data) {
-			// Check if valid property
-			if (!data.hasOwnProperty(i) || i.charAt(0) === '$') {
-				return
-			}
-			// Search for the resource
-			var found = false;
-			for (var j in resources) {
-				// If the data has an id, search if id match, else, search if tmpId match
-				if (data[i]._id && resources[j]._id === data[i]._id) {
-					_copyDataToResource(resources[j], data[i]);
-					found = true;
-					break;
-				}
-			}
-			// If no resource found, add it
-			if (!found) {
-				resources.push(data[i]);
-			}
-		}
-		// If not the same length, search for old resources to delete
-		if (resources.length !== data.length) {
-			for (var i in resources) {
-				// Check if valid property
-				if (!resources.hasOwnProperty(i) || i.charAt(0) === '$') {
-					return
-				}
-				// Search for the resource
-				var found = false;
-				for (var j in data) {
-					if (data[j]._id && resources[i]._id === data[j]._id) {
-						found = true;
-						break;
-					}
-				}
-				// If not in the data array, delete it
-				if (!found) {
-					resources.splice(i, 1);
-				}
-			}
-		}
 	};
 
 	// Return change handling methods
