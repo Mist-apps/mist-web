@@ -198,14 +198,14 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 			var ctx = canvas.getContext('2d');
 			// Create image object with base64 upload
 			var image = new Image();
-			reader.onload = function (e) {
-				image.src = e.target.result;
-			};
-			// Read the image from the input in base64
-			var reader = new FileReader();
 			image.onload = function() {
 				ctx.drawImage(image, 0, 0, 85, 85);
 				$scope.tmpUser.image = canvas.toDataURL();
+			};
+			// Read the image from the input in base64
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				image.src = e.target.result;
 			};
 			reader.readAsDataURL(input.files[0]);
 		}
