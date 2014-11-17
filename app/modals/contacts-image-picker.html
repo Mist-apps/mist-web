@@ -1,0 +1,29 @@
+<div id="modal-contacts-image-picker" class="modal" ng-controller="ImagePickerController">
+
+	<!-- Header -->
+	<div class="modal-header">
+		<span class="fa fa-upload"></span>
+		Upload image
+	</div>
+
+	<!-- Content -->
+	<div class="modal-content">
+
+		<div id="upload-preview">
+			<img />
+		</div>
+		<div id="image-preview">
+			<img />
+		</div>
+		<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().upload()">
+		<canvas id="image-canvas"></canvas>
+
+	</div>
+
+	<!-- Footer -->
+	<div class="modal-footer">
+		<button tabindex="1" ng-click="cancel()">Cancel</button>
+		<button tabindex="1" ng-click="save()">Save</button>
+	</div>
+
+</div>

@@ -40,8 +40,8 @@
 		<br><br>
 		<div>
 			<img ng-src="{{tmpUser.image || 'images/user.png'}}">
-			<input type="file" tabindex="1" onchange="angular.element(this).scope().uploadImage()">
-			<canvas></canvas>
+			<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().uploadImage()">
+			<canvas id="user-image-canvas"></canvas>
 		</div>
 	</div>
 

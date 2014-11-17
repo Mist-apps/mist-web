@@ -4,7 +4,7 @@
 /**
  * Contacts controller
  */
-webApp.controller('ContactsController', function ($rootScope, $scope, syncService) {
+webApp.controller('ContactsController', function ($rootScope, $scope, $modal, syncService) {
 
 	/**
 	 * Get Contacts from API
@@ -186,6 +186,15 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 	};
 
 	/**
+	 * Start uploading new image
+	 */
+	$scope.uploadImage = function (contact) {
+		if ($scope.activeContact === contact) {
+			$modal.show('contacts-image-picker', {contact: contact});
+		}
+	};
+
+	/**
 	 * Add fields in contact
 	 */
 	$scope.addPhone = function () {
@@ -324,6 +333,114 @@ webApp.controller('ContactsController', function ($rootScope, $scope, syncServic
 			contact.modificationDate = new Date().getTime();
 			syncService.updateResource('CONTACT', contact);
 		}
+	};
+
+});
+
+webApp.controller('ImagePickerController', function ($scope, $modal, syncService) {
+
+	// Boundaries for cropping
+	var uploadPreviewWidth;
+	var uploadPreviewHeight;
+	var imagePreviewWidth = $('#image-preview').width();
+	var imagePreviewHeight = $('#image-preview').height();
+	var coordinates;
+	// Cropping library
+	var jcrop;
+
+	// Initialize image
+	if ($modal.parameters.contact.image) {
+		$('#image-preview > img').attr('src', $modal.parameters.contact.image);
+	} else {
+		$('#image-preview > img').attr('src', 'images/user.png');
+		var canvas = document.getElementById('image-canvas');
+		canvas.width = 85;
+		canvas.height = 85;
+		var ctx = canvas.getContext('2d');
+		// Create image object with base64 upload
+		var image = $('#image-preview > img').get(0);
+		ctx.drawImage(image, 0, 0, 85, 85);
+		$('#image-preview > img').attr('src', canvas.toDataURL());
+	}
+
+	/**
+	 * Preview the result of the crop operation
+	 */
+	var _preview = function (coords) {
+		coordinates = coords;
+		var rx = imagePreviewWidth / coords.w;
+		var ry = imagePreviewHeight / coords.h;
+		$('#image-preview > img').css({
+			width: Math.round(rx * uploadPreviewWidth) + 'px',
+			height: Math.round(ry * uploadPreviewHeight) + 'px',
+			marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+			marginTop: '-' + Math.round(ry * coords.y) + 'px'
+		});
+	};
+
+	/**
+	 * Upload the file on the client for cropping and preview
+	 */
+	$scope.upload = function () {
+		var input = $('#user-image-input').get(0);
+		if (input.files && input.files[0]) {
+			// If there was a previous image cropping
+			if (jcrop) {
+				// Destroy the jcrop objects
+				jcrop.destroy();
+				jcrop = undefined;
+				// Remove jcrop css attributes
+				$('#upload-preview > img').css('width', '');
+				$('#upload-preview > img').css('height', '');
+			}
+			// Read the file input
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				// Set the image for previews
+				$('#upload-preview > img').attr('src', e.target.result);
+				$('#image-preview > img').attr('src', e.target.result);
+				// Add jcrop behaviour
+				$('#upload-preview > img').Jcrop({
+					aspectRatio:	1,
+					boxWidth:		350,
+					boxHeight:		350,
+					onChange:		_preview,
+					onSelect:		_preview
+				}, function () {
+					jcrop = this;
+				});
+				// Get image preview boundaries
+				uploadPreviewWidth = $('#upload-preview > img').width();
+				uploadPreviewHeight = $('#upload-preview > img').height();
+			};
+			reader.readAsDataURL(input.files[0]);
+		}
+	};
+
+	/**
+	 * Save the image in the contact
+	 */
+	$scope.save = function (contact) {
+		// Create canvas for resizing image
+		var canvas = document.getElementById('image-canvas');
+		canvas.width = 85;
+		canvas.height = 85;
+		var ctx = canvas.getContext('2d');
+		// Create image object with base64 upload
+		var image = $('#image-preview > img').get(0);
+		ctx.drawImage(image, coordinates.x, coordinates.y, coordinates.w, coordinates.h, 0, 0, 85, 85);
+		$modal.parameters.contact.image = canvas.toDataURL();
+		// Notify sync service
+		syncService.updateResource('CONTACT', $modal.parameters.contact);
+		// Hide modal
+		$modal.hide('contacts-image-picker');
+	};
+
+	/**
+	 * Cancel the image upload: hide modal
+	 */
+	$scope.cancel = function () {
+		$modal.hide('contacts-image-picker');
 	};
 
 });

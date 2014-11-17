@@ -48,7 +48,7 @@
 		</div>
 
 		<!-- Common data -->
-		<img class="image" ng-src="{{contact.image || 'images/user.png'}}">
+		<img class="image" ng-src="{{contact.image || 'images/user.png'}}" ng-click="uploadImage(contact);">
 		<div class="name">
 			<span ng-click="startEditContact($event, contact);">{{contact.firstName}} {{contact.lastName}}</span>
 			<input type="text" ng-model="contact.firstName" placeholder="Firstname" ng-keydown="fieldKeyListener($event, contact);" />
