@@ -36,6 +36,10 @@
 			height: auto;
 		}
 
+		input:focus {
+			box-shadow: 0px 0px 6px #CCC;
+		}
+
 	}
 
 	.modal-footer button {

@@ -306,6 +306,10 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 
 	}
 
+	input:focus {
+		box-shadow: 0px 0px 6px #CCC;
+	}
+
 }
 
 
