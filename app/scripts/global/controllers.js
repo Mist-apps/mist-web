@@ -284,4 +284,8 @@ webApp.controller('LoginController', function ($scope, $location, $modal, AuthSe
 			}
 		);
 	};
+
+	// Auto-focus the login field
+	$('#login-container form input[name="login"]').focus();
+
 });
