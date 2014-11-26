@@ -219,8 +219,8 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 			word-wrap: break-word;
 		}
 
-		.fa {
-			padding: 5px;
+		&>.fa, .dropdown {
+			margin: 5px;
 			display: block;
 			float: left;
 			height: 100%;

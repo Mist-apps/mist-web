@@ -702,6 +702,8 @@ textarea {
 
 .dropdown {
 	position: relative;
+	display: inline-block;
+	text-align: left;
 }
 
 .dropdown .dropdown-menu {
@@ -722,6 +724,8 @@ textarea {
 	font-family: arial,sans-serif;
 	font-size: 14px;
 	list-style-type: none;
+	text-align: left;
+	cursor: auto;
 
 	.dropdown-arrow {
 		border-color: transparent transparent rgba(0, 0, 0, 0.2);
@@ -747,12 +751,19 @@ textarea {
 
 		padding: 7px;
 		white-space: nowrap;
+		color: rgba(0, 0, 0, 0.6);
+		cursor: pointer;
 
 		.fa {
+			display: inline-block;
+			padding: 0px;
+			float: none;
 			width: 20px;
+			color: rgba(0, 0, 0, 0.6);
+			text-align: left;
 		}
 
-		&:hover {
+		&:hover, &:hover .fa {
 			background-color: rgba(0, 0, 0, 0.02);
 			color: rgba(0, 0, 0, 0.9);
 		}
@@ -776,6 +787,10 @@ textarea {
 		left: initial;
 	}
 
+}
+
+.dropdown-button {
+	cursor: pointer;
 }
 
 

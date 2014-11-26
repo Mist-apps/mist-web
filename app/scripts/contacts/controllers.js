@@ -217,6 +217,22 @@ webApp.controller('ContactsController', function ($rootScope, $scope, $modal, sy
 	};
 
 	/**
+	 * Set type in field
+	 */
+	$scope.setPhoneType = function (contact, phone, type) {
+		phone.type = type;
+		syncService.updateResource('CONTACT', contact);
+	};
+	$scope.setAddressType = function (contact, address, type) {
+		address.type = type;
+		syncService.updateResource('CONTACT', contact);
+	};
+	$scope.setMailType = function (contact, mail, type) {
+		mail.type = type;
+		syncService.updateResource('CONTACT', contact);
+	};
+
+	/**
 	 * Check in the current contact if some fields are empty and remove it.
 	 */
 	var _removeEmptyFields = function (contact) {

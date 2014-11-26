@@ -64,24 +64,60 @@
 		<!-- Full data -->
 		<div class="full-mails" ng-if="contact.mails && contact.mails.length > 0">
 			<div class="mail" ng-repeat="mail in contact.mails">
-				<div class="fa fa-lg fa-envelope"></div>
+				<!-- Mail icon (+dropdown) -->
+				<div class="dropdown dropdown-left">
+					<div class="fa fa-lg dropdown-button" ng-class="{'fa-envelope': mail.type=='personal', 'fa-briefcase': mail.type=='professional'}"></div>
+					<ul class="dropdown-menu">
+						<div class="dropdown-arrow"></div>
+						<div class="dropdown-arrow-fill"></div>
+						<li ng-click="setMailType(contact, mail, 'personal');"><div class="fa fa-envelope"></div>Home</li>
+						<li ng-click="setMailType(contact, mail, 'professional');"><div class="fa fa-briefcase"></div>Work</li>
+					</ul>
+				</div>
+				<!-- Mail view -->
 				<div class="mail-show" ng-click="startEditContact($event, contact);"><a ng-href="mailto:{{mail.address}}">{{mail.address}}</a></div>
+				<!-- Mail editor -->
 				<div class="mail-edit"><input type="text" ng-model="mail.address" placeholder="E-mail" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
 		</div>
 		<div class="full-phones" ng-if="contact.phones && contact.phones.length > 0">
 			<div class="phone" ng-repeat="phone in contact.phones">
-				<div class="fa fa-lg"  ng-class="{'fa-phone': phone.type=='home', 'fa-building': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager'}"></div><input type="text" ng-model="phone.number" placeholder="Phone number" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
+				<!-- Phone icon (+dropdown) -->
+				<div class="dropdown dropdown-left">
+					<div class="fa fa-lg dropdown-button" ng-class="{'fa-phone': phone.type=='home', 'fa-briefcase': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager'}"></div>
+					<ul class="dropdown-menu">
+						<div class="dropdown-arrow"></div>
+						<div class="dropdown-arrow-fill"></div>
+						<li ng-click="setPhoneType(contact, phone, 'home');"><div class="fa fa-phone"></div>Home</li>
+						<li ng-click="setPhoneType(contact, phone, 'work');"><div class="fa fa-briefcase"></div>Work</li>
+						<li ng-click="setPhoneType(contact, phone, 'cell');"><div class="fa fa-mobile"></div>Cell</li>
+						<li ng-click="setPhoneType(contact, phone, 'fax');"><div class="fa fa-fax"></div>Fax</li>
+						<li ng-click="setPhoneType(contact, phone, 'pager');"><div class="fa fa-bell"></div>Pager</li>
+					</ul>
+				</div>
+				<!-- Phone view/editor -->
+				<input type="text" ng-model="phone.number" placeholder="Phone number" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
 			</div>
 		</div>
 		<div class="full-addresses"  ng-if="contact.addresses && contact.addresses.length > 0">
 			<div class="address" ng-repeat="address in contact.addresses">
-				<div class="fa fa-lg" ng-class="{'fa-home': address.type=='home', 'fa-building': address.type=='work'}"></div>
+				<!-- Address icon (+dropdown) -->
+				<div class="dropdown dropdown-left">
+					<div class="fa fa-lg dropdown-button" ng-class="{'fa-home': address.type=='home', 'fa-building': address.type=='work'}"></div>
+					<ul class="dropdown-menu">
+						<div class="dropdown-arrow"></div>
+						<div class="dropdown-arrow-fill"></div>
+						<li ng-click="setAddressType(contact, address, 'home');"><div class="fa fa-home"></div>Home</li>
+						<li ng-click="setAddressType(contact, address, 'work');"><div class="fa fa-building"></div>Work</li>
+					</ul>
+				</div>
+				<!-- Address view -->
 				<div class="address-show" ng-click="startEditContact($event, contact);">
 					{{address.street}} {{address.number}}<br>
 					{{address.postalCode}} {{address.locality}}<br>
 					{{address.country}}
 				</div>
+				<!-- Address editor -->
 				<div class="address-edit">
 					<input type="text" ng-model="address.street" placeholder="Street" ng-keydown="fieldKeyListener($event, contact);" />
 					<input type="text" ng-model="address.number" placeholder="Number" ng-keydown="fieldKeyListener($event, contact);" />
