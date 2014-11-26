@@ -289,8 +289,9 @@ webApp.controller('ContactsController', function ($rootScope, $scope, $modal, sy
 	var _isContactEmpty = function (contact) {
 		for (var field in contact) {
 			if (contact.hasOwnProperty(field)
-				&& !field.startsWith('_')
-				&& !field.startsWith('$')
+				&& field.charAt(0) !== '_'
+				&& field.charAt(0) !== '$'
+				&& field !== 'tmpId'
 				&& field !== 'creationDate' && field !== 'modificationDate' && field !== 'deleteDate') {
 				// If array, check if it is empty
 				if (Array.isArray(contact[field])) {
