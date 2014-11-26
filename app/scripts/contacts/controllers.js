@@ -340,18 +340,24 @@ webApp.controller('ContactsController', function ($rootScope, $scope, $modal, sy
 webApp.controller('ImagePickerController', function ($scope, $modal, syncService) {
 
 	// Boundaries for cropping
-	var uploadPreviewWidth;
-	var uploadPreviewHeight;
 	var imagePreviewWidth = $('#image-preview').width();
 	var imagePreviewHeight = $('#image-preview').height();
 	var coordinates;
 	// Cropping library
 	var jcrop;
+	// Is default image
+	var isDefault = false;
 
-	// Initialize image
-	if ($modal.parameters.contact.image) {
-		$('#image-preview > img').attr('src', $modal.parameters.contact.image);
-	} else {
+	/**
+	 * Set the default image
+	 */
+	var _setDefault = function () {
+		// If already default, does nothing
+		if (isDefault) {
+			return;
+		} else {
+			isDefault = true;
+		}
 		$('#image-preview > img').attr('src', 'images/user.png');
 		var canvas = document.getElementById('image-canvas');
 		canvas.width = 85;
@@ -361,15 +367,38 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 		var image = $('#image-preview > img').get(0);
 		ctx.drawImage(image, 0, 0, 85, 85);
 		$('#image-preview > img').attr('src', canvas.toDataURL());
+	};
+
+	/**
+	 * Remove Jcrop if it was set
+	 */
+	var _removeJcrop = function () {
+		// If there was a previous image cropping
+		if (jcrop) {
+			// Destroy the jcrop objects
+			jcrop.destroy();
+			jcrop = undefined;
+			// Clean the DOM
+			$('#upload-preview').empty();
+			$('#upload-preview').append('<img />');
+			$('#image-preview > img').remove();
+			$('#image-preview').prepend('<img />');
+		}
 	}
 
 	/**
 	 * Preview the result of the crop operation
 	 */
 	var _preview = function (coords) {
+		// Save coordinates
 		coordinates = coords;
+		// Calculate deplacement
 		var rx = imagePreviewWidth / coords.w;
 		var ry = imagePreviewHeight / coords.h;
+		// Get upload preview boundaries
+		var uploadPreviewWidth = $('#upload-preview > img').width();
+		var uploadPreviewHeight = $('#upload-preview > img').height();
+		// Set image preview
 		$('#image-preview > img').css({
 			width: Math.round(rx * uploadPreviewWidth) + 'px',
 			height: Math.round(ry * uploadPreviewHeight) + 'px',
@@ -382,17 +411,11 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 	 * Upload the file on the client for cropping and preview
 	 */
 	$scope.upload = function () {
+		isDefault = false;
 		var input = $('#user-image-input').get(0);
 		if (input.files && input.files[0]) {
-			// If there was a previous image cropping
-			if (jcrop) {
-				// Destroy the jcrop objects
-				jcrop.destroy();
-				jcrop = undefined;
-				// Remove jcrop css attributes
-				$('#upload-preview > img').css('width', '');
-				$('#upload-preview > img').css('height', '');
-			}
+			// Remove previous jcrop
+			_removeJcrop();
 			// Read the file input
 			var reader = new FileReader();
 			reader.onload = function (e) {
@@ -409,9 +432,6 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 				}, function () {
 					jcrop = this;
 				});
-				// Get image preview boundaries
-				uploadPreviewWidth = $('#upload-preview > img').width();
-				uploadPreviewHeight = $('#upload-preview > img').height();
 			};
 			reader.readAsDataURL(input.files[0]);
 		}
@@ -421,19 +441,34 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 	 * Save the image in the contact
 	 */
 	$scope.save = function (contact) {
-		// Create canvas for resizing image
-		var canvas = document.getElementById('image-canvas');
-		canvas.width = 85;
-		canvas.height = 85;
-		var ctx = canvas.getContext('2d');
-		// Create image object with base64 upload
-		var image = $('#image-preview > img').get(0);
-		ctx.drawImage(image, coordinates.x, coordinates.y, coordinates.w, coordinates.h, 0, 0, 85, 85);
-		$modal.parameters.contact.image = canvas.toDataURL();
+		// If default image
+		if (isDefault) {
+			delete($modal.parameters.contact.image);
+		}
+		// If new image
+		else {
+			// Create canvas for resizing image
+			var canvas = document.getElementById('image-canvas');
+			canvas.width = 85;
+			canvas.height = 85;
+			var ctx = canvas.getContext('2d');
+			// Create image object with base64 upload
+			var image = $('#image-preview > img').get(0);
+			ctx.drawImage(image, coordinates.x, coordinates.y, coordinates.w, coordinates.h, 0, 0, 85, 85);
+			$modal.parameters.contact.image = canvas.toDataURL();
+		}
 		// Notify sync service
 		syncService.updateResource('CONTACT', $modal.parameters.contact);
 		// Hide modal
 		$modal.hide('contacts-image-picker');
+	};
+
+	/**
+	 * Remove the current image
+	 */
+	$scope.remove = function () {
+		_removeJcrop();
+		_setDefault();
 	};
 
 	/**
@@ -442,6 +477,13 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 	$scope.cancel = function () {
 		$modal.hide('contacts-image-picker');
 	};
+
+	// Initialize image
+	if ($modal.parameters.contact.image) {
+		$('#image-preview > img').attr('src', $modal.parameters.contact.image);
+	} else {
+		_setDefault();
+	}
 
 });
 

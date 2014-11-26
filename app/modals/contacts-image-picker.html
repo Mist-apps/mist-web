@@ -14,16 +14,17 @@
 		</div>
 		<div id="image-preview">
 			<img />
+			<span class="fa fa-2x fa-trash" ng-click="remove();"></span>
 		</div>
-		<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().upload()">
+		<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().upload();">
 		<canvas id="image-canvas"></canvas>
 
 	</div>
 
 	<!-- Footer -->
 	<div class="modal-footer">
-		<button tabindex="1" ng-click="cancel()">Cancel</button>
-		<button tabindex="1" ng-click="save()">Save</button>
+		<button tabindex="1" ng-click="cancel();">Cancel</button>
+		<button tabindex="1" ng-click="save();">Save</button>
 	</div>
 
 </div>
