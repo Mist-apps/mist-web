@@ -166,6 +166,16 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 	};
 
 	/**
+	 * Change color of note
+	 */
+	$scope.setColor = function (note, color) {
+		// Set the color
+		note.color = color;
+		// Inform sync service
+		syncService.updateResource('NOTE', note);
+	}
+
+	/**
 	 * Start editing a note
 	 */
 	$scope.startEditNote = function (event) {

@@ -204,10 +204,10 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 	transition-property: height;
 	transition-timing-function: linear;
 
-	.fa {
+	&>.fa, .dropdown>.fa {
 
 		color: rgba(255, 255, 255, 1);
-		font-size: 25px;
+		font-size: 18px;
 		cursor: pointer;
 		height: 36px;
 		line-height: 36px;
@@ -218,7 +218,7 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 
 	}
 
-	div {
+	&>div {
 		display: inline-block;
 		margin: 0px 0px 0px 10px;
 	}
@@ -227,6 +227,26 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 		position: absolute;
 		right: 3px;
 		bottom: 3px;
+	}
+
+	.dropdown-menu {
+
+		width: 144px;
+
+		.fa {
+			padding: 1px 2px;
+			margin: 1px;
+			cursor: pointer;
+			width: 12px;
+			border-radius: 15%;
+			display: block;
+			float: left;
+		}
+
+		.fa:hover {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
+
 	}
 
 }
@@ -246,4 +266,64 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 .note-task-edit {
 	border-top: 1px solid rgba(0, 0, 0, 0.15);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+
+/**
+ * Note colors
+ */
+
+.note-white {
+	background-color: #FFFFFF;
+}
+.note-red {
+	background-color: #FF6D3F;
+}
+.note-orange {
+	background-color: #FF9B00;
+}
+.note-yellow {
+	background-color: #FFDA00;
+}
+.note-green {
+	background-color: #95D641;
+}
+.note-turquoise {
+	background-color: #1CE8B5;
+}
+.note-blue {
+	background-color: #3FC3FF;
+}
+.note-grey {
+	background-color: #B8C4C9;
+}
+
+
+/**
+ * Note menu colors
+ */
+
+.note-menu-white {
+	color: #B8C4C9;
+}
+.note-menu-red {
+	color: #FF6D3F;
+}
+.note-menu-orange {
+	color: #FF9B00;
+}
+.note-menu-yellow {
+	color: #FFDA00;
+}
+.note-menu-green {
+	color: #95D641;
+}
+.note-menu-turquoise {
+	color: #1CE8B5;
+}
+.note-menu-blue {
+	color: #3FC3FF;
+}
+.note-menu-grey {
+	color: #B8C4C9;
 }

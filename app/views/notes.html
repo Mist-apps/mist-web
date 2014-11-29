@@ -22,7 +22,7 @@
 <div id="grid-container" grid>
 
 	<!-- Notes view -->
-	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:'order'" grid-item>
+	<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:'order'" ng-class="'note-' + (note.color || 'white')" grid-item>
 
 		<div class="drag-drop-zone" ng-mousedown="$root.masonry.dragStart($event);" ng-mouseup="$root.masonry.dragEnd($event, moveNote);"></div>
 		<input type="hidden" name="order" value="{{note.order}}">
@@ -44,6 +44,21 @@
 		<!-- Menu -->
 		<div class="note-menu">
 			<div class="fa fa-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
+			<div class="dropdown dropdown-right">
+				<div class="fa fa-paint-brush dropdown-button" ng-if="!note.deleteDate" ng-click=""></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<div class="fa note-menu-white" ng-class="{'fa-square-o': note.color&&note.color!=='white', 'fa-check-square-o': !note.color||note.color==='white'}" ng-click="setColor(note, 'white');"></div>
+					<div class="fa note-menu-red" ng-class="{'fa-square': note.color!=='red', 'fa-check-square': note.color==='red'}" ng-click="setColor(note, 'red');"></div>
+					<div class="fa note-menu-orange" ng-class="{'fa-square': note.color!=='orange', 'fa-check-square': note.color==='orange'}" ng-click="setColor(note, 'orange');"></div>
+					<div class="fa note-menu-yellow" ng-class="{'fa-square': note.color!=='yellow', 'fa-check-square': note.color==='yellow'}" ng-click="setColor(note, 'yellow');"></div>
+					<div class="fa note-menu-green" ng-class="{'fa-square': note.color!=='green', 'fa-check-square': note.color==='green'}" ng-click="setColor(note, 'green');"></div>
+					<div class="fa note-menu-turquoise" ng-class="{'fa-square': note.color!=='turquoise', 'fa-check-square': note.color==='turquoise'}" ng-click="setColor(note, 'turquoise');"></div>
+					<div class="fa note-menu-blue" ng-class="{'fa-square': note.color!=='blue', 'fa-check-square': note.color==='blue'}" ng-click="setColor(note, 'blue');"></div>
+					<div class="fa note-menu-grey" ng-class="{'fa-square': note.color!=='grey', 'fa-check-square': note.color==='grey'}" ng-click="setColor(note, 'grey');"></div>
+				</ul>
+			</div>
 			<div class="fa fa-remove" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
 			<div class="fa fa-undo" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
 			<button ng-click="stopEditNotes();">OK</button>
