@@ -40,10 +40,49 @@
 		<!-- Left menu icon -->
 		<div id="nav-menu" ng-click="toggleLeftMenu($event);"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
 
-		<!-- User navbar menu -->
-		<div id="nav-user" ng-click="toggleUserMenu($event);">
-			<img id="user-image" ng-src="{{$root.user.image || 'images/user.png'}}">
-			<span>{{$root.user.firstName}} {{$root.user.lastName}} &nbsp;&nbsp;&#9662;</span>
+		<!-- Right menu -->
+		<div id="nav-user">
+			<!-- Search icon -->
+			<div class="fa fa-lg fa-search"></div>
+			<!-- App selector -->
+			<div id="app-menu" class="dropdown dropdown-right">
+				<div class="dropdown-button"><div class="fa fa-lg fa-th"></div></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<table>
+						<tr>
+							<td><div class="fa fa-3x fa-rss"></div>Reader</td>
+							<td ng-click="goto('/contacts');"><div class="fa fa-3x fa-users"></div>Contacts</td>
+						</tr>
+						<tr>
+							<td><div class="fa fa-3x fa-calendar"></div>Calendar</td>
+							<td><div class="fa fa-3x fa-envelope"></div>Mail</td>
+						</tr>
+						<tr>
+							<td><div class="fa fa-3x fa-lock"></div>Pass</td>
+							<td ng-click="goto('/notes');"><div class="fa fa-3x fa-lightbulb-o"></div>Notes</td>
+						</tr>
+					</table>
+				</ul>
+			</div>
+			<!-- Notifications -->
+			<div class="dropdown dropdown-right">
+				<div class="dropdown-button"><div class="fa fa-lg fa-bell"></div></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<div id="notifications">No notifications...</div>
+				</ul>
+			</div>
+			<!-- User menu -->
+			<div id="user-menu" class="dropdown dropdown-right">
+				<img class="dropdown-button" ng-src="{{$root.user.image || 'images/user.png'}}">
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+				</ul>
+			</div>
 		</div>
 
 		<!-- Search menu -->
@@ -56,7 +95,7 @@
 			<span class="fa fa-search"></span>
 		</div>
 
-		<!-- User dropdown menu -->
+		<!-- User dropdown menu
 		<div id="user-menu">
 			<div id="user-menu-arrow"></div>
 			<div id="user-menu-arrow-fill"></div>
@@ -72,7 +111,7 @@
 				<div ng-click="showSettings()"><span class="fa fa-cogs"></span><span>Settings</span></div>
 				<div ng-click="logout()"><span class="fa fa-power-off"></span><span>Logout</span></div>
 			</div>
-		</div>
+		</div>-->
 
 	</div>
 

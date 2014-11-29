@@ -66,7 +66,6 @@ body {
 	display: inline-block;
 	height: 100%;
 	margin-right: 25px;
-	cursor: pointer;
 	float: right;
 	font-size: 14px;
 
@@ -74,21 +73,57 @@ body {
 		margin-right: 10px;
 	}
 
-	span {
+	&>div, img {
+		cursor: pointer;
+		vertical-align: middle;
+	}
 
-		@media (max-width: 600px) {
-			display: none;
+	&>div {
+		margin-right: 15px;
+	}
+
+	#user-menu {
+
+		margin-right: 0px;
+
+		img {
+			width: 32px;
+			height: 32px;
+			border: 2px solid rgba(255, 255, 255, 0.6);
+			border-radius: 50%;
 		}
 
 	}
 
-	#user-image {
-		width: 32px;
-		height: 32px;
-		vertical-align: middle;
-		margin-right: 8px;
-		border: 2px solid rgba(255, 255, 255, 0.6);
-		border-radius: 50%;
+	#app-menu table {
+
+		border-spacing: 15px;
+		margin: -5px;
+
+		td {
+
+			width: 65px;
+			height: 65px;
+			text-align: center;
+			cursor: pointer;
+			font-size: 12px;
+
+			div {
+				width: 65px;
+			}
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.02);
+				color: rgba(0, 0, 0, 0.9);
+			}
+
+		}
+	}
+
+
+	#notifications {
+		width: 200px;
+		text-align: center;
 	}
 
 }
@@ -188,7 +223,7 @@ body {
 /**
  * User menu
  * Popup menu showed when clicking on the username
- */
+
 
 #user-menu {
 	line-height: 1;
@@ -284,7 +319,7 @@ body {
 
 	}
 
-}
+}*/
 
 
 /**

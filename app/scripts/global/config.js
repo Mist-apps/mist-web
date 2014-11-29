@@ -137,8 +137,5 @@ $('body').on('click', '.dropdown-button', function () {
 		$('body').one('click', function () {
 			dropdown.hide();
 		});
-		$('body').one('keydown', function (event) {
-			dropdown.hide();
-		})
 	}
 });

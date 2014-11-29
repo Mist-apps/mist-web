@@ -35,7 +35,6 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 	 */
 	var _hideMenus = function () {
 		$('.menu').removeClass('menu-show');
-		$('#user-menu').hide();
 		$('#nav-search').css('display', '');	// Remove manually display to recover the class value
 		$('#add-menu div').hide();
 		$('#add-menu div:first-child').show();
@@ -50,22 +49,6 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 		if (!$('.menu').hasClass('menu-show')) {
 			_hideMenus();
 			$('.menu').addClass('menu-show');
-			$('html').click(function () {
-				_hideMenus();
-			});
-			$event.stopPropagation();
-		} else {
-			_hideMenus();
-		}
-	};
-
-	/**
-	 * Show and hide user menu dynamically
-	 */
-	$scope.toggleUserMenu = function ($event) {
-		if ($('#user-menu').is(':hidden')) {
-			_hideMenus();
-			$('#user-menu').show();
 			$('html').click(function () {
 				_hideMenus();
 			});
