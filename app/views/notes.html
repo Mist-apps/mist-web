@@ -44,8 +44,8 @@
 		<!-- Menu -->
 		<div class="note-menu">
 			<div class="fa fa-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
-			<div class="dropdown dropdown-right">
-				<div class="fa fa-paint-brush dropdown-button" ng-if="!note.deleteDate" ng-click=""></div>
+			<div class="dropdown dropdown-left" ng-if="!note.deleteDate">
+				<div class="fa fa-paint-brush dropdown-button"></div>
 				<ul class="dropdown-menu">
 					<div class="dropdown-arrow"></div>
 					<div class="dropdown-arrow-fill"></div>
