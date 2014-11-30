@@ -492,8 +492,7 @@ body {
 }
 
 #modal-container {
-	position: absolute;
-	top: 35px;
+	position: fixed;
 	margin: auto;
 	width: 100%;
 	z-index: 960;
@@ -566,22 +565,36 @@ body {
 
 	.modal-content {
 
-		padding: 20px 15px;
+		padding: 20px 15px 0px 15px;
 		font-size: 14px;
 		text-align: left;
+		overflow: auto;
 
 		.modal-content-column {
 			text-align: center;
 			display: inline-block;
 		}
 
+		&:after {
+			height: 20px;
+			width: 0px;
+			display: block;
+			content: "";
+		}
+
 	}
 
 	.modal-footer {
+
 		padding: 10px 15px;
 		border-top: 1px solid rgba(0, 0, 0, 0.3);
 		text-align: center;
 		clear: both;
+
+		button {
+			margin: 0px 15px;
+		}
+
 	}
 }
 

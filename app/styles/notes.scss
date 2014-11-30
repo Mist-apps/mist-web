@@ -161,12 +161,12 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 	cursor: pointer;
 
 	&:before {
-	display: inline-block;
-	font: normal normal normal 14px/1 FontAwesome;
-	font-size: inherit;
-	text-rendering: auto;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+		display: inline-block;
+		font: normal normal normal 14px/1 FontAwesome;
+		font-size: inherit;
+		text-rendering: auto;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 		content: "\f096";
 		font-size: 20px;
 		color: rgba(0, 0, 0, 0.35);

@@ -489,6 +489,22 @@ webApp.service('$modal', function ($rootScope) {
 		return 'modals/' + name + '.html';
 	};
 
+	// Center the modal
+	var _center = function () {
+		// Get window height without 2 * 10px for dialog box margin
+		var windowHeight = $(window).height() - 20;
+		// Get content max height from window height minus the modal header and footer
+		var contentMaxHeight = windowHeight - $('.modal-header').outerHeight(true) - $('.modal-footer').outerHeight(true);
+		// Set content max-height
+		$('.modal-content').css('max-height', (contentMaxHeight - 40) + 'px');
+		// Get the modal effective height
+		var modalHeight = $('.modal').height();
+		// Set top window offset, add the 10px top margin
+		$('#modal-container').css('top', ((windowHeight - modalHeight) / 3 + 10) + 'px');
+	};
+
+	$rootScope.$on('$includeContentLoaded', _center);
+
 	// Show the modal
 	this.show = function (name, params) {
 		if (!$rootScope.modal) {
@@ -497,6 +513,7 @@ webApp.service('$modal', function ($rootScope) {
 			}
 			this.dim();
 			$rootScope.modal = _getModalUrl(name);
+			$(window).on('resize', _center);
 		}
 	};
 
@@ -506,6 +523,7 @@ webApp.service('$modal', function ($rootScope) {
 			$rootScope.modal = '';
 			this.clear();
 			this.parameters = {};
+			$(window).off('resize', _center);
 		}
 	};
 
