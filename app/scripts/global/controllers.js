@@ -174,6 +174,7 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 			// Clean the DOM
 			$('#upload-preview').empty();
 			$('#upload-preview').append('<img />');
+			$('#upload-preview').hide();
 			$('#image-preview > img').remove();
 			$('#image-preview').prepend('<img />');
 		}
@@ -266,6 +267,7 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 			var reader = new FileReader();
 			reader.onload = function (e) {
 				// Set the image for previews
+				$('#upload-preview').show();
 				$('#upload-preview > img').attr('src', e.target.result);
 				$('#image-preview > img').attr('src', e.target.result);
 				// Add jcrop behaviour
