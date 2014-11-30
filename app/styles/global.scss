@@ -79,7 +79,7 @@ body {
 	}
 
 	&>div {
-		margin-right: 15px;
+		margin-right: 25px;
 	}
 
 	#user-menu {
@@ -91,6 +91,57 @@ body {
 			height: 32px;
 			border: 2px solid rgba(255, 255, 255, 0.6);
 			border-radius: 50%;
+		}
+
+		table {
+			width: 270px;
+			border-collapse: collapse;
+			margin: -10px;
+		}
+
+		#user-menu-info {
+
+			border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+			padding: 15px;
+			text-align: center;
+
+			img {
+				width: 85px;
+				height: 85px;
+				border: none;
+				border-radius: 50%;
+				cursor: default;
+				box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.2);
+				margin-bottom: 5px;
+			}
+
+			#user-menu-name {
+				font-size: 20px;
+				line-height: 1.5;
+			}
+
+			#user-menu-mail {
+				font-size: 12px;
+			}
+
+		}
+
+		#user-menu-button {
+
+			width: 135px;
+			height: 50px;
+			text-align: center;
+			cursor: pointer;
+
+			div {
+				margin-right: 10px;
+			}
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.02);
+				color: rgba(0, 0, 0, 0.9);
+			}
+
 		}
 
 	}
@@ -218,108 +269,6 @@ body {
 	}
 
 }
-
-
-/**
- * User menu
- * Popup menu showed when clicking on the username
-
-
-#user-menu {
-	line-height: 1;
-	background-color: #FFF;
-	position: absolute;
-	right: 25px;
-	top: $navbar-height;
-	z-index: 900;
-	width: 223px;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-	border-radius: 2px 2px 2px 2px;
-	color: rgba(0, 0, 0, 0.6);
-	display: none;
-}
-
-#user-menu-arrow {
-	border-color: transparent transparent rgba(0, 0, 0, 0.2);
-	border-style: dashed dashed solid;
-	border-width: 0px 8px 8px;
-	position: absolute;
-	right: 15px;
-	top: -8px;
-	z-index: 900;
-}
-
-#user-menu-arrow-fill {
-	border-color: transparent transparent rgb(255, 255, 255);
-	border-style: dashed dashed solid;
-	border-width: 0px 8px 8px;
-	position: absolute;
-	right: 15px;
-	top: -7px;
-	z-index: 901;
-}
-
-#user-menu-apps {
-
-	padding: 15px;
-	font-size: 12px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-
-	div {
-
-		padding: 15px;
-		width: 65px;
-		height: 55px;
-		text-align: center;
-		display: inline-block;
-		cursor: pointer;
-
-		.fa {
-			font-size: 36px;
-			display: block;
-		}
-
-		&:hover {
-			background-color: rgba(0, 0, 0, 0.02);
-			color: rgba(0, 0, 0, 0.9);
-		}
-
-	}
-
-}
-
-#user-menu-footer {
-
-	font-size: 12px;
-
-	div {
-
-		width: 80px;
-		padding: 15px;
-		text-align: center;
-		display: inline-block;
-		cursor: pointer;
-
-		.fa {
-			margin-right: 10px;
-			font-size: 150%;
-		}
-
-		span {
-			display: inline-block;
-			line-height: 20px;
-			float: left;
-		}
-
-		&:hover {
-			background-color: rgba(0, 0, 0, 0.02);
-			color: rgba(0, 0, 0, 0.9);
-		}
-
-	}
-
-}*/
 
 
 /**

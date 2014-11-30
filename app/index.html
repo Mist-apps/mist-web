@@ -81,6 +81,19 @@
 				<ul class="dropdown-menu">
 					<div class="dropdown-arrow"></div>
 					<div class="dropdown-arrow-fill"></div>
+					<table>
+						<tr>
+							<td colspan="2" id="user-menu-info">
+								<img ng-src="{{$root.user.image || 'images/user.png'}}"><br>
+								<span id="user-menu-name">{{$root.user.firstName}} {{$root.user.lastName}}</span><br>
+								<span id="user-menu-mail">{{$root.user.mail}}</span>
+							</td>
+						</tr>
+						<tr>
+							<td id="user-menu-button" ng-click="showSettings()"><div class="fa fa-lg fa-cogs"></div><span>Settings</span></td>
+							<td id="user-menu-button" ng-click="logout()"><div class="fa fa-lg fa-power-off"></div><span>Logout</span></td>
+						</tr>
+					</table>
 				</ul>
 			</div>
 		</div>
@@ -94,24 +107,6 @@
 		<div id="nav-search-button" ng-click="toggleSearchMenu($event);">
 			<span class="fa fa-search"></span>
 		</div>
-
-		<!-- User dropdown menu
-		<div id="user-menu">
-			<div id="user-menu-arrow"></div>
-			<div id="user-menu-arrow-fill"></div>
-			<div id="user-menu-apps">
-				<div><span class="fa fa-rss"></span>Reader</div>
-				<div><span class="fa fa-users" ng-click="goto('/contacts');"></span>Contacts</div>
-				<div><span class="fa fa-calendar"></span>Calendar</div>
-				<div><span class="fa fa-envelope"></span>Mail</div>
-				<div><span class="fa fa-lock"></span>Pass</div>
-				<div><span class="fa fa-lightbulb-o" ng-click="goto('/notes');"></span>Notes</div>
-			</div>
-			<div id="user-menu-footer">
-				<div ng-click="showSettings()"><span class="fa fa-cogs"></span><span>Settings</span></div>
-				<div ng-click="logout()"><span class="fa fa-power-off"></span><span>Logout</span></div>
-			</div>
-		</div>-->
 
 	</div>
 
