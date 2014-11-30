@@ -75,6 +75,7 @@ webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
 		// Set application name, page-title...
 		$rootScope.appName = next.appName;
 		$rootScope.title = next.title;
+		$rootScope.favicon = next.favicon;
 		// If not authenticated
 		if (!AuthService.isAuthenticated()) {
 			// Add a resolve method to try to recover authentication

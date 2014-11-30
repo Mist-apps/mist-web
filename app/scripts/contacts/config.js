@@ -11,7 +11,8 @@ webApp.config(function ($routeProvider) {
 		controller: 'ContactsController',
 		authenticated: true,
 		appName: 'contacts',
-		title: 'Contacts'
+		title: 'Contacts',
+		favicon: 'images/favicon-contacts.png'
 	});
 
 });

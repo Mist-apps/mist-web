@@ -6,7 +6,7 @@
  *		- Show/hide all menus
  *		- Logout
  */
-webApp.controller('ApplicationController', function ($scope, $timeout, $rootScope, $location, $modal, AuthService, syncService) {
+webApp.controller('ApplicationController', function ($scope, $rootScope, $timeout, $location, $modal, AuthService, syncService) {
 
 	/**
 	 * Left menu location

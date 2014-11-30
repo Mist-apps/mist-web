@@ -11,7 +11,8 @@ webApp.config(function ($routeProvider) {
 		controller: 'NotesCtrl',
 		authenticated: true,
 		appName: 'notes',
-		title: 'Notes'
+		title: 'Notes',
+		favicon: 'images/favicon-notes.png'
 	});
 
 });
