@@ -38,11 +38,15 @@
 		<br><br>
 		<strong>Image:</strong>
 		<br><br>
-		<div>
-			<img ng-src="{{tmpUser.image || 'images/user.png'}}">
-			<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().uploadImage()">
-			<canvas id="user-image-canvas"></canvas>
+		<div id="upload-preview">
+			<img />
 		</div>
+		<div id="image-preview">
+			<img />
+			<span class="fa fa-2x fa-trash" ng-click="remove();"></span>
+		</div>
+		<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().upload();">
+		<canvas id="image-canvas"></canvas>
 	</div>
 
 	<!-- Footer -->

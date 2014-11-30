@@ -375,15 +375,17 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 		} else {
 			isDefault = true;
 		}
-		$('#image-preview > img').attr('src', 'images/user.png');
-		var canvas = document.getElementById('image-canvas');
-		canvas.width = 85;
-		canvas.height = 85;
-		var ctx = canvas.getContext('2d');
 		// Create image object with base64 upload
-		var image = $('#image-preview > img').get(0);
-		ctx.drawImage(image, 0, 0, 85, 85);
-		$('#image-preview > img').attr('src', canvas.toDataURL());
+		var image = new Image();
+		image.src = 'images/user.png';
+		image.onload = function () {
+			var canvas = document.getElementById('image-canvas');
+			canvas.width = 85;
+			canvas.height = 85;
+			var ctx = canvas.getContext('2d');
+			ctx.drawImage(image, 0, 0, 85, 85);
+			$('#image-preview > img').attr('src', canvas.toDataURL());
+		}
 	};
 
 	/**
@@ -463,7 +465,7 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 			delete($modal.parameters.contact.image);
 		}
 		// If new image
-		else {
+		else if (coordinates) {
 			// Create canvas for resizing image
 			var canvas = document.getElementById('image-canvas');
 			canvas.width = 85;
