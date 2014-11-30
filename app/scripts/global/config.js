@@ -126,7 +126,7 @@ $('body').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', '.s
 /**
  * Auto shown/hide the dropdowns on click on the related buttons
  */
-$('body').on('click', '.dropdown-button', function () {
+$(document).on('click', '.dropdown-button', function () {
 	// Get the dropdown
 	var dropdown = $(this).next();
 	// Check if the dropdown is not already shown
@@ -134,7 +134,7 @@ $('body').on('click', '.dropdown-button', function () {
 		// Show the dropdown
 		dropdown.show();
 		// Remove on next click
-		$('body').one('click', function () {
+		$(document).one('click', function () {
 			dropdown.hide();
 		});
 	}
