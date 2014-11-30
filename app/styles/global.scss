@@ -82,6 +82,14 @@ body {
 		margin-right: 25px;
 	}
 
+	#search-menu {
+
+		@media (min-width: 600px) {
+			display: none;
+		}
+
+	}
+
 	#user-menu {
 
 		margin-right: 0px;
@@ -171,7 +179,6 @@ body {
 		}
 	}
 
-
 	#notifications {
 		width: 200px;
 		text-align: center;
@@ -252,20 +259,6 @@ body {
 			margin-right: 16px;
 		}
 
-	}
-
-}
-
-#nav-search-button {
-
-	display: inline-block;
-	cursor: pointer;
-	font-size: 20px;
-	float: right;
-	margin-right: 10px;
-
-	@media (min-width: 600px) {
-		display: none;
 	}
 
 }

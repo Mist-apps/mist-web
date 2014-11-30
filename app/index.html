@@ -43,7 +43,7 @@
 		<!-- Right menu -->
 		<div id="nav-user">
 			<!-- Search icon -->
-			<div class="fa fa-lg fa-search"></div>
+			<div id="search-menu" class="fa fa-lg fa-search" ng-click="toggleSearchMenu($event);"></div>
 			<!-- App selector -->
 			<div id="app-menu" class="dropdown dropdown-right">
 				<div class="dropdown-button"><div class="fa fa-lg fa-th"></div></div>
@@ -103,9 +103,6 @@
 			<span id="nav-search-icon" class="fa fa-search"></span>
 			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search" tabindex="1"></div>
 			<span id="nav-search-stop" class="fa fa-remove" ng-show="$root.search && $root.search !== ''" ng-click="$root.search = '';" ></span>
-		</div>
-		<div id="nav-search-button" ng-click="toggleSearchMenu($event);">
-			<span class="fa fa-search"></span>
 		</div>
 
 	</div>

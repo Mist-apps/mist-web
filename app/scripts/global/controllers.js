@@ -74,6 +74,25 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 	};
 
 	/**
+	 * Show and hide the search menu dynamically (small screens)
+	 */
+	$scope.toggleSearchMenu = function ($event) {
+		if ($('#nav-search').is(':hidden')) {
+			_hideMenus();
+			$('#nav-search').show();
+			$('html').click(function (event) {
+				// Check if we clicked outside of the nav menu
+				if ($(event.target).parents('#nav-search').length !== 1) {
+					_hideMenus();
+				}
+			});
+			$event.stopPropagation();
+		} else {
+			_hideMenus();
+		}
+	};
+
+	/**
 	 * Show the settings modal and send a broadcast to initialize the
 	 * settings controller.
 	 */
@@ -97,25 +116,6 @@ webApp.controller('ApplicationController', function ($scope, $timeout, $rootScop
 			AuthService.logout();
 			syncService.init();
 			$location.path('/login');
-		}
-	};
-
-	/**
-	 * Show and hide the search menu dynamically (small screens)
-	 */
-	$scope.toggleSearchMenu = function ($event) {
-		if ($('#nav-search').is(':hidden')) {
-			_hideMenus();
-			$('#nav-search').show();
-			$('html').click(function (event) {
-				// Check if we clicked outside of the nav menu
-				if ($(event.target).parents('#nav-search').length !== 1) {
-					_hideMenus();
-				}
-			});
-			$event.stopPropagation();
-		} else {
-			_hideMenus();
 		}
 	};
 
