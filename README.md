@@ -36,4 +36,4 @@ It's done ! You may start develop the web application:
 ## Troubleshooting
 
 * If you have an `EACCES` error during the `npm install` command, please remove the npm tmp cache folder located in your home: `rm -rf /home/username/.npm` and retry again. This is due to some cache items written with the root permissions, so when accessing the cache with normal user permissions, it fails.
-* If you have a warning message when launching grunt "jcrop was not injected in your file." Copy this file https://github.com/tapmodo/Jcrop/blob/master/bower.json in the JCrop component folder `/path/to/sources/bower_components/jcrop/`. This is because bower not include this file in the installation.
+* If you have a warning message when launching grunt "jcrop was not injected in your file", copy this file https://github.com/tapmodo/Jcrop/blob/master/bower.json in the JCrop component folder `/path/to/sources/bower_components/jcrop/`. This is because bower not include this file in the installation.
