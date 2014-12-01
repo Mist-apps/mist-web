@@ -21,6 +21,7 @@ It's done ! You may access the web application on http://localhost, change the s
 * install nodejs: `sudo add-apt-repository ppa:chris-lea/node.js && sudo apt-get update && sudo apt-get install nodejs`
 * install the grunt client: `sudo npm install -g grunt-cli`
 * install bower: `sudo npm install -g bower`
+* install ruby: `sudo apt-get install ruby`
 * install compass: `sudo gem install compass`
 * clone the repository where you want: `git clone https://github.com/Mist-apps/mist-web.git /path/to/sources`
 * go into the sources folder: `cd /path/to/sources`
@@ -29,5 +30,10 @@ It's done ! You may access the web application on http://localhost, change the s
 
 It's done ! You may start develop the web application:
 * the web application sources are in the `app` folder
-* to use a built-in web server and watch changes in the sources, use `grunt serve` in the root folder and the app will be served on http://localhost:9000/
+* to use a built-in web server and watch changes in the sources, use `grunt serve --force` in the root folder and the app will be served on http://localhost:9000
 * to build a distribution release of the application, use `grunt` in the root folder. The release will be generated in the `dist` folder.
+
+## Troubleshooting
+
+* If you have an `EACCES` error during the `npm install` command, please remove the npm tmp cache folder located in your home: `rm -rf /home/username/.npm` and retry again. This is due to some cache items written with the root permissions, so when accessing the cache with normal user permissions, it fails.
+* If you have a warning message when launching grunt "jcrop was not injected in your file." Copy this file https://github.com/tapmodo/Jcrop/blob/master/bower.json in the JCrop component folder `/path/to/sources/bower_components/jcrop/`. This is because bower not include this file in the installation.
