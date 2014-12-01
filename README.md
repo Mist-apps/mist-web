@@ -18,7 +18,7 @@ The web application is very easy to install. It only needs a web-server to serve
 It's done ! You may access the web application on http://localhost, change the server name in the vhost if you have your own domain... To update the site, only rsync the files again and set the rights.
 
 #### For a development installation:
-* install nodejs: `sudo apt-get install nodejs`
+* install nodejs: `sudo add-apt-repository ppa:chris-lea/node.js && sudo apt-get update && sudo apt-get install nodejs`
 * install the grunt client: `sudo npm install -g grunt-cli`
 * install bower: `sudo npm install -g bower`
 * install compass: `sudo gem install compass`
