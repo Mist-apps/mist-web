@@ -26,14 +26,35 @@ It's done ! You may start develop the web application:
 
 #### For a production installation:
 * install nginx: `sudo apt-get install nginx`
-* add the vhost: `sudo mv mist-web /etc/nginx/etc/sites-available/mist-web && sudo chown root:root /etc/nginx/etc/sites-available/mist-web`
+* create the vhost: `sudo vim /etc/nginx/etc/sites-available/mist-web`
+* add these contents
+```
+server {
+
+        listen 80;
+
+        server_name my-web-domain-name;
+
+        access_log   /var/log/nginx/mist.access.log;
+        error_log    /var/log/nginx/mist.error.log;
+
+        root /var/www/mist-web;
+        index index.html;
+
+        location / {
+                try_files $uri /index.html;
+        }
+
+}
+```
+* set the rights on the vhost`sudo chown root:root /etc/nginx/etc/sites-available/mist-web`
 * enable the vhost: `sudo ln -s /etc/nginx/etc/sites-available/mist-web /etc/nginx/etc/sites-enabled/mist-web`
 * copy the content of the "dist" folder of a development installation into the web server folder: `sudo rsync -a --delete /path/to/sources/dist/ /var/www/mist-web`. The "dist" files can be generated on a developpment installation on the same host or on another. Use the command `grunt` to build the distribution release.
 * change the API url to match yours: `sudo sed -i 's/http:\/\/localhost:8080\/http:\/\/my-api-domain-name\//g' /var/www/mist-web/scripts/scripts.*.js`
 * change the ownership of the files: `sudo chown -R www-data:www-data /var/www/mist-web`
 * reload nginx: `sudo service nginx reload`
 
-It's done ! You may access the web application on http://localhost, change the server name in the vhost if you have your own domain... To update the site, only rsync the files again and set the rights.
+It's done ! You may access the web application on http://my-web-domain-name/. To update the web application, only repeat the 4 last operations: copy the dist folder, change API and ownership, reload nginx.
 
 #### Troubleshooting
 
