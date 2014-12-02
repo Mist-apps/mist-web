@@ -1,11 +1,11 @@
 Mist Web Application
 ====================
 
-The Mist web application is the main front-end for the Mist API. It offers currently only a Notes management application. The front-end is a HTML5/CSS/JavaScript web application based on the AngularJS Framework. It is available on recent browsers only (tested Firefox/Chromium)
+The Mist web application is the main front-end for the Mist API. It offers currently only a Notes and contacts management application. The front-end is a HTML5/CSS/JavaScript web application based on the AngularJS Framework. It is available on recent browsers only (tested Firefox/Chromium).
 
 ## Installation
 
-The web application is very easy to install. It only needs a web-server to serve the static files. If you already installed the mist-api, follow these steps:
+The web application is very easy to install. It only needs a web-server to serve the static files. The web application only works if the Mist API is operational, else, you won't be able to connect. To install the Mist web application, follow these steps:
 
 #### For a development installation:
 * install nodejs: `sudo add-apt-repository ppa:chris-lea/node.js && sudo apt-get update && sudo apt-get install nodejs`
