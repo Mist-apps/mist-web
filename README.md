@@ -35,8 +35,8 @@ server {
 
         server_name my-web-domain-name;
 
-        access_log   /var/log/nginx/mist.access.log;
-        error_log    /var/log/nginx/mist.error.log;
+        access_log   /var/log/nginx/mist-web.access.log;
+        error_log    /var/log/nginx/mist-web.error.log;
 
         root /var/www/mist-web;
         index index.html;
