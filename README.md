@@ -26,8 +26,8 @@ It's done ! You may start develop the web application:
 
 #### For a production installation:
 * install nginx: `sudo apt-get install nginx`
-* create the vhost: `sudo vim /etc/nginx/etc/sites-available/mist-web`
-* add these contents
+* create the vhost file: `sudo vim /etc/nginx/etc/sites-available/mist-web`
+* add these contents:
 ```
 server {
 
@@ -47,7 +47,7 @@ server {
 
 }
 ```
-* set the rights on the vhost`sudo chown root:root /etc/nginx/etc/sites-available/mist-web`
+* set the rights on the vhost file: `sudo chown root:root /etc/nginx/etc/sites-available/mist-web`
 * enable the vhost: `sudo ln -s /etc/nginx/etc/sites-available/mist-web /etc/nginx/etc/sites-enabled/mist-web`
 * copy the content of the "dist" folder of a development installation into the web server folder: `sudo rsync -a --delete /path/to/sources/dist/ /var/www/mist-web`. The "dist" files can be generated on a developpment installation on the same host or on another. Use the command `grunt` to build the distribution release.
 * change the API url to match yours: `sudo sed -i 's/http:\/\/localhost:8080\/http:\/\/my-api-domain-name\//g' /var/www/mist-web/scripts/scripts.*.js`
