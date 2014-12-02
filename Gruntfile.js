@@ -208,10 +208,15 @@ module.exports = function (grunt) {
 		usemin: {
 			html: ['<%= yeoman.dist %>/{,*/}*.html'],
 			css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
+			js: ['<%= yeoman.dist %>/scripts/{,*/}*.js'],
 			options: {
 				assetsDirs: ['<%= yeoman.dist %>','<%= yeoman.dist %>/images'],
 				patterns: {
 					html: [
+						[
+							/ng-src=\"[^"]*\'(images[^']*)\'[^"]*\"/gm,
+							'Update the HTML with the new img filenames (angular)'
+						],
 						[
 							/<script.+src=['"]([^"']+)["']/gm,
 							'Update the HTML to reference our concat/min/revved script files'
@@ -221,12 +226,8 @@ module.exports = function (grunt) {
 							'Update the HTML with the new css filenames'
 						],
 						[
-							/<img[^\>]*[^\>\S]+src=['"]([^"']+)["']/gm,
+							/<img[^\>]*[^\>\S]+src=['"]([^'"\)#]+)(#.+)?["']/gm,
 							'Update the HTML with the new img filenames'
-						],
-						[
-							/ng-src=\"[^"]*\'(images[^']*)\'[^"]*\"/gm,
-							'Update the HTML with the new img filenames (angular)'
 						],
 						[
 							/<video[^\>]+src=['"]([^"']+)["']/gm,
@@ -269,7 +270,42 @@ module.exports = function (grunt) {
 						[
 							/<meta[^\>]+content=['"]([^"']+)["']/gm,
 							'Update the HTML with the new img filenames in meta tags'
+						],
+						[
+							/<object[^\>]+data=['"]([^"']+)["']/gm,
+							'Update the HTML with the new object filenames'
+						],
+						[
+							/<image[^\>]*[^\>\S]+xlink:href=['"]([^"'#]+)(#.+)?["']/gm,
+							'Update the HTML with the new image filenames for svg xlink:href links'
+						],
+						[
+							/<image[^\>]*[^\>\S]+src=['"]([^'"\)#]+)(#.+)?["']/gm,
+							'Update the HTML with the new image filenames for src links'
+						],
+						[
+							/<(?:img|source)[^\>]*[^\>\S]+srcset=['"]([^"'\s]+)\s*?(?:\s\d*?[w])?(?:\s\d*?[x])?\s*?["']/gm,
+							'Update the HTML with the new image filenames for srcset links'
+						],
+						[
+							/<(?:use|image)[^\>]*[^\>\S]+xlink:href=['"]([^'"\)#]+)(#.+)?["']/gm,
+							'Update the HTML within the <use> tag when referencing an external url with svg sprites as in svg4everybody'
 						]
+					],
+					css: [
+						[
+							/(?:src=|url\(\s*)['"]?([^'"\)(\?|#)]+)['"]?\s*\)?/gm,
+							'Update the CSS to reference our revved images'
+						]
+					],
+					json: [
+						[
+							/:\s*['"]([^"']+)["']/gm,
+							'Update the json value to reference our revved url'
+						]
+					],
+					js: [
+						[/(images\/.*?\.(?:gif|jpeg|jpg|png|webp|svg))/gm, 'Update the JS to reference our revved images']
 					]
 				}
 			}
