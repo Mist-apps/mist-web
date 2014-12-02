@@ -27,13 +27,13 @@ It's done ! You may start develop the web application:
 * install nginx: `sudo apt-get install nginx`
 * add the vhost: `sudo mv mist-web /etc/nginx/etc/sites-available/mist-web && sudo chown root:root /etc/nginx/etc/sites-available/mist-web`
 * enable the vhost: `sudo ln -s /etc/nginx/etc/sites-available/mist-web /etc/nginx/etc/sites-enabled/mist-web`
-* copy the content of the "dist" folder of a dev installation, or the release taken on the github page, into the web server folder: `sudo rsync -a --delete /path/to/sources/dist/ /var/www/mist-web`
+* copy the content of the "dist" folder of a development installation into the web server folder: `sudo rsync -a --delete /path/to/sources/dist/ /var/www/mist-web`. The "dist" files can be generated on a developpment installation on the same host or on another. Use the command `grunt` to build the distribution release.
 * change the ownership of the files: `sudo chown -R www-data:www-data /var/www/mist-web`
 * reload nginx: `sudo service nginx reload`
 
 It's done ! You may access the web application on http://localhost, change the server name in the vhost if you have your own domain... To update the site, only rsync the files again and set the rights.
 
-## Troubleshooting
+#### Troubleshooting
 
 * If you have an `EACCES` error during the `npm install` command, please remove the npm tmp cache folder located in your home: `rm -rf /home/username/.npm` and retry again. This is due to some cache items written with the root permissions, so when accessing the cache with normal user permissions, it fails.
 * If you have a warning message when launching grunt "jcrop was not injected in your file", copy this file https://github.com/tapmodo/Jcrop/blob/master/bower.json in the JCrop component folder `/path/to/sources/bower_components/jcrop/`. This is because bower not include this file in the installation.
