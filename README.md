@@ -28,7 +28,7 @@ It's done ! You may start develop the web application:
 * install nginx: `sudo apt-get install nginx`
 * create the vhost file: `sudo vim /etc/nginx/etc/sites-available/mist-web`
 * add these contents:
-```
+``` Nginx
 server {
 
         listen 80;
