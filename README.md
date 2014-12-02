@@ -8,10 +8,11 @@ The Mist web application is the main front-end for the Mist API. It offers curre
 The web application is very easy to install. It only needs a web-server to serve the static files. The web application only works if the Mist API is operational, else, you won't be able to connect. To install the Mist web application, follow these steps:
 
 #### For a development installation:
+* install build-essential: `sudo apt-get install build-essential`
 * install nodejs: `sudo add-apt-repository ppa:chris-lea/node.js && sudo apt-get update && sudo apt-get install nodejs`
 * install the grunt client: `sudo npm install -g grunt-cli`
 * install bower: `sudo npm install -g bower`
-* install ruby: `sudo apt-get install ruby`
+* install ruby: `sudo apt-get install ruby ruby-dev`
 * install compass: `sudo gem install compass`
 * clone the repository where you want: `git clone https://github.com/Mist-apps/mist-web.git /path/to/sources`
 * go into the sources folder: `cd /path/to/sources`
