@@ -4,7 +4,21 @@
 /**
  * Contacts controller
  */
-webApp.controller('ContactsController', function ($rootScope, $scope, $modal, syncService) {
+webApp.controller('ContactsController', function ($scope, $modal, syncService) {
+
+	/**
+	 * Left menu location
+	 */
+	$scope.location = 'all';
+	$scope.$watch('location', function () {
+		var interval = setInterval(function () {
+			var title = $('#menu-item-' + $scope.location).text();
+			if (title && $('#nav-menu-title').html() !== undefined) {
+				$('#nav-menu-title').html(title);
+				clearInterval(interval);
+			}
+		}, 10);
+	});
 
 	/**
 	 * Get Contacts from API
@@ -22,9 +36,9 @@ webApp.controller('ContactsController', function ($rootScope, $scope, $modal, sy
 	 * Filter the contacts from the menu selection
 	 */
 	$scope.filterContacts = function (value) {
-		if ($rootScope.location === 'all') {
+		if ($scope.location === 'all') {
 			return !value.deleteDate;
-		} else if ($rootScope.location === 'trash') {
+		} else if ($scope.location === 'trash') {
 			return value.deleteDate;
 		} else {
 			return false;
@@ -207,7 +221,7 @@ webApp.controller('ContactsController', function ($rootScope, $scope, $modal, sy
 		if (!$scope.activeContact.mails) {
 			$scope.activeContact.mails = [];
 		}
-		$scope.activeContact.mails.push({'type': 'personnal'});
+		$scope.activeContact.mails.push({'type': 'personal'});
 	};
 	$scope.addAddress = function () {
 		if (!$scope.activeContact.addresses) {

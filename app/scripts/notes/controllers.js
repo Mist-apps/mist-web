@@ -7,6 +7,20 @@
 webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syncService, NotesWebService) {
 
 	/**
+	 * Left menu location
+	 */
+	$scope.location = 'all';
+	$scope.$watch('location', function () {
+		var interval = setInterval(function () {
+			var title = $('#menu-item-' + $scope.location).text();
+			if (title && $('#nav-menu-title').html() !== undefined) {
+				$('#nav-menu-title').html(title);
+				clearInterval(interval);
+			}
+		}, 10);
+	});
+
+	/**
 	 * Get Notes from API
 	 */
 	$scope.notes = [];
@@ -73,13 +87,13 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 	 * Filter the notes from the menu selection
 	 */
 	$scope.filterNotes = function (value) {
-		if ($rootScope.location === 'all') {
+		if ($scope.location === 'all') {
 			return !value.deleteDate;
-		} else if ($rootScope.location === 'notes') {
+		} else if ($scope.location === 'notes') {
 			return !value.deleteDate && !value.tasks;
-		} else if ($rootScope.location === 'todo') {
+		} else if ($scope.location === 'todo') {
 			return !value.deleteDate && value.tasks;
-		} else if ($rootScope.location === 'trash') {
+		} else if ($scope.location === 'trash') {
 			return value.deleteDate;
 		} else {
 			return false;

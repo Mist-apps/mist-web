@@ -9,21 +9,6 @@
 webApp.controller('ApplicationController', function ($scope, $rootScope, $timeout, $location, $modal, AuthService, syncService) {
 
 	/**
-	 * Left menu location
-	 */
-	$rootScope.location = 'all';
-
-	$rootScope.$watch('location', function () {
-		var interval = setInterval(function () {
-			var title = $('#menu-item-' + $rootScope.location).text();
-			if (title && $('#nav-menu-title').html() !== undefined) {
-				$('#nav-menu-title').html(title);
-				clearInterval(interval);
-			}
-		}, 100);
-	});
-
-	/**
 	 * Navigate to path
 	 */
 	$scope.goto = function (path) {

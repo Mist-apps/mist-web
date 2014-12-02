@@ -465,11 +465,11 @@ body {
 
 	position: relative;
 	top: $navbar-height;
-	padding: 35px;
+	padding: 35px 35px 50px 35px;
 	min-height: 100px;
 
 	@media (max-width: 600px) {
-		padding: 20px 10px;
+		padding: 20px 10px 45px 10px;
 	}
 
 }

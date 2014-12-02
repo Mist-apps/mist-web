@@ -1,7 +1,7 @@
 <!-- Left menu -->
 <div class="menu">
 	<!-- Items -->
-	<div id="menu-item-all" class="menu-item" ng-click="$root.location = 'all'" ng-class="{'menu-item-active': $root.location=='all'}"><span class="fa fa-th fa-lg"></span>All</div>
+	<div id="menu-item-all" class="menu-item" ng-click="location = 'all'" ng-class="{'menu-item-active': location=='all'}"><span class="fa fa-th fa-lg"></span>All</div>
 	<div class="menu-item"><span class="fa fa-star fa-lg"></span>Starred</div>
 	<div class="menu-item"><span class="fa fa-question fa-lg"></span>Ungrouped</div>
 	<div class="menu-separator"></div>
@@ -9,7 +9,7 @@
 	<div class="menu-item"><span class="fa fa-home fa-lg"></span>Family</div>
 	<div class="menu-item"><span class="fa fa-briefcase fa-lg"></span>Work</div>
 	<div class="menu-separator"></div>
-	<div id="menu-item-trash" class="menu-item" ng-click="$root.location = 'trash'" ng-class="{'menu-item-active': $root.location=='trash'}"><span class="fa fa-trash fa-lg"></span>Trash</div>
+	<div id="menu-item-trash" class="menu-item" ng-click="location = 'trash'" ng-class="{'menu-item-active': location=='trash'}"><span class="fa fa-trash fa-lg"></span>Trash</div>
 	<!-- Sync status -->
 	<div class="menu-bottom">
 		<div id="menu-sync">
@@ -23,7 +23,7 @@
 
 
 <div class="contacts" ng-if="(contacts | filter:filterContacts | filter:$root.search).length > 0 && !loading">
-	<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search" ng-click="showFullContact(contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
+	<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search | orderBy:['firstName','lastName']" ng-click="showFullContact(contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
 
 		<!-- Menu -->
 		<div class="edit-menu">
