@@ -18,6 +18,10 @@
 </div>
 
 
+<!-- No notes message -->
+<div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0 && !loading" id="nothing-message">No notes here...</div>
+
+
 <!-- Grid container for notes -->
 <div id="grid-container" grid>
 
@@ -67,10 +71,6 @@
 	</div>
 
 </div>
-
-
-<!-- No notes message -->
-<div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0 && !loading" id="nothing-message">No notes here...</div>
 
 
 <!-- Bottom add menu -->

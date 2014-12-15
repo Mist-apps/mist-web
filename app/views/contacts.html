@@ -22,6 +22,11 @@
 </div>
 
 
+<!-- No contacts message -->
+<div ng-if="(contacts | filter:filterContacts | filter:$root.search).length === 0 && !loading" id="nothing-message">No contacts here...</div>
+
+
+<!-- Contacts container -->
 <div class="contacts" ng-if="(contacts | filter:filterContacts | filter:$root.search).length > 0 && !loading">
 	<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search | orderBy:['firstName','lastName']" ng-click="showFullContact(contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
 
@@ -147,9 +152,6 @@
 
 	</div>
 </div>
-
-<!-- No contacts message -->
-<div ng-if="(contacts | filter:filterContacts | filter:$root.search).length === 0 && !loading" id="nothing-message">No contacts here...</div>
 
 
 <!-- Bottom add menu -->

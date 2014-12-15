@@ -45,8 +45,11 @@ var Masonry = function (container) {
 				columns[col] += gap + $(items[i]).height();
 			}
 		}
+		// Prepare height
+		var height = columns[_getHighestCol(columns)];
+		height = height > gap ? height - gap : height;
 		// Set container size
-		container.style.height = (columns[_getHighestCol(columns)] - gap) + 'px';
+		container.style.height = height + 'px';
 		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
 	};
 
