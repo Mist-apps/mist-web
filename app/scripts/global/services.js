@@ -503,7 +503,10 @@ webApp.service('$modal', function ($rootScope) {
 		$('#modal-container').css('top', ((windowHeight - modalHeight) / 3 + 10) + 'px');
 	};
 
-	$rootScope.$on('$includeContentLoaded', _center);
+	$rootScope.$on('$includeContentLoaded', function () {
+		_center();
+		$('.modal-content').on('resize', _center);
+	});
 
 	// Show the modal
 	this.show = function (name, params) {
@@ -524,6 +527,7 @@ webApp.service('$modal', function ($rootScope) {
 			this.clear();
 			this.parameters = {};
 			$(window).off('resize', _center);
+			$('.modal-content').off('resize', _center);
 		}
 	};
 

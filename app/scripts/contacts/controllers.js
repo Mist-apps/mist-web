@@ -417,6 +417,8 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 			$('#upload-preview').hide();
 			$('#image-preview > img').remove();
 			$('#image-preview').prepend('<img />');
+			// Send the resize event, for centering the modal
+			$('.modal-content').resize();
 		}
 	}
 
@@ -467,6 +469,8 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 				}, function () {
 					jcrop = this;
 				});
+				// Send the resize event, for centering the modal
+				$('.modal-content').resize();
 			};
 			reader.readAsDataURL(input.files[0]);
 		}

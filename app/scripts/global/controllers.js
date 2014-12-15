@@ -162,6 +162,8 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 			$('#upload-preview').hide();
 			$('#image-preview > img').remove();
 			$('#image-preview').prepend('<img />');
+			// Send the resize event, for centering the modal
+			$('.modal-content').resize();
 		}
 	}
 
@@ -265,6 +267,8 @@ webApp.controller('SettingsController', function ($scope, $modal, toastr, Sessio
 				}, function () {
 					jcrop = this;
 				});
+				// Send the resize event, for centering the modal
+				$('.modal-content').resize();
 			};
 			reader.readAsDataURL(input.files[0]);
 		}
