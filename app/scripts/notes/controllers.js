@@ -29,6 +29,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 			toastr.error('Unable to get notes (' + err.message + ')');
 		} else {
 			$scope.notes = data;
+			_checkNotesOrder();
 		}
 	});
 
