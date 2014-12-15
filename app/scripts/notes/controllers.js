@@ -23,15 +23,18 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 	/**
 	 * Get Notes from API
 	 */
-	$scope.notes = [];
-	syncService.getResources('NOTE', function (err, data) {
-		if (err) {
-			toastr.error('Unable to get notes (' + err.message + ')');
-		} else {
-			$scope.notes = data;
-			_checkNotesOrder();
-		}
-	});
+	$scope.getNotes = function () {
+		$scope.notes = [];
+		syncService.getResources('NOTE', function (err, data) {
+			if (err) {
+				toastr.error('Unable to get notes (' + err.message + ')');
+			} else {
+				$scope.notes = data;
+				_checkNotesOrder();
+			}
+		});
+	}
+	$scope.getNotes();
 
 	/**
 	 * Check the notes order for gaps, or duplicates
@@ -383,8 +386,6 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
  */
 webApp.controller('ImportController', function ($rootScope, $scope, $http, $modal, $download, toastr, noteResource) {
 
-	$scope.exportType = 'json';
-
 	$scope.import = function () {
 		var input = $('#modal-notes-import .import-file input').get(0);
 		if (input.files && input.files[0]) {
@@ -405,8 +406,6 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 				// Import
 				if (input.files[0].type === 'application/json') {
 					noteResource.importJSON(e.target.result, success, error);
-				} else if (input.files[0].type === 'text/xml') {
-					noteResource.importXML(e.target.result, success, error);
 				} else {
 					toastr.error('Wrong file type');
 				}
@@ -417,27 +416,15 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 	};
 
 	$scope.export = function () {
-		if ($scope.exportType === 'json') {
-			noteResource.exportJSON(
-				function (data) {
-					$modal.hide('notes-import');
-					$download.download('notes.json', 'data:application/json;base64,' + btoa(JSON.stringify(data)));
-				}, function (httpResponse) {
-					$modal.hide('notes-import');
-					toastr.error('Error during notes export');
-				}
-			);
-		} else if ($scope.exportType === 'xml') {
-			$http.get(API_URL + '/note/export', {headers: {'Accept': 'application/xml'}})
-				.success(function (data) {
-					$modal.hide('notes-import');
-					$download.download('notes.xml', 'data:application/xml;base64,' + btoa(data));
-				})
-				.error(function (httpResponse) {
-					$modal.hide('notes-import');
-					toastr.error('Error during notes export');
-				});
-		}
+		noteResource.exportJSON(
+			function (data) {
+				$modal.hide('notes-import');
+				$download.download('notes.json', 'data:application/json;base64,' + btoa(JSON.stringify(data)));
+			}, function (httpResponse) {
+				$modal.hide('notes-import');
+				toastr.error('Error during notes export');
+			}
+		);
 	};
 
 	$scope.close = function () {
