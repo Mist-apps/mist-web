@@ -28,7 +28,7 @@
 
 <!-- Contacts container -->
 <div class="contacts" ng-if="(contacts | filter:filterContacts | filter:$root.search).length > 0 && !loading">
-	<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search | orderBy:['firstName','lastName']" ng-click="showFullContact(contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
+	<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search | orderBy:['firstName','lastName']" ng-click="toggleFullContact($event, contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
 
 		<!-- Menu -->
 		<div class="edit-menu">
@@ -48,14 +48,14 @@
 			<div class="fa fa-lg fa-remove" ng-if="contact.deleteDate" ng-click="destroyContact(contact);"></div>
 			<div class="fa fa-lg fa-undo" ng-if="contact.deleteDate" ng-click="restoreContact(contact);"></div>
 			<div class="fa fa-lg fa-trash" ng-if="!editing && !contact.deleteDate" ng-click="deleteContact(contact);"></div>
-			<div class="fa fa-lg fa-pencil" ng-if="!editing && !contact.deleteDate" ng-click="startEditContact($event, contact);"></div>
+			<div class="fa fa-lg fa-pencil" ng-if="!editing && !contact.deleteDate" ng-click="startEditContact(contact);"></div>
 			<div class="fa fa-lg fa-check" ng-if="editing" ng-click="stopEditContact();"></div>
 		</div>
 
 		<!-- Common data -->
 		<img class="image" ng-src="{{contact.image || 'images/user.png'}}" ng-click="uploadImage(contact);">
 		<div class="name">
-			<span ng-click="startEditContact($event, contact);">{{contact.firstName}} {{contact.lastName}}</span>
+			<span>{{contact.firstName}} {{contact.lastName}}</span>
 			<input type="text" ng-model="contact.firstName" placeholder="Firstname" ng-keydown="fieldKeyListener($event, contact);" />
 			<input type="text" ng-model="contact.lastName" placeholder="Lastname" ng-keydown="fieldKeyListener($event, contact);" />
 		</div>
@@ -71,7 +71,7 @@
 			<div class="mail" ng-repeat="mail in contact.mails">
 				<!-- Mail icon (+dropdown) -->
 				<div class="dropdown dropdown-left">
-					<div class="fa fa-lg dropdown-button" ng-class="{'fa-envelope': mail.type=='personal', 'fa-briefcase': mail.type=='professional'}"></div>
+					<div class="fa fa-lg" ng-class="{'fa-envelope': mail.type=='personal', 'fa-briefcase': mail.type=='professional', 'dropdown-button': contact===activeContact&&editing}"></div>
 					<ul class="dropdown-menu">
 						<div class="dropdown-arrow"></div>
 						<div class="dropdown-arrow-fill"></div>
@@ -80,7 +80,7 @@
 					</ul>
 				</div>
 				<!-- Mail view -->
-				<div class="mail-show" ng-click="startEditContact($event, contact);"><a ng-href="mailto:{{mail.address}}">{{mail.address}}</a></div>
+				<div class="mail-show"><a ng-href="mailto:{{mail.address}}">{{mail.address}}</a></div>
 				<!-- Mail editor -->
 				<div class="mail-edit"><input type="text" ng-model="mail.address" placeholder="E-mail" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
@@ -89,7 +89,7 @@
 			<div class="phone" ng-repeat="phone in contact.phones">
 				<!-- Phone icon (+dropdown) -->
 				<div class="dropdown dropdown-left">
-					<div class="fa fa-lg dropdown-button" ng-class="{'fa-phone': phone.type=='home', 'fa-briefcase': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager'}"></div>
+					<div class="fa fa-lg" ng-class="{'fa-phone': phone.type=='home', 'fa-briefcase': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager', 'dropdown-button': contact===activeContact&&editing}"></div>
 					<ul class="dropdown-menu">
 						<div class="dropdown-arrow"></div>
 						<div class="dropdown-arrow-fill"></div>
@@ -100,15 +100,17 @@
 						<li ng-click="setPhoneType(contact, phone, 'pager');"><div class="fa fa-bell"></div>Pager</li>
 					</ul>
 				</div>
-				<!-- Phone view/editor -->
-				<input type="text" ng-model="phone.number" placeholder="Phone number" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
+				<!-- Phone view -->
+				<div class="mail-show">{{phone.number}}</div>
+				<!-- Phone editor -->
+				<div class="mail-edit"><input type="text" ng-model="phone.number" placeholder="Phone number" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
 		</div>
 		<div class="full-addresses"  ng-if="contact.addresses && contact.addresses.length > 0">
 			<div class="address" ng-repeat="address in contact.addresses">
 				<!-- Address icon (+dropdown) -->
 				<div class="dropdown dropdown-left">
-					<div class="fa fa-lg dropdown-button" ng-class="{'fa-home': address.type=='home', 'fa-building': address.type=='work'}"></div>
+					<div class="fa fa-lg" ng-class="{'fa-home': address.type=='home', 'fa-building': address.type=='work', 'dropdown-button': contact===activeContact&&editing}"></div>
 					<ul class="dropdown-menu">
 						<div class="dropdown-arrow"></div>
 						<div class="dropdown-arrow-fill"></div>
@@ -117,7 +119,7 @@
 					</ul>
 				</div>
 				<!-- Address view -->
-				<div class="address-show" ng-click="startEditContact($event, contact);">
+				<div class="address-show">
 					{{address.street}} {{address.number}}<br>
 					{{address.postalCode}} {{address.locality}}<br>
 					{{address.country}}
@@ -137,16 +139,18 @@
 		<div class="full-info"  ng-if="contact.birthday!==undefined || contact.url!==undefined || contact.pubKey!==undefined">
 			<div class="birthday" ng-if="contact.birthday!==undefined">
 				<div class="fa fa-lg fa-birthday-cake"></div>
-				<div class="birthday-show" ng-click="startEditContact($event, contact);">{{contact.birthday | date:shortDay}}</div>
+				<div class="birthday-show">{{contact.birthday | date:shortDay}}</div>
 				<div class="birthday-edit"><input type="date" ng-model="$parent.$parent.$parent.$parent.tmpDate" placeholder="BirthDay" /></div>
 			</div>
 			<div class="website" ng-if="contact.url!==undefined">
 				<div class="fa fa-lg fa-globe"></div>
-				<div class="website-show" ng-click="startEditContact($event, contact);"><a ng-href="{{contact.url}}" target="_blank">{{contact.url}}</a></div>
+				<div class="website-show"><a ng-href="{{contact.url}}" target="_blank">{{contact.url}}</a></div>
 				<div class="website-edit"><input type="text" ng-model="contact.url" placeholder="Website" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
 			<div class="public-key" ng-if="contact.pubKey!==undefined">
-				<div class="fa fa-lg fa-key"></div><input type="text" ng-model="contact.pubKey" placeholder="Public Key" ng-keydown="fieldKeyListener($event, contact);" ng-click="startEditContact($event, contact);" />
+				<div class="fa fa-lg fa-key"></div>
+				<div class="public-key-show">{{contact.pubKey}}</div>
+				<div class="public-key-edit"><input type="text" ng-model="contact.pubKey" placeholder="Public Key" ng-keydown="fieldKeyListener($event, contact);" /></div>
 			</div>
 		</div>
 

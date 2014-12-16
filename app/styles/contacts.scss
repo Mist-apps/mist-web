@@ -143,7 +143,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 
 .contact-full {
 
-	cursor: default;
 	position: relative;
 	min-height: 75px;
 	background-color: rgb(247, 247, 247);
@@ -193,7 +192,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 		margin-top: 5px;
 
 		span {
-			cursor: text;
 			font-size: 25px;
 			height: 85px;
 		}
@@ -205,7 +203,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 		height: 85px;
 		border: none;
 		border-radius: 50%;
-		cursor: pointer;
 		box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.2);
 		margin-top: 5px;
 	}
@@ -219,7 +216,6 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 			border-left: 2px solid rgba(0, 0, 0, 0.2);
 			margin-bottom: 5px;
 			width: 250px;
-			cursor: text;
 			text-overflow: ellipsis;
 			word-wrap: break-word;
 		}
@@ -248,6 +244,8 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 
 .contact-edit {
 
+	cursor: default;
+
 	.name {
 
 		width: 430px;
@@ -268,6 +266,10 @@ $navbar-text-hover-color: rgba(255, 255, 255, 0.7);
 			margin-left: 2px;
 		}
 
+	}
+
+	.image {
+		cursor: pointer;
 	}
 
 	.mail, .phone, .address, .birthday, .website, .public-key {

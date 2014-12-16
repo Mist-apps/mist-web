@@ -60,8 +60,8 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 		// Inform sync service
 		syncService.newResource('CONTACT', contact);
 		// Start edit the new contact
-		$scope.showFullContact(contact);
-		$scope.startEditContact(null, contact);
+		$scope.toggleFullContact(null, contact);
+		$scope.startEditContact(contact);
 	};
 
 	/**
@@ -113,10 +113,15 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 	$scope.activeContact = undefined;
 
 	/**
-	 * Show the full data of a contact
+	 * Show the full data of a contact or hide it.
 	 * Warning ! $(event.target) != $(this)
 	 */
-	$scope.showFullContact = function (contact) {
+	$scope.toggleFullContact = function ($event, contact) {
+		// Check if we clicked on a link
+		if ($event && $($event.target).is('a')) {
+			return;
+		}
+		console.log('toggle');
 		// If the contact is not fully shown and no current edit
 		if ($scope.activeContact !== contact && !$scope.editing) {
 			// Stop showing other contacts full data
@@ -125,6 +130,10 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 			$scope.activeContact = contact;
 			// Listen to escape key
 			$('body').on('keydown', _escapeKeyListenerFull);
+		}
+		// If the contact is currently fully chown, and not editing
+		else if ($scope.activeContact === contact && !$scope.editing) {
+			$scope.stopFullContact();
 		}
 	};
 
@@ -144,11 +153,7 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 	/**
 	 * Start editing a contact
 	 */
-	$scope.startEditContact = function ($event, contact) {
-		// Check if we clicked on a link
-		if ($event && $($event.target).is('a')) {
-			return;
-		}
+	$scope.startEditContact = function (contact) {
 		// If the contact is active and we are not editing already and it is not deleted
 		if ($scope.activeContact === contact && !$scope.editing && !contact.deleteDate) {
 			// Save current edited contact
@@ -203,7 +208,7 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 	 * Start uploading new image
 	 */
 	$scope.uploadImage = function (contact) {
-		if ($scope.activeContact === contact) {
+		if ($scope.activeContact === contact && $scope.editing) {
 			$modal.show('contacts-image-picker', {contact: contact});
 		}
 	};
