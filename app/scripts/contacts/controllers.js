@@ -23,14 +23,17 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 	/**
 	 * Get Contacts from API
 	 */
-	$scope.contacts = [];
-	syncService.getResources('CONTACT', function (err, data) {
-		if (err) {
-			toastr.error('Unable to get contacts (' + err.message + ')');
-		} else {
-			$scope.contacts = data;
-		}
-	});
+	$scope.getContacts = function () {
+		$scope.contacts = [];
+		syncService.getResources('CONTACT', function (err, data) {
+			if (err) {
+				toastr.error('Unable to get contacts (' + err.message + ')');
+			} else {
+				$scope.contacts = data;
+			}
+		});
+	}
+	$scope.getContacts();
 
 	/**
 	 * Filter the contacts from the menu selection
@@ -43,6 +46,13 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 		} else {
 			return false;
 		}
+	};
+
+	/**
+	 * Import/Export
+	 */
+	$scope.importExport = function () {
+		$modal.show('contacts-import');
 	};
 
 	/**
@@ -121,7 +131,6 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 		if ($event && $($event.target).is('a')) {
 			return;
 		}
-		console.log('toggle');
 		// If the contact is not fully shown and no current edit
 		if ($scope.activeContact !== contact && !$scope.editing) {
 			// Stop showing other contacts full data
@@ -371,6 +380,13 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 		}
 	};
 
+	/**
+	 * Listen to broadcasts
+	 */
+	$scope.$on('REFRESH', function (event) {
+		$scope.getContacts();
+	});
+
 });
 
 webApp.controller('ImagePickerController', function ($scope, $modal, syncService) {
@@ -528,6 +544,66 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 	} else {
 		_setDefault();
 	}
+
+});
+
+
+/**
+ * Import/Export controller (modal)
+ */
+webApp.controller('ContactsImportController', function ($rootScope, $scope, $http, $modal, $download, toastr, contactResource) {
+
+	$scope.importType = 'mist';
+
+	$scope.import = function () {
+		var input = $('#modal-contacts-import .import-file').get(0);
+		if (input.files && input.files[0]) {
+			// Prepare reader
+			var reader = new FileReader();
+			// Import when file read
+			reader.onload = function (e) {
+				// Callbacks
+				var success = function (data) {
+					$modal.hide('contacts-import');
+					toastr.success('Contacts import successful, ' + data.number + ' contacts imported.');
+					$rootScope.$broadcast('REFRESH');
+				};
+				var error = function (httpResponse) {
+					$modal.hide('contacts-import');
+					toastr.error('Error during contacts import');
+				};
+				// Import
+				if (input.files[0].type === 'application/json' && $scope.importType === 'mist') {
+					contactResource.importMist(e.target.result, success, error);
+				} else if (input.files[0].type === 'text/csv' && $scope.importType === 'google') {
+					contactResource.importGoogle(e.target.result, success, error);
+				} else if (input.files[0].type === 'text/csv' && $scope.importType === 'outlook') {
+					contactResource.importOutlook(e.target.result, success, error);
+				} else {
+					toastr.error('Wrong file type');
+				}
+			};
+			// Read the file
+			reader.readAsText(input.files[0]);
+		}
+	};
+
+	$scope.export = function () {
+		contactResource.exportJSON(
+			function (data) {
+				$modal.hide('contacts-import');
+				$download.download('contacts.json', 'data:application/json;base64,' + btoa(JSON.stringify(data)));
+			}, function (httpResponse) {
+				$modal.hide('contacts-import');
+				toastr.error('Error during contacts export');
+			}
+		);
+	};
+
+	$scope.close = function () {
+		// Hide modal
+		$modal.hide('contacts-import');
+	};
 
 });
 

@@ -2,7 +2,6 @@
  * Image upload modal
  */
 
-
 #modal-contacts-image-picker {
 
 	#image-preview {
@@ -60,6 +59,61 @@
 		width: auto;
 		height: auto;
 		line-height: 85px;
+	}
+
+}
+
+
+/**
+ * Import/Export modal
+ */
+
+#modal-contacts-import {
+
+	.modal-content {
+
+		max-width: 350px;
+		text-align: center;
+
+		.fa {
+			display: block;
+			font-size: 80px;
+		}
+
+		hr {
+			border: none;
+			border-top: 1px solid rgba(0, 0, 0, 0.3);
+			margin: 25px 0px 20px 0px;
+		}
+
+		.text-left {
+			text-align: left;
+		}
+
+		.import-file {
+			margin: 10px 0px 20px 29px;
+			max-width: 200px;
+		}
+
+		.import-type {
+
+			div {
+				margin-top: 10px;
+			}
+
+			input {
+				width: auto;
+				height: auto;
+				margin-right: 10px;
+				margin-left: 30px;
+			}
+
+		}
+
+		button {
+			margin: auto;
+		}
+
 	}
 
 }

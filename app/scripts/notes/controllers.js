@@ -384,10 +384,10 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
 /**
  * Import/Export controller (modal)
  */
-webApp.controller('ImportController', function ($rootScope, $scope, $http, $modal, $download, toastr, noteResource) {
+webApp.controller('NotesImportController', function ($rootScope, $scope, $http, $modal, $download, toastr, noteResource) {
 
 	$scope.import = function () {
-		var input = $('#modal-notes-import .import-file input').get(0);
+		var input = $('#modal-notes-import .import-file').get(0);
 		if (input.files && input.files[0]) {
 			// Prepare reader
 			var reader = new FileReader();
@@ -405,7 +405,8 @@ webApp.controller('ImportController', function ($rootScope, $scope, $http, $moda
 				};
 				// Import
 				if (input.files[0].type === 'application/json') {
-					noteResource.importJSON(e.target.result, success, error);
+					console.log(e.target.result);
+					//noteResource.importJSON(e.target.result, success, error);
 				} else {
 					toastr.error('Wrong file type');
 				}

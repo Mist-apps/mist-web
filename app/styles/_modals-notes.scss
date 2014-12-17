@@ -25,57 +25,53 @@
 }
 
 /**
- * Import modal
+ * Import/Export modal
  */
 
 #modal-notes-import {
 
-	input {
-		margin-top: 8px;
-	}
+	.modal-content {
 
-	button {
-		display: inline-block;
-	}
-
-	.modal-content-column {
+		max-width: 350px;
+		text-align: center;
 
 		.fa {
 			display: block;
 			font-size: 80px;
 		}
 
-		&:nth-child(1) {
-
-			border-right: 1px solid rgba(0, 0, 0, 0.3);
-			padding-left: 15px;
-			padding-right: 25px;
-
-			button {
-				margin-top: 13px;
-			}
-
+		hr {
+			border: none;
+			border-top: 1px solid rgba(0, 0, 0, 0.3);
+			margin: 25px 0px 20px 0px;
 		}
 
-		&:nth-child(2) {
-			padding-left: 25px;
-			padding-right: 15px;
-		}
-
-		.import-file input {
-			width: 200px;
-		}
-
-		.export-type {
-
+		.text-left {
 			text-align: left;
+		}
+
+		.import-file {
+			margin: 10px 0px 20px 29px;
+			max-width: 200px;
+		}
+
+		.import-type {
+
+			div {
+				margin-top: 10px;
+			}
 
 			input {
 				width: auto;
+				height: auto;
 				margin-right: 10px;
 				margin-left: 30px;
 			}
 
+		}
+
+		button {
+			margin: auto;
 		}
 
 	}
