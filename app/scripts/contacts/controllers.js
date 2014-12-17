@@ -39,13 +39,27 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 	 * Filter the contacts from the menu selection
 	 */
 	$scope.filterContacts = function (value) {
+		// If it is a group
+		if (value.name) {
+			return false;
+		}
+		// If it is a contact
 		if ($scope.location === 'all') {
 			return !value.deleteDate;
 		} else if ($scope.location === 'trash') {
 			return value.deleteDate;
+		} else if ($scope.location === 'ungrouped') {
+			return !value.groups || value.groups.length === 0;
 		} else {
-			return false;
+			return value.groups.indexOf($scope.location) > -1;
 		}
+	};
+
+	/**
+	 * Filter the groups
+	 */
+	$scope.filterGroups = function (value) {
+		return value.name;
 	};
 
 	/**
