@@ -50,8 +50,10 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 			return value.deleteDate;
 		} else if ($scope.location === 'ungrouped') {
 			return !value.groups || value.groups.length === 0;
+		} else if ($scope.location === 'Starred') {
+			return value.groups && value.groups.indexOf('Starred') > -1;
 		} else {
-			return value.groups.indexOf($scope.location) > -1;
+			return value.groups && value.groups.indexOf($scope.groupName) > -1;
 		}
 	};
 
