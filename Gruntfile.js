@@ -10,9 +10,6 @@ module.exports = function (grunt) {
 	// Time how long tasks take. Can help when optimizing build times
 	require('time-grunt')(grunt);
 
-	// Get mod rewrite for connect server
-	var modRewrite = require('connect-modrewrite');
-
 	// Configurable paths for the application
 	var appConfig = {
 		app: 'app',
@@ -32,14 +29,14 @@ module.exports = function (grunt) {
 				tasks: ['wiredep']
 			},
 			js: {
-				files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
+				files: ['<%= yeoman.app %>/{,*/}*.js'],
 				tasks: ['newer:jshint:all'],
 				options: {
 					livereload: '<%= connect.options.livereload %>'
 				}
 			},
 			compass: {
-				files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+				files: ['<%= yeoman.app %>/{,*/}*.{scss,sass}'],
 				tasks: ['compass:server', 'autoprefixer']
 			},
 			gruntfile: {
@@ -52,8 +49,7 @@ module.exports = function (grunt) {
 				files: [
 					'<%= yeoman.app %>/{,*/}*.html',
 					'.tmp/styles/{,*/}*.css',
-					'<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-					'<%= yeoman.app %>/libs/{,*/}*'
+					'<%= yeoman.app %>/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
 				]
 			}
 		},
@@ -69,17 +65,6 @@ module.exports = function (grunt) {
 			livereload: {
 				options: {
 					open: true,
-					middleware: function (connect) {
-						return [
-							modRewrite(['^[^\\.]*$ /index.html [L]']),
-							connect.static('.tmp'),
-							connect().use(
-								'/bower_components',
-								connect.static('./bower_components')
-							),
-							connect.static(appConfig.app)
-						];
-					}
 				}
 			},
 			dist: {
@@ -211,103 +196,6 @@ module.exports = function (grunt) {
 			js: ['<%= yeoman.dist %>/scripts/{,*/}*.js'],
 			options: {
 				assetsDirs: ['<%= yeoman.dist %>','<%= yeoman.dist %>/images'],
-				patterns: {
-					html: [
-						[
-							/ng-src=\"[^"]*\'(images[^']*)\'[^"]*\"/gm,
-							'Update the HTML with the new img filenames (angular)'
-						],
-						[
-							/<script.+src=['"]([^"']+)["']/gm,
-							'Update the HTML to reference our concat/min/revved script files'
-						],
-						[
-							/<link[^\>]+href=['"]([^"']+)["']/gm,
-							'Update the HTML with the new css filenames'
-						],
-						[
-							/<img[^\>]*[^\>\S]+src=['"]([^'"\)#]+)(#.+)?["']/gm,
-							'Update the HTML with the new img filenames'
-						],
-						[
-							/<video[^\>]+src=['"]([^"']+)["']/gm,
-							'Update the HTML with the new video filenames'
-						],
-						[
-							/<video[^\>]+poster=['"]([^"']+)["']/gm,
-							'Update the HTML with the new poster filenames'
-						],
-						[
-							/<source[^\>]+src=['"]([^"']+)["']/gm,
-							'Update the HTML with the new source filenames'
-						],
-						[
-							/data-main\s*=['"]([^"']+)['"]/gm,
-							'Update the HTML with data-main tags',
-							function (m) {
-								return m.match(/\.js$/) ? m : m + '.js';
-							},
-							function (m) {
-								return m.replace('.js', '');
-							}
-						],
-						[
-							/data-(?!main).[^=]+=['"]([^'"]+)['"]/gm,
-							'Update the HTML with data-* tags'
-						],
-						[
-							/url\(\s*['"]?([^"'\)]+)["']?\s*\)/gm,
-							'Update the HTML with background imgs, case there is some inline style'
-						],
-						[
-							/<a[^\>]+href=['"]([^"']+)["']/gm,
-							'Update the HTML with anchors images'
-						],
-						[
-							/<input[^\>]+src=['"]([^"']+)["']/gm,
-							'Update the HTML with reference in input'
-						],
-						[
-							/<meta[^\>]+content=['"]([^"']+)["']/gm,
-							'Update the HTML with the new img filenames in meta tags'
-						],
-						[
-							/<object[^\>]+data=['"]([^"']+)["']/gm,
-							'Update the HTML with the new object filenames'
-						],
-						[
-							/<image[^\>]*[^\>\S]+xlink:href=['"]([^"'#]+)(#.+)?["']/gm,
-							'Update the HTML with the new image filenames for svg xlink:href links'
-						],
-						[
-							/<image[^\>]*[^\>\S]+src=['"]([^'"\)#]+)(#.+)?["']/gm,
-							'Update the HTML with the new image filenames for src links'
-						],
-						[
-							/<(?:img|source)[^\>]*[^\>\S]+srcset=['"]([^"'\s]+)\s*?(?:\s\d*?[w])?(?:\s\d*?[x])?\s*?["']/gm,
-							'Update the HTML with the new image filenames for srcset links'
-						],
-						[
-							/<(?:use|image)[^\>]*[^\>\S]+xlink:href=['"]([^'"\)#]+)(#.+)?["']/gm,
-							'Update the HTML within the <use> tag when referencing an external url with svg sprites as in svg4everybody'
-						]
-					],
-					css: [
-						[
-							/(?:src=|url\(\s*)['"]?([^'"\)(\?|#)]+)['"]?\s*\)?/gm,
-							'Update the CSS to reference our revved images'
-						]
-					],
-					json: [
-						[
-							/:\s*['"]([^"']+)["']/gm,
-							'Update the json value to reference our revved url'
-						]
-					],
-					js: [
-						[/(images\/.*?\.(?:gif|jpeg|jpg|png|webp|svg))/gm, 'Update the JS to reference our revved images']
-					]
-				}
 			}
 		},
 
@@ -347,20 +235,6 @@ module.exports = function (grunt) {
 					cwd: '<%= yeoman.dist %>',
 					src: ['*.html', 'views/{,*/}*.html', 'modals/{,*/}*.html'],
 					dest: '<%= yeoman.dist %>'
-				}]
-			}
-		},
-
-		// ngAnnotate tries to make the code safe for minification automatically by
-		// using the Angular long form for dependency injection. It doesn't work on
-		// things like resolve or inject so those have to be done manually.
-		ngAnnotate: {
-			dist: {
-				files: [{
-					expand: true,
-					cwd: '.tmp/concat/scripts',
-					src: '*.js',
-					dest: '.tmp/concat/scripts'
 				}]
 			}
 		},
@@ -447,7 +321,6 @@ module.exports = function (grunt) {
 		'concurrent:dist',
 		'autoprefixer',
 		'concat',
-		'ngAnnotate',
 		'copy:dist',
 		'cdnify',
 		'cssmin',
