@@ -1,0 +1,310 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+	<!-- Meta informations -->
+	<meta charset="utf-8">
+	<meta name="description" content="Mist applications in the cloud ! Notes, contacts, calendar, rss reader...">
+	<meta name="author" content="Leleux Laurent">
+	<meta name="viewport" content="width=device-width">
+
+	<!-- Other -->
+	<title>Mist - Contacts</title>
+	<link rel="icon" type="image/png" href="images/favicon-contacts.png">
+
+	<!-- build:css({.,app}) styles/vendor.css -->
+	<!-- bower:css -->
+	<link rel="stylesheet" href="bower_components/toastr/toastr.css" />
+	<link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.css" />
+	<link rel="stylesheet" href="bower_components/jcrop/css/jquery.Jcrop.css" />
+	<!-- endbower -->
+	<!-- endbuild -->
+
+	<!-- build:css(.tmp) styles/main.css -->
+	<link rel="stylesheet" href="styles/global.css">
+	<link rel="stylesheet" href="styles/contacts.css">
+	<!-- endbuild -->
+
+</head>
+
+<body>
+
+	<!-- Top navigation bar -->
+	<div class="navbar navbar-contacts" ng-if="$root.user">
+
+		<!-- Left menu icon -->
+		<div id="nav-menu" ng-click="toggleLeftMenu($event);"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
+
+		<!-- Right menu -->
+		<div id="nav-user">
+			<!-- Search icon -->
+			<div id="search-menu" class="fa fa-lg fa-search" ng-click="toggleSearchMenu($event);"></div>
+			<!-- App selector -->
+			<div id="app-menu" class="dropdown dropdown-right">
+				<div class="dropdown-button"><div class="fa fa-lg fa-th"></div></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<table>
+						<tr>
+							<td><div class="fa fa-3x fa-rss"></div>Reader</td>
+							<td ng-click="goto('/contacts');"><div class="fa fa-3x fa-users"></div>Contacts</td>
+						</tr>
+						<tr>
+							<td><div class="fa fa-3x fa-calendar"></div>Calendar</td>
+							<td><div class="fa fa-3x fa-envelope"></div>Mail</td>
+						</tr>
+						<tr>
+							<td><div class="fa fa-3x fa-lock"></div>Pass</td>
+							<td ng-click="goto('/notes');"><div class="fa fa-3x fa-lightbulb-o"></div>Notes</td>
+						</tr>
+					</table>
+				</ul>
+			</div>
+			<!-- Notifications -->
+			<div class="dropdown dropdown-right">
+				<div class="dropdown-button"><div class="fa fa-lg fa-bell"></div></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<div id="notifications">No notifications...</div>
+				</ul>
+			</div>
+			<!-- User menu -->
+			<div id="user-menu" class="dropdown dropdown-right">
+				<img class="dropdown-button" ng-src="{{$root.user.image || 'images/user.png'}}">
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<table>
+						<tr>
+							<td colspan="2" id="user-menu-info">
+								<img ng-src="{{$root.user.image || 'images/user.png'}}"><br>
+								<span id="user-menu-name">{{$root.user.firstName}} {{$root.user.lastName}}</span><br>
+								<span id="user-menu-mail">{{$root.user.mail}}</span>
+							</td>
+						</tr>
+						<tr>
+							<td id="user-menu-button" ng-click="showSettings()"><div class="fa fa-lg fa-cogs"></div><span>Settings</span></td>
+							<td id="user-menu-button" ng-click="logout()"><div class="fa fa-lg fa-power-off"></div><span>Logout</span></td>
+						</tr>
+					</table>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Search menu -->
+		<div id="nav-search">
+			<span id="nav-search-icon" class="fa fa-search"></span>
+			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search" tabindex="1"></div>
+			<span id="nav-search-stop" class="fa fa-remove" ng-show="$root.search && $root.search !== ''" ng-click="$root.search = '';" ></span>
+		</div>
+
+	</div>
+
+	<!-- Main container -->
+	<div id="container">
+
+		<!-- Left menu -->
+		<div class="menu">
+			<!-- Items -->
+			<div id="menu-item-all" class="menu-item" ng-click="location = 'all'" ng-class="{'menu-item-active': location==='all'}"><span class="fa fa-th fa-lg"></span>All</div>
+			<div id="menu-item-Starred" class="menu-item" ng-click="location = 'Starred'" ng-class="{'menu-item-active': location==='Starred'}"><span class="fa fa-star fa-lg"></span>Starred</div>
+			<div id="menu-item-ungrouped" class="menu-item" ng-click="location = 'ungrouped'" ng-class="{'menu-item-active': location==='ungrouped'}"><span class="fa fa-question fa-lg"></span>Ungrouped</div>
+			<div class="menu-separator"></div>
+			<div id="menu-item-{{group._id}}" class="menu-item" ng-repeat="group in contacts | filter:filterGroups" ng-click="$parent.location = group._id; $parent.groupName = group.name" ng-class="{'menu-item-active': $parent.location===group._id}"><span ng-class="group.icon" class="fa fa-lg"></span>{{group.name}}</div>
+			<div class="menu-separator"></div>
+			<div id="menu-item-trash" class="menu-item" ng-click="location = 'trash'" ng-class="{'menu-item-active': location==='trash'}"><span class="fa fa-trash fa-lg"></span>Trash</div>
+			<!-- Sync status -->
+			<div class="menu-bottom">
+				<div id="menu-sync">
+					<div ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-refresh fa-lg"></span>Syncing</div>
+					<div ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-check fa-lg"></span>Synced</div>
+					<div ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-warning fa-lg"></span>Sync error</div>
+					<div ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'"><span class="fa fa-warning fa-lg"></span>Sync stopped</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- No contacts message -->
+		<div ng-if="(contacts | filter:filterContacts | filter:$root.search).length === 0 && !loading" id="nothing-message">No contacts here...</div>
+
+
+		<!-- Contacts container -->
+		<div class="contacts" ng-if="(contacts | filter:filterContacts | filter:$root.search).length > 0 && !loading">
+			<div class="contact" ng-repeat="contact in contacts | filter:filterContacts | filter:$root.search | orderBy:['firstName','lastName']" ng-click="toggleFullContact($event, contact);" ng-class="{'contact-full': contact===activeContact, 'contact-edit': contact===activeContact&&editing}">
+
+				<!-- Menu -->
+				<div class="edit-menu">
+					<div class="dropdown dropdown-right" ng-if="editing">
+						<div class="fa fa-lg fa-plus dropdown-button"></div>
+						<ul class="dropdown-menu">
+							<div class="dropdown-arrow"></div>
+							<div class="dropdown-arrow-fill"></div>
+							<li ng-click="addPhone();"><div class="fa fa-phone"></div>Phone number</li>
+							<li ng-click="addMail();"><div class="fa fa-envelope"></div>E-mail address</li>
+							<li ng-click="addAddress();"><div class="fa fa-home"></div>Postal address</li>
+							<li ng-if="contact.birthday===undefined" ng-click="contact.birthday='';"><div class="fa fa-birthday-cake"></div>Birthday</li>
+							<li ng-if="contact.url===undefined" ng-click="contact.url='';"><div class="fa fa-globe"></div>Website</li>
+							<li ng-if="contact.pubKey===undefined" ng-click="contact.pubKey='';"><div class="fa fa-key"></div>Public Key</li>
+						</ul>
+					</div>
+					<div class="fa fa-lg fa-remove" ng-if="contact.deleteDate" ng-click="destroyContact(contact);"></div>
+					<div class="fa fa-lg fa-undo" ng-if="contact.deleteDate" ng-click="restoreContact(contact);"></div>
+					<div class="fa fa-lg fa-trash" ng-if="!editing && !contact.deleteDate" ng-click="deleteContact(contact);"></div>
+					<div class="fa fa-lg fa-pencil" ng-if="!editing && !contact.deleteDate" ng-click="startEditContact(contact);"></div>
+					<div class="fa fa-lg fa-check" ng-if="editing" ng-click="stopEditContact();"></div>
+				</div>
+
+				<!-- Common data -->
+				<img class="image" ng-src="{{contact.image || 'images/user.png'}}" ng-click="uploadImage(contact);">
+				<div class="name">
+					<span>{{contact.firstName}} {{contact.lastName}}</span>
+					<input type="text" ng-model="contact.firstName" placeholder="Firstname" ng-keydown="fieldKeyListener($event, contact);" />
+					<input type="text" ng-model="contact.lastName" placeholder="Lastname" ng-keydown="fieldKeyListener($event, contact);" />
+				</div>
+
+				<!-- Samples -->
+				<div class="sample-mail">{{contact.mails[0].address}} <span ng-if="contact.mails.length > 1">(+{{contact.mails.length -1}})</span></div>
+				<div class="sample-phone">{{contact.phones[0].number}} <span ng-if="contact.phones.length > 1">(+{{contact.phones.length -1}})</span></div>
+				<div class="sample-address">{{contact.addresses[0] | formatInlineAddress}} <span ng-if="contact.addresses.length > 1">(+{{contact.addresses.length -1}})</span></div>
+				<div class="sample-note">{{contact.note}}</div>
+
+				<!-- Full data -->
+				<div class="full-mails" ng-if="contact.mails && contact.mails.length > 0">
+					<div class="mail" ng-repeat="mail in contact.mails">
+						<!-- Mail icon (+dropdown) -->
+						<div class="dropdown dropdown-left">
+							<div class="fa fa-lg" ng-class="{'fa-envelope': mail.type=='personal', 'fa-briefcase': mail.type=='professional', 'dropdown-button': contact===activeContact&&editing}"></div>
+							<ul class="dropdown-menu">
+								<div class="dropdown-arrow"></div>
+								<div class="dropdown-arrow-fill"></div>
+								<li ng-click="setMailType(contact, mail, 'personal');"><div class="fa fa-envelope"></div>Home</li>
+								<li ng-click="setMailType(contact, mail, 'professional');"><div class="fa fa-briefcase"></div>Work</li>
+							</ul>
+						</div>
+						<!-- Mail view -->
+						<div class="mail-show"><a ng-href="mailto:{{mail.address}}">{{mail.address}}</a></div>
+						<!-- Mail editor -->
+						<div class="mail-edit"><input type="text" ng-model="mail.address" placeholder="E-mail" ng-keydown="fieldKeyListener($event, contact);" /></div>
+					</div>
+				</div>
+				<div class="full-phones" ng-if="contact.phones && contact.phones.length > 0">
+					<div class="phone" ng-repeat="phone in contact.phones">
+						<!-- Phone icon (+dropdown) -->
+						<div class="dropdown dropdown-left">
+							<div class="fa fa-lg" ng-class="{'fa-phone': phone.type=='home', 'fa-briefcase': phone.type=='work', 'fa-mobile': phone.type=='cell', 'fa-fax': phone.type=='fax', 'fa-bell': phone.type=='pager', 'dropdown-button': contact===activeContact&&editing}"></div>
+							<ul class="dropdown-menu">
+								<div class="dropdown-arrow"></div>
+								<div class="dropdown-arrow-fill"></div>
+								<li ng-click="setPhoneType(contact, phone, 'home');"><div class="fa fa-phone"></div>Home</li>
+								<li ng-click="setPhoneType(contact, phone, 'work');"><div class="fa fa-briefcase"></div>Work</li>
+								<li ng-click="setPhoneType(contact, phone, 'cell');"><div class="fa fa-mobile"></div>Cell</li>
+								<li ng-click="setPhoneType(contact, phone, 'fax');"><div class="fa fa-fax"></div>Fax</li>
+								<li ng-click="setPhoneType(contact, phone, 'pager');"><div class="fa fa-bell"></div>Pager</li>
+							</ul>
+						</div>
+						<!-- Phone view -->
+						<div class="mail-show">{{phone.number}}</div>
+						<!-- Phone editor -->
+						<div class="mail-edit"><input type="text" ng-model="phone.number" placeholder="Phone number" ng-keydown="fieldKeyListener($event, contact);" /></div>
+					</div>
+				</div>
+				<div class="full-addresses"  ng-if="contact.addresses && contact.addresses.length > 0">
+					<div class="address" ng-repeat="address in contact.addresses">
+						<!-- Address icon (+dropdown) -->
+						<div class="dropdown dropdown-left">
+							<div class="fa fa-lg" ng-class="{'fa-home': address.type=='home', 'fa-building': address.type=='work', 'dropdown-button': contact===activeContact&&editing}"></div>
+							<ul class="dropdown-menu">
+								<div class="dropdown-arrow"></div>
+								<div class="dropdown-arrow-fill"></div>
+								<li ng-click="setAddressType(contact, address, 'home');"><div class="fa fa-home"></div>Home</li>
+								<li ng-click="setAddressType(contact, address, 'work');"><div class="fa fa-building"></div>Work</li>
+							</ul>
+						</div>
+						<!-- Address view -->
+						<div class="address-show">
+							{{address.street}} {{address.number}}<br>
+							{{address.postalCode}} {{address.locality}}<br>
+							{{address.country}}
+						</div>
+						<!-- Address editor -->
+						<div class="address-edit">
+							<input type="text" ng-model="address.street" placeholder="Street" ng-keydown="fieldKeyListener($event, contact);" />
+							<input type="text" ng-model="address.number" placeholder="Number" ng-keydown="fieldKeyListener($event, contact);" />
+							<br>
+							<input type="text" ng-model="address.postalCode" placeholder="Zip" ng-keydown="fieldKeyListener($event, contact);" />
+							<input type="text" ng-model="address.locality" placeholder="City" ng-keydown="fieldKeyListener($event, contact);" />
+							<br>
+							<input type="text" ng-model="address.country" placeholder="Country" ng-keydown="fieldKeyListener($event, contact);" />
+						</div>
+					</div>
+				</div>
+				<div class="full-info"  ng-if="contact.birthday!==undefined || contact.url!==undefined || contact.pubKey!==undefined">
+					<div class="birthday" ng-if="contact.birthday!==undefined">
+						<div class="fa fa-lg fa-birthday-cake"></div>
+						<div class="birthday-show">{{contact.birthday | date:shortDay}}</div>
+						<div class="birthday-edit"><input type="date" ng-model="$parent.$parent.$parent.$parent.tmpDate" placeholder="BirthDay" /></div>
+					</div>
+					<div class="website" ng-if="contact.url!==undefined">
+						<div class="fa fa-lg fa-globe"></div>
+						<div class="website-show"><a ng-href="{{contact.url}}" target="_blank">{{contact.url}}</a></div>
+						<div class="website-edit"><input type="text" ng-model="contact.url" placeholder="Website" ng-keydown="fieldKeyListener($event, contact);" /></div>
+					</div>
+					<div class="public-key" ng-if="contact.pubKey!==undefined">
+						<div class="fa fa-lg fa-key"></div>
+						<div class="public-key-show">{{contact.pubKey}}</div>
+						<div class="public-key-edit"><input type="text" ng-model="contact.pubKey" placeholder="Public Key" ng-keydown="fieldKeyListener($event, contact);" /></div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<!-- Bottom add menu -->
+		<div id="add-menu">
+			<div><div class="fa fa-plus" ng-click="$parent.toggleAddMenu($event)"></div></div>
+			<div><span>Import/export</span><div class="fa fa-cloud-upload" ng-click="importExport();"></div></div>
+			<div><span>New group</span><div class="fa fa-users" ng-click=""></div></div>
+			<div><span>New contact</span><div class="fa fa-user" ng-click="addNewContact();"></div></div>
+		</div>
+
+	</div>
+
+	<!-- Dim filter -->
+	<div class="dim"></div>
+
+	<!-- Loading message -->
+	<div ng-if="loading" class="loader"><span class="fa fa-refresh fa-spin"></span><br><br>Loading... Please wait...</div>
+
+	<!-- Modal container -->
+	<div id="modal-container"></div>
+
+	<!-- Download link -->
+	<a id="download-link" style="display: none"></a>
+
+	<!-- build:js(.) scripts/vendor.js -->
+	<!-- bower:js -->
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/toastr/toastr.js"></script>
+	<script src="bower_components/jcrop/js/jquery.Jcrop.js"></script>
+	<!-- endbower -->
+	<!-- endbuild -->
+
+	<!-- build:js({.tmp,app}) scripts/scripts.js -->
+	<script src="scripts/global/config.js"></script>
+	<script src="scripts/global/controllers.js"></script>
+	<script src="scripts/global/resources.js"></script>
+	<script src="scripts/global/services.js"></script>
+	<script src="scripts/contacts/config.js"></script>
+	<script src="scripts/contacts/controllers.js"></script>
+	<script src="scripts/contacts/resources.js"></script>
+	<!-- endbuild -->
+
+</body>
+
+</html>

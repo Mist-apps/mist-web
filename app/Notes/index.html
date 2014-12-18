@@ -1,0 +1,228 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+	<!-- Meta informations -->
+	<meta charset="utf-8">
+	<meta name="description" content="Mist applications in the cloud ! Notes, contacts, calendar, rss reader...">
+	<meta name="author" content="Leleux Laurent">
+	<meta name="viewport" content="width=device-width">
+
+	<!-- Other -->
+	<title>Mist - Notes</title>
+	<link rel="icon" type="image/png" href="images/favicon-notes.png">
+
+	<!-- build:css({.,app}) styles/vendor.css -->
+	<!-- bower:css -->
+	<link rel="stylesheet" href="bower_components/toastr/toastr.css" />
+	<link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.css" />
+	<link rel="stylesheet" href="bower_components/jcrop/css/jquery.Jcrop.css" />
+	<!-- endbower -->
+	<!-- endbuild -->
+
+	<!-- build:css(.tmp) styles/main.css -->
+	<link rel="stylesheet" href="styles/global.css">
+	<link rel="stylesheet" href="styles/notes.css">
+	<!-- endbuild -->
+
+</head>
+
+<body>
+
+	<!-- Top navigation bar -->
+	<div class="navbar navbar-notes" ng-if="$root.user">
+
+		<!-- Left menu icon -->
+		<div id="nav-menu" ng-click="toggleLeftMenu($event);"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
+
+		<!-- Right menu -->
+		<div id="nav-user">
+			<!-- Search icon -->
+			<div id="search-menu" class="fa fa-lg fa-search" ng-click="toggleSearchMenu($event);"></div>
+			<!-- App selector -->
+			<div id="app-menu" class="dropdown dropdown-right">
+				<div class="dropdown-button"><div class="fa fa-lg fa-th"></div></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<table>
+						<tr>
+							<td><div class="fa fa-3x fa-rss"></div>Reader</td>
+							<td ng-click="goto('/contacts');"><div class="fa fa-3x fa-users"></div>Contacts</td>
+						</tr>
+						<tr>
+							<td><div class="fa fa-3x fa-calendar"></div>Calendar</td>
+							<td><div class="fa fa-3x fa-envelope"></div>Mail</td>
+						</tr>
+						<tr>
+							<td><div class="fa fa-3x fa-lock"></div>Pass</td>
+							<td ng-click="goto('/notes');"><div class="fa fa-3x fa-lightbulb-o"></div>Notes</td>
+						</tr>
+					</table>
+				</ul>
+			</div>
+			<!-- Notifications -->
+			<div class="dropdown dropdown-right">
+				<div class="dropdown-button"><div class="fa fa-lg fa-bell"></div></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<div id="notifications">No notifications...</div>
+				</ul>
+			</div>
+			<!-- User menu -->
+			<div id="user-menu" class="dropdown dropdown-right">
+				<img class="dropdown-button" ng-src="{{$root.user.image || 'images/user.png'}}">
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<table>
+						<tr>
+							<td colspan="2" id="user-menu-info">
+								<img ng-src="{{$root.user.image || 'images/user.png'}}"><br>
+								<span id="user-menu-name">{{$root.user.firstName}} {{$root.user.lastName}}</span><br>
+								<span id="user-menu-mail">{{$root.user.mail}}</span>
+							</td>
+						</tr>
+						<tr>
+							<td id="user-menu-button" ng-click="showSettings()"><div class="fa fa-lg fa-cogs"></div><span>Settings</span></td>
+							<td id="user-menu-button" ng-click="logout()"><div class="fa fa-lg fa-power-off"></div><span>Logout</span></td>
+						</tr>
+					</table>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Search menu -->
+		<div id="nav-search">
+			<span id="nav-search-icon" class="fa fa-search"></span>
+			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search" tabindex="1"></div>
+			<span id="nav-search-stop" class="fa fa-remove" ng-show="$root.search && $root.search !== ''" ng-click="$root.search = '';" ></span>
+		</div>
+
+	</div>
+
+	<!-- Main container -->
+	<div id="container">
+
+		<!-- Left menu -->
+		<div class="menu">
+			<!-- Items -->
+			<div id="menu-item-all" ng-click="location = 'all'" ng-class="{'menu-item-active': location=='all'}" class="menu-item"><span class="fa fa-th fa-lg"></span>All</div>
+			<div id="menu-item-notes" ng-click="location = 'notes'" ng-class="{'menu-item-active': location=='notes'}" class="menu-item"><span class="fa fa-lightbulb-o fa-lg"></span>Notes</div>
+			<div id="menu-item-todo" ng-click="location = 'todo'" ng-class="{'menu-item-active': location=='todo'}" class="menu-item"><span class="fa fa-check fa-lg"></span>Todo lists</div>
+			<div class="menu-separator"></div>
+			<div id="menu-item-trash" ng-click="location = 'trash'" ng-class="{'menu-item-active': location=='trash'}" class="menu-item"><span class="fa fa-trash fa-lg"></span>Trash</div>
+			<!-- Sync status -->
+			<div class="menu-bottom">
+				<div id="menu-sync">
+					<div ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-refresh fa-lg"></span>Syncing</div>
+					<div ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-check fa-lg"></span>Synced</div>
+					<div ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-warning fa-lg"></span>Sync error</div>
+					<div ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'"><span class="fa fa-warning fa-lg"></span>Sync stopped</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- No notes message -->
+		<div ng-if="(notes | filter:filterNotes | filter:$root.search).length === 0 && !loading" id="nothing-message">No notes here...</div>
+
+		<!-- Grid container for notes -->
+		<div id="grid-container" grid>
+
+			<!-- Notes view -->
+			<div class="note" ng-repeat="note in notes | filter:filterNotes | filter:$root.search | orderBy:'order'" ng-class="'note-' + (note.color || 'white')" grid-item>
+
+				<div class="drag-drop-zone" ng-mousedown="$root.masonry.dragStart($event);" ng-mouseup="$root.masonry.dragEnd($event, moveNote);"></div>
+				<input type="hidden" name="order" value="{{note.order}}">
+
+				<!-- Title -->
+				<input class="note-title" type="text" placeholder="Title" tabindex="-1" ng-keydown="titleKeyListener($event, note);" ng-model="note.title" />
+
+				<!-- If note, print contents -->
+				<textarea class="note-content" ng-if="!note.tasks" rows="1" placeholder="Note" tabindex="-1" ng-keydown="contentKeyListener($event, note);" ng-model="note.content" resize></textarea>
+
+				<!-- If todo list, print tasks -->
+				<div class="note-tasks" ng-if="note.tasks">
+					<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in note.tasks">
+						<div class="note-task-icon" ng-click="toggleTaskDone(note, task);"></div>
+						<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="-1" ng-keydown="taskKeyListener($event, note, $index)" ng-focus="startEditTask($event);" ng-blur="stopEditTask($event);" ng-model="task.content" resize></textarea>
+					</div>
+				</div>
+
+				<!-- Menu -->
+				<div class="note-menu">
+					<div class="fa fa-trash" ng-if="!note.deleteDate" ng-click="deleteNote(note);"></div>
+					<div class="dropdown dropdown-left" ng-if="!note.deleteDate">
+						<div class="fa fa-paint-brush dropdown-button"></div>
+						<ul class="dropdown-menu">
+							<div class="dropdown-arrow"></div>
+							<div class="dropdown-arrow-fill"></div>
+							<div class="fa note-menu-white" ng-class="{'fa-square-o': note.color&&note.color!=='white', 'fa-check-square-o': !note.color||note.color==='white'}" ng-click="setColor(note, 'white');"></div>
+							<div class="fa note-menu-red" ng-class="{'fa-square': note.color!=='red', 'fa-check-square': note.color==='red'}" ng-click="setColor(note, 'red');"></div>
+							<div class="fa note-menu-orange" ng-class="{'fa-square': note.color!=='orange', 'fa-check-square': note.color==='orange'}" ng-click="setColor(note, 'orange');"></div>
+							<div class="fa note-menu-yellow" ng-class="{'fa-square': note.color!=='yellow', 'fa-check-square': note.color==='yellow'}" ng-click="setColor(note, 'yellow');"></div>
+							<div class="fa note-menu-green" ng-class="{'fa-square': note.color!=='green', 'fa-check-square': note.color==='green'}" ng-click="setColor(note, 'green');"></div>
+							<div class="fa note-menu-turquoise" ng-class="{'fa-square': note.color!=='turquoise', 'fa-check-square': note.color==='turquoise'}" ng-click="setColor(note, 'turquoise');"></div>
+							<div class="fa note-menu-blue" ng-class="{'fa-square': note.color!=='blue', 'fa-check-square': note.color==='blue'}" ng-click="setColor(note, 'blue');"></div>
+							<div class="fa note-menu-grey" ng-class="{'fa-square': note.color!=='grey', 'fa-check-square': note.color==='grey'}" ng-click="setColor(note, 'grey');"></div>
+						</ul>
+					</div>
+					<div class="fa fa-remove" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
+					<div class="fa fa-undo" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
+					<button ng-click="stopEditNotes();">OK</button>
+				</div>
+
+			</div>
+
+		</div>
+
+		<!-- Bottom add menu -->
+		<div id="add-menu">
+			<div><div class="fa fa-plus" ng-click="$parent.toggleAddMenu($event)"></div></div>
+			<div><span>Import/export</span><div class="fa fa-cloud-upload" ng-click="importExport();"></div></div>
+			<div><span>New todo list</span><div class="fa fa-check" ng-click="addNewTodo();"></div></div>
+			<div><span>New note</span><div class="fa fa-lightbulb-o" ng-click="addNewNote();"></div></div>
+		</div>
+
+	</div>
+
+	<!-- Dim filter -->
+	<div class="dim"></div>
+
+	<!-- Loading message -->
+	<div ng-if="loading" class="loader"><span class="fa fa-refresh fa-spin"></span><br><br>Loading... Please wait...</div>
+
+	<!-- Modal container -->
+	<div id="modal-container"></div>
+
+	<!-- Download link -->
+	<a id="download-link" style="display: none"></a>
+
+	<!-- build:js(.) scripts/vendor.js -->
+	<!-- bower:js -->
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/toastr/toastr.js"></script>
+	<script src="bower_components/jcrop/js/jquery.Jcrop.js"></script>
+	<!-- endbower -->
+	<!-- endbuild -->
+
+	<!-- build:js({.tmp,app}) scripts/scripts.js -->
+	<script src="libs/masonry.js"></script>
+	<script src="scripts/global/config.js"></script>
+	<script src="scripts/global/controllers.js"></script>
+	<script src="scripts/global/resources.js"></script>
+	<script src="scripts/global/services.js"></script>
+	<script src="scripts/notes/config.js"></script>
+	<script src="scripts/notes/controllers.js"></script>
+	<script src="scripts/notes/directives.js"></script>
+	<script src="scripts/notes/resources.js"></script>
+	<script src="scripts/notes/services.js"></script>
+	<script src="scripts/notes/jquery-functions.js"></script>
+	<!-- endbuild -->
+
+</body>
+
+</html>

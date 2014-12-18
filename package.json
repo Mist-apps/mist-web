@@ -2,7 +2,7 @@
 	"name": "mist-web",
 	"description": "Mist Web Applications",
 	"private": true,
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"devDependencies": {
 		"grunt": "^0.4.1",
 		"grunt-autoprefixer": "^0.7.3",
