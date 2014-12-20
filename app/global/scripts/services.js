@@ -2,167 +2,109 @@
 
 
 /**
- * Toast notifications service
- * This service loads some configuration like, the show duration,
- * timeout... This toastr methods are available:
- *		- success(message, title)
- *		- info(message, title)
- *		- warning(message, title)
- *		- error(message, title)
- */
-webApp.factory('toastr', function() {
-	toastr.options = {
-		'closeButton': false,
-		'debug': false,
-		'positionClass': 'toast-top-right',
-		'onclick': null,
-		'showDuration': 500,
-		'hideDuration': 1000,
-		'timeOut': 5000,
-		'extendedTimeOut': 1000,
-		'showEasing': 'swing',
-		'hideEasing': 'linear',
-		'showMethod': 'fadeIn',
-		'hideMethod': 'fadeOut'
-	};
-	return {
-		success:	function (message, title) { toastr.success(message, title); },
-		info:		function (message, title) { toastr.info(message, title); },
-		warning:	function (message, title) { toastr.warning(message, title); },
-		error:		function (message, title) { toastr.error(message, title); }
-	};
-});
-
-/**
  * Authentication service to login/logout and manage the Session.
  */
-webApp.factory('AuthService', function ($loader, $http, $q, $timeout, $sessionStorage, $localStorage, userResource, Session) {
+var AuthService = {
 
-	return {
-
-		/**
-		 * Login by sending the credentials to the API and waiting for a token.
-		 * This method returns a promise.
-		 *
-		 * If ok, store the token into session/local storage and resolve the promise
-		 * If not ok, reject the promise with an error code and message
-		 */
-		login: function (credentials) {
-			var promise = $q.defer();
-			// If login attempt success
-			var success = function (data, responseHeaders) {
-				// Stop loading
-				$loader.stop('AuthService.login');
-				// Create the session
-				Session.create(data.token, data.user);
-				// Send the token on each API request
-				$http.defaults.headers.common['API-Token'] = data.token;
-				// Save token in local/session storage
-				if (credentials.remember) {
-					$localStorage.token = data.token;
-				} else {
-					$sessionStorage.token = data.token;
-				}
-				// Initialize sync service
-
-				// Connected
-				promise.resolve();
-			};
-			// If login attempt fails
-			var error = function (httpResponse) {
-				// Stop loading
-				$loader.stop('AuthService.login');
-				if (httpResponse.status === 401) {
-					promise.reject({code: 1, message: 'Bad credentials'});
-				} else {
-					promise.reject({code: 2, message: 'Unknown error'});
-				}
-			};
-			// Try to log in
-			userResource.login(credentials, success, error);
-			// Start loading
-			$loader.start('AuthService.login');
-			// Return a promise
-			return promise.promise;
-		},
-
-		/**
-		 * Logout by destroying the token
-		 */
-		logout: function () {
-			// Destroy session
-			Session.destroy();
-			// No more send the token on each API request
-			delete($http.defaults.headers.common['API-Token']);
-			// Delete token in local/session storage
-			delete($sessionStorage.token);
-			delete($localStorage.token);
-		},
-
-		/**
-		 * Try to recover the authentication by searching for a token in
-		 * session/local storage. If found, ask for user information.
-		 */
-		recover: function () {
-			var promise = $q.defer();
-			// Search for token in local/session storage
-			var token = null;
-			if ($sessionStorage.token) {
-				token = $sessionStorage.token;
-			} else if ($localStorage.token) {
-				token = $localStorage.token;
+	/**
+	 * Login by sending the credentials to the API and waiting for a token.
+	 * This method returns a promise.
+	 *
+	 * If ok, store the token into session/local storage and resolve the promise
+	 * If not ok, reject the promise with an error code and message
+	 */
+	login: function (credentials) {
+		var deferred = $.Deferred();
+		// If login attempt success
+		var success = function (data, responseHeaders) {
+			// Create the session
+			Session.create(data.token, data.user);
+			// Save token in local/session storage
+			if (credentials.remember) {
+				localStorage.setItem('token', data.token);
+			} else {
+				sessionStorage.setItem('token', data.token);
 			}
-			// Send the token on each API request
-			$http.defaults.headers.common['API-Token'] = token;
-			// If token found
-			if (token) {
-				// If user information retrieval success
-				var success = function (data, responseHeaders) {
-					// Stop loading
-					$loader.stop('AuthService.recover');
-					// Create the session
-					Session.create(token, data);
-					// Connected
-					promise.resolve();
-				};
-				// If user information retrieval fails
-				var error = function (httpResponse) {
-					// Stop loading
-					$loader.stop('AuthService.recover');
-					// No more send the token on each API request
-					delete($http.defaults.headers.common['API-Token']);
-					// Not connected
-					promise.reject('Unknown error when retrieving user');
-				};
-				// Start loading
-				$loader.start('AuthService.recover');
-				userResource.get(success, error);
+			// Connected
+			deferred.resolve();
+		};
+		// If login attempt fails
+		var error = function (httpResponse) {
+			if (httpResponse.status === 401) {
+				deferred.reject({code: 1, message: 'Bad credentials'});
+			} else if (httpResponse.status === 404) {
+				deferred.reject({code: 2, message: 'Unable to join server'});
+			} else {
+				deferred.reject({code: 3, message: 'Unknown error'});
 			}
-			// If no token found
-			else {
-				$timeout(function () {
-					promise.reject('No token found in storage');
-				});
-			}
-			// Return a promise
-			return promise.promise;
-		},
+		};
+		// Try to log in
+		userResource.login(credentials, success, error);
+		// Return a promise
+		return deferred.promise();
+	},
 
-		/**
-		 * Check if the user is authenticated or not
-		 */
-		isAuthenticated: function () {
-			return !!Session.token;
+	/**
+	 * Logout by destroying the token
+	 */
+	logout: function () {
+		// Destroy session
+		Session.destroy();
+		// Clear all the local/session storage
+		sessionStorage.clear();
+		localStorage.clear();
+	},
+
+	/**
+	 * Try to recover the authentication by searching for a token in
+	 * session/local storage. If found, ask for user information.
+	 * This method returns a promise.
+	 */
+	recover: function () {
+		var deferred = $.Deferred();
+		// Search for token in local/session storage
+		var token = sessionStorage.getItem('token');
+		if (!token) {
+			token = localStorage.getItem('token');
 		}
+		// If token found
+		if (token) {
+			// If user information retrieval success
+			var success = function (data, responseHeaders) {
+				// Create the session
+				Session.create(token, data);
+				// Connected
+				deferred.resolve();
+			};
+			// If user information retrieval fails
+			var error = function (httpResponse) {
+				// Not connected
+				deferred.reject('Unknown error when retrieving user');
+			};
+			// Get user information
+			userResource.get(success, error);
+		}
+		// If no token found
+		else {
+			deferred.reject('No token found in storage');
+		}
+		// Return a promise
+		return deferred.promise();
+	},
 
-	};
+	/**
+	 * Check if the user is authenticated or not
+	 */
+	isAuthenticated: function () {
+		return !!Session.token;
+	}
 
-});
+};
 
 /**
  * Session containing the user, token...
  */
-webApp.service('Session', function ($rootScope) {
+var Session = {
 	this.create = function (token, user) {
 		this.token = $rootScope.token = token;
 		this.user = $rootScope.user = user;
@@ -175,7 +117,26 @@ webApp.service('Session', function ($rootScope) {
 		this.user = $rootScope.user = user;
 	};
 	return this;
-});
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Sync service to sync resources with the server.

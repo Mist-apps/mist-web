@@ -3,37 +3,7 @@
 
 var API_URL = 'http://localhost:8080';
 
-
-var webApp = angular.module('webApp', ['ngResource', 'ngRoute', 'ngStorage']);
-
-/**
- * Configure the routes
- */
-webApp.config(function ($routeProvider, $locationProvider) {
-
-	$routeProvider.when('/login', {
-		templateUrl: 'views/login.html',
-		controller: 'LoginController',
-		title: 'Login'
-	});
-
-	$routeProvider.otherwise({
-		redirectTo: '/notes'
-	});
-
-	$locationProvider.html5Mode(true);
-
-});
-
-/**
- * Route Change Listener to:
- * 		- Recover the user session
- *		- Check if the user is authenticated where he must be
- *		- Set the application name
- *		- Set the page title
- */
-webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
-
+/*
 	// Recover the user credentials
 	var recover = function (next) {
 		return function () {
@@ -72,10 +42,6 @@ webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
 
 	// Listen to route changes
 	$rootScope.$on('$routeChangeStart', function (event, next, current) {
-		// Set application name, page-title...
-		$rootScope.appName = next.appName;
-		$rootScope.title = next.title;
-		$rootScope.favicon = next.favicon;
 		// If not authenticated
 		if (!AuthService.isAuthenticated()) {
 			// Add a resolve method to try to recover authentication
@@ -85,11 +51,12 @@ webApp.run(function ($rootScope, $location, $q, AuthService, syncService) {
 		}
 	});
 
-});
+*/
 
 /**
  * HTTP Interceptor to catch 401 statuses and redirect the user to the /login page.
  */
+/*
 webApp.config(function ($httpProvider) {
 
 	$httpProvider.interceptors.push(function ($rootScope, $location, $q, $sessionStorage, $localStorage, $modal, Session) {
@@ -116,13 +83,13 @@ webApp.config(function ($httpProvider) {
 	});
 
 });
+*/
 
-/**
- * Auto remove shake class
- */
-$('body').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', '.shake', function () {
-	$(this).removeClass('shake');
-});
+
+
+
+
+
 
 /**
  * Auto shown/hide the dropdowns on click on the related buttons
@@ -140,3 +107,21 @@ $(document).on('click', '.dropdown-button', function () {
 		});
 	}
 });
+
+/**
+ * Configure toastr service
+ */
+toastr.options = {
+	'closeButton': false,
+	'debug': false,
+	'positionClass': 'toast-top-right',
+	'onclick': null,
+	'showDuration': 500,
+	'hideDuration': 1000,
+	'timeOut': 5000,
+	'extendedTimeOut': 1000,
+	'showEasing': 'swing',
+	'hideEasing': 'linear',
+	'showMethod': 'fadeIn',
+	'hideMethod': 'fadeOut'
+};

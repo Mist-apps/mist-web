@@ -1,4 +1,4 @@
-#login-container {
+#container {
 
 	width: 100%;
 	text-align: center;
@@ -10,7 +10,7 @@
 		display: inline-block;
 	}
 
-	& > div {
+	#colored-line {
 
 		height: 4px;
 		width: 250px;
@@ -39,17 +39,10 @@
 
 	}
 
-	form {
-
+	input {
 		text-align: left;
 		display: inline-block;
-
-		input {
-			text-align: left;
-			display: inline-block;
-			width: auto;
-		}
-
+		width: auto;
 	}
 
 }
@@ -150,24 +143,6 @@
 	margin-top: 20px;
 }
 
-@-webkit-keyframes shake {
-	0%, 100% {-webkit-transform: translateX(0);}
-	25%, 75% {-webkit-transform: translateX(-10px);}
-	50% {-webkit-transform: translateX(10px);}
-}
-
-@-moz-keyframes shake {
-	0%, 100% {-moz-transform: translateX(0);}
-	25%, 75% {-moz-transform: translateX(-10px);}
-	50% {-moz-transform: translateX(10px);}
-}
-
-@-o-keyframes shake {
-	0%, 100% {-o-transform: translateX(0);}
-	25%, 75% {-o-transform: translateX(-10px);}
-	50% {-o-transform: translateX(10px);}
-}
-
 @keyframes shake {
 	0%, 100% {transform: translateX(0);}
 	25%, 75% {transform: translateX(-10px);}
@@ -175,8 +150,5 @@
 }
 
 .shake {
-	-webkit-animation-name: shake;
-	-moz-animation-name: shake;
-	-o-animation-name: shake;
 	animation-name: shake;
 }
