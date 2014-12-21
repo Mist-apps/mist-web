@@ -2,12 +2,20 @@
 
 
 /**
- * Notes resource
+ * Note resource to CRUD the Note API
  */
-webApp.factory('noteResource', ['$resource', function ($resource) {
-	return $resource(API_URL + '/note/:id', {id: '@id'}, {
-		update: { method: 'PUT' },
-		exportJSON: { method: 'GET', url: API_URL + '/note/export', headers: {'Accept': 'application/json'}, isArray: true },
-		importJSON: { method: 'POST', url: API_URL + '/note/import', headers: {'Content-Type': 'application/json'}, isArray: false }
-	});
-}]);
+var NoteResource = new Resource('/note');
+
+/**
+ * Import notes from a JSON file
+ */
+NoteResource.importJSON = function () {
+	// TODO importJSON: { method: 'POST', url: API_URL + '/note/import', headers: {'Content-Type': 'application/json'}, isArray: false }
+};
+
+/**
+ * Export the notes to a JSON file
+ */
+NoteResource.exportJSON = function () {
+	// TODO exportJSON: { method: 'GET', url: API_URL + '/note/export', headers: {'Accept': 'application/json'}, isArray: true },
+};

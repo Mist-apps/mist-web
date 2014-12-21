@@ -134,7 +134,7 @@ body {
 
 		}
 
-		#user-menu-button {
+		.user-menu-button {
 
 			width: 135px;
 			height: 50px;
@@ -499,7 +499,7 @@ body {
 	text-align: center;
 }
 
-#nothing-message, .loader {
+#nothing-message, #loader {
 
 	padding-top: 15px;
 	text-align: center;
@@ -513,7 +513,8 @@ body {
 		}
 }
 
-.loader {
+#loader {
+	display: none;
 	position: absolute;
 	top: 80px;
 	width: 100%;
@@ -626,19 +627,8 @@ button {
 
 }
 
-::-webkit-input-placeholder {	/* WebKit browsers */
-	color: rgba(0, 0, 0, 0.2);;
-}
-:-moz-placeholder {				/* Mozilla Firefox 4 to 18 */
-    opacity:  1;
-    color: rgba(0, 0, 0, 0.2);;
-}
-::-moz-placeholder {			/* Mozilla Firefox 19+ */
-    opacity:  1;
-    color: rgba(0, 0, 0, 0.2);;
-}
-:-ms-input-placeholder {		/* Internet Explorer 10+ */
-	color: rgba(0, 0, 0, 0.2);;
+::placeholder {
+	color: rgba(0, 0, 0, 0.2);
 }
 
 input {

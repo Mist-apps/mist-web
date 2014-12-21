@@ -1,0 +1,99 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+	<!-- Meta informations -->
+	<meta charset="utf-8">
+	<meta name="description" content="Mist applications in the cloud ! Notes, contacts, calendar, rss reader...">
+	<meta name="author" content="Leleux Laurent">
+	<meta name="viewport" content="width=device-width">
+
+	<!-- Other -->
+	<title>Mist - Login</title>
+	<link rel="icon" type="image/png" href="favicon.png">
+
+	<!-- build:css({.,app}) global/styles/vendor.css -->
+	<!-- bower:css -->
+	<link rel="stylesheet" href="../../bower_components/toastr/toastr.css" />
+	<link rel="stylesheet" href="../../bower_components/fontawesome/css/font-awesome.css" />
+	<!-- endbower -->
+	<link rel="stylesheet" href="../global/styles/global.css">
+	<!-- endbuild -->
+
+	<!-- build:css(.tmp) global/styles/main.css -->
+	<link rel="stylesheet" href="styles/login.css">
+	<!-- endbuild -->
+
+</head>
+
+<body>
+
+	<!-- Main container -->
+	<div id="container">
+
+		<span>Mist</span>
+
+		<div id="colored-line">
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+
+		<form action="">
+
+			<div class="login-form-input">
+				<div class="fa fa-user fa-fw"></div>
+				<input type="text" placeholder="Login" name="login">
+			</div>
+
+			<br>
+
+			<div class="login-form-input">
+				<div class="fa fa-lock fa-fw"></div>
+				<input type="password" placeholder="Password" name="password">
+			</div>
+
+			<br>
+
+			<div id="remember">
+				<input type="checkbox" name="remember">
+				<label for="remember"> Remember me ?</label>
+			</div>
+
+			<div id="login-submit">
+				<button type="submit">Login</button>
+			</div>
+
+		</form>
+
+		<div id="login-error"></div>
+
+	</div>
+
+	<!-- Dim filter -->
+	<div class="dim"></div>
+
+	<!-- Modal container -->
+	<div id="modal-container"></div>
+
+	<!-- build:js(.) global/scripts/vendor.js -->
+	<!-- bower:js -->
+	<script src="../../bower_components/jquery/dist/jquery.js"></script>
+	<script src="../../bower_components/toastr/toastr.js"></script>
+	<!-- endbower -->
+	<script src="../global/scripts/config.js"></script>
+	<script src="../global/scripts/classes.js"></script>
+	<script src="../global/scripts/resources.js"></script>
+	<script src="../global/scripts/services.js"></script>
+	<script src="../global/scripts/controllers.js"></script>
+	<!-- endbuild -->
+
+	<!-- build:js({.tmp,app}) global/scripts/main.js -->
+	<script src="scripts/controllers.js"></script>
+	<!-- endbuild -->
+
+</body>
+
+</html>

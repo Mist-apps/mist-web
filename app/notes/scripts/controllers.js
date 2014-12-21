@@ -2,13 +2,258 @@
 
 
 /**
- * Notes Controller
+ * Check and uncheck a task in a todo list
  */
+var toggleTaskDone = function (note, task) {
+	// Toggle
+	task.done = !task.done;
+	// Set modification date
+	note.modificationDate = new Date().getTime();
+	// Inform sync service
+	syncService.updateResource('NOTE', note);
+};
+
+/**
+ * Listen to key events on the note titles
+ */
+var titleKeyListener = function ($event, note) {
+	// "ENTER" key
+	if ($event.keyCode === 13) {
+		var next = $($event.target).next();
+		// Go to content
+		if (next.hasClass('note-content')) {
+			next.focus();
+		}
+		// Go to task
+		else if (next.hasClass('note-tasks')) {
+			next.find('.note-task-content').focus();
+		}
+		// Stop key default behaviour
+		$event.preventDefault();
+	}
+	// Inform sync service and set modification time if necessary
+	if (!_keyMustBeIgnored($event.keyCode)) {
+		note.modificationDate = new Date().getTime();
+		syncService.updateResource('NOTE', note);
+	}
+};
+
+/**
+ * Listen to key events on the note contents
+ */
+var contentKeyListener = function ($event, note) {
+	// Inform sync service and set modification time if necessary
+	if (!_keyMustBeIgnored($event.keyCode)) {
+		note.modificationDate = new Date().getTime();
+		syncService.updateResource('NOTE', note);
+	}
+};
+
+/**
+ * Listen for key events on the task contents
+ */
+var taskKeyListener = function ($event, note, index) {
+	var target = $($event.target);
+	var tasks = note.tasks;
+
+	// "ENTER" key
+	if ($event.keyCode === 13) {
+		// Get two parts of the task
+		var start = target.val().substring(0, target.prop('selectionStart'));
+		var end = target.val().substring(target.prop('selectionEnd'));
+		// Update model
+		tasks[index].content = start;
+		tasks.splice(index + 1, 0, {done: false, content: end});
+		// Stop key default behaviour
+		$event.preventDefault();
+		// Wait rendering to go to the created task
+		$timeout(function () {
+			target.change();
+			target.parent().next().find('.note-task-content').focusStart();
+		});
+	}
+	// "DOWN" key
+	else if ($event.which === 40) {
+		if (target.isCursorOnEndOfTask() && target.parent().next().length) {
+			// Focus out of the digest, because focus has a callback
+			$timeout(function () {
+				target.parent().next().find('.note-task-content').focusStart();
+			});
+			$event.preventDefault();
+		}
+	}
+	// "UP" key
+	else if ($event.which === 38) {
+		if (target.isCursorOnStartOfTask() && target.parent().prev().length) {
+			// Focus out of the digest, because focus has a callback
+			$timeout(function () {
+				target.parent().prev().find('.note-task-content').focusEnd();
+			});
+			$event.preventDefault();
+		}
+	}
+	// "BACKSPACE" key
+	else if ($event.which === 8) {
+		// If there is a previous task, and the cursor is on the start of the task
+		if (target.isCursorOnStartOfTask() && target.parent().prev().length) {
+			// Move caret position after rendering
+			var pos = tasks[index - 1].content.length;
+			var elem = target.parent().prev().find('.note-task-content');
+			$timeout(function() {
+				elem.focusPosition(pos);
+			});
+			// Merge the two tasks
+			tasks[index - 1].content += tasks[index].content;
+			tasks.splice(index, 1);
+			// Stop key default behaviour
+			$event.preventDefault();
+		}
+	}
+	// "DELETE" key
+	else if ($event.which === 46) {
+		// If there is a next task, and the cursor is on the end of the task
+		if (target.isCursorOnEndOfTask() && target.parent().next().length) {
+			// Move caret position after rendering
+			var pos = tasks[index].content.length;
+			$timeout(function() {
+				target.focusPosition(pos);
+			});
+			// Merge the two tasks
+			tasks[index].content += tasks[index + 1].content;
+			tasks.splice(index + 1, 1);
+			// Stop key default behaviour
+			$event.preventDefault();
+		}
+	}
+	// Inform sync service and set modification time if necessary
+	if (!_keyMustBeIgnored($event.keyCode)) {
+		note.modificationDate = new Date().getTime();
+		syncService.updateResource('NOTE', note);
+	}
+};
+
+/**
+ * Check whether the key must be ignored or not for informing
+ * the sync service
+ */
+var _keyMustBeIgnored = function (keyCode) {
+	var keysToIgnore = [
+		37, 38, 39, 40,		// Arrows
+		16, 17, 18, 27,		// Shift Control Alt Escape
+		9, 19, 91, 92,		// Tab Pause WindowsLeft WindowsRight
+		20, 144, 145,		// CapsLock NumLock ScrollLock
+		33, 34, 35, 36,		// PageUp PageDown End Home
+		45, 93,				// Insert Select
+		112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123	// F1 -> F12
+	];
+	return keysToIgnore.indexOf(keyCode) !== -1;
+};
+
+/**
+ * Start editing task
+ */
+var startEditTask = function ($event) {
+	$($event.target).parent().addClass('note-task-edit');
+};
+
+/**
+ * Stop editing task
+ */
+var stopEditTask = function ($event) {
+	$($event.target).parent().removeClass('note-task-edit');
+};
+
+
+/**
+ * Get Notes from API
+ */
+var notes = [];
+var getNotes = function () {
+	notes = [];
+	LoaderService.start('getNotes');
+	SyncService.getResources('NOTE', function (err, data) {
+		if (err) {
+			toastr.error('Unable to get notes (' + err.message + ')');
+		} else {
+			notes = data;
+			_checkNotesOrder();
+		}
+		LoaderService.stop('getNotes');
+	});
+}
+
+
+/**
+ * Check the notes order for gaps, or duplicates
+ */
+var _checkNotesOrder = function () {
+	// Check order
+	var order = [];
+	var other = [];
+	// Split ordered and others
+	for (var i in notes) {
+		// If no order
+		if (!notes[i].order) {
+			other.push(notes[i]);
+		}
+		// If place taken
+		else if (order[notes[i].order]) {
+			other.push(notes[i]);
+		}
+		// Set in the ordered list
+		else {
+			order[notes[i].order] = notes[i];
+		}
+	}
+	// Pack the ordered list
+	var i = 1;
+	for (var j in order) {
+		if (order[j].order !== i) {
+			order[j].order = i;
+			// Inform sync service
+			SyncService.updateResource('NOTE', order[j]);
+		}
+		i++;
+	}
+	// Add the unordered to the end
+	for (var j in other) {
+		if (other[j].order !== i) {
+			other[j].order = i;
+			// Inform sync service
+			SyncService.updateResource('NOTE', other[j]);
+		}
+		i++;
+	}
+};
+
+
+/**
+ * ===========================================================================================================================================
+ * Execution flow
+ * ===========================================================================================================================================
+ */
+
+// Get notes when session recovered
+recovered.done(getNotes);
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Notes Controller
+ *//*
 webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syncService, NotesWebService) {
 
 	/**
 	 * Left menu location
-	 */
+	 *//*
 	$scope.location = 'all';
 	$scope.$watch('location', function () {
 		var interval = setInterval(function () {
@@ -21,75 +266,8 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 	});
 
 	/**
-	 * Get Notes from API
-	 */
-	$scope.getNotes = function () {
-		$scope.notes = [];
-		syncService.getResources('NOTE', function (err, data) {
-			if (err) {
-				toastr.error('Unable to get notes (' + err.message + ')');
-			} else {
-				$scope.notes = data;
-				_checkNotesOrder();
-			}
-		});
-	}
-	$scope.getNotes();
-
-	/**
-	 * Check the notes order for gaps, or duplicates
-	 */
-	var _checkNotesOrder = function () {
-		// Check order
-		var order = [];
-		var other = [];
-		// Split ordered and others
-		for (var i in $scope.notes) {
-			// If no order
-			if (!$scope.notes[i].order) {
-				other.push($scope.notes[i]);
-			}
-			// If place taken
-			else if (order[$scope.notes[i].order]) {
-				other.push($scope.notes[i]);
-			}
-			// Set in the ordered list
-			else {
-				order[$scope.notes[i].order] = $scope.notes[i];
-			}
-		}
-		// Pack the ordered list
-		var i = 1;
-		for (var j in order) {
-			if (order[j].order !== i) {
-				order[j].order = i;
-				// Inform sync service
-				syncService.updateResource('NOTE', order[j]);
-			}
-			i++;
-		}
-		// Add the unordered to the end
-		for (var j in other) {
-			if (other[j].order !== i) {
-				other[j].order = i;
-				// Inform sync service
-				syncService.updateResource('NOTE', other[j]);
-			}
-			i++;
-		}
-	};
-
-	// Add notes web methods
-	$scope.toggleTaskDone = NotesWebService.toggleTaskDone;
-	$scope.titleKeyListener = NotesWebService.titleKeyListener;
-	$scope.contentKeyListener = NotesWebService.contentKeyListener;
-	$scope.taskKeyListener = NotesWebService.taskKeyListener;
-	$scope.startEditTask = NotesWebService.startEditTask;
-	$scope.stopEditTask = NotesWebService.stopEditTask;
-
-	/**
 	 * Filter the notes from the menu selection
-	 */
+	 *//*
 	$scope.filterNotes = function (value) {
 		if ($scope.location === 'all') {
 			return !value.deleteDate;
@@ -106,7 +284,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Add a new empty note
-	 */
+	 *//*
 	$scope.addNewNote = function () {
 		// Add new note
 		var date = new Date().getTime();
@@ -120,7 +298,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Add a new empty todo list
-	 */
+	 *//*
 	$scope.addNewTodo = function () {
 		// Add new todo list
 		var date = new Date().getTime();
@@ -134,7 +312,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Delete a note
-	 */
+	 *//*
 	$scope.deleteNote = function (note) {
 		// Update note
 		note.deleteDate = new Date().getTime();
@@ -146,7 +324,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Delete definitively a note
-	 */
+	 *//*
 	$scope.destroyNote = function (note) {
 		// Search for note to delete
 		for (var key in $scope.notes) {
@@ -173,7 +351,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Restore a deleted note
-	 */
+	 *//*
 	$scope.restoreNote = function (note) {
 		// Update note
 		delete(note.deleteDate);
@@ -185,7 +363,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Change color of note
-	 */
+	 *//*
 	$scope.setColor = function (note, color) {
 		// Set the color
 		note.color = color;
@@ -195,7 +373,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Start editing a note
-	 */
+	 *//*
 	$scope.startEditNote = function (event) {
 		if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
 			// Set tabindex
@@ -222,7 +400,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Stop editing the notes
-	 */
+	 *//*
 	$scope.stopEditNotes = function (event) {
 		// Stop focusing the element
 		if (event) {
@@ -254,7 +432,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Custom listeners
-	 */
+	 *//*
 	var _escapeKeyListener = function (event) {
 		if (event.which === 27) {
 			$scope.stopEditNotes(event);
@@ -263,7 +441,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * Import/Export
-	 */
+	 *//*
 	$scope.importExport = function () {
 		$modal.show('notes-import');
 	};
@@ -271,7 +449,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 	/**
 	 * Move the note after the "previous" note.
 	 * The arguments are the order position of the notes.
-	 */
+	 *//*
 	$scope.moveNote = function (AOrder, BOrder) {
 		// Set notes order
 		for (var key in $scope.notes) {
@@ -302,7 +480,7 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 	/**
 	 * When a conflict is detected, stop edit the note and show modal
-	 */
+	 *//*
 	$scope.$on('CONFLICT', function (event, local, remote) {
 		$scope.stopEditNotes();
 		$modal.show('notes-conflict', {local: local, remote: remote});
@@ -325,24 +503,16 @@ webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syn
 
 /**
  * Conflict controller (modal)
- */
+ *//*
 webApp.controller('ConflictController', function ($scope, $rootScope, $modal, syncService, NotesWebService) {
 
 	// Get conflicted notes
 	$scope.local = $modal.parameters.local;
 	$scope.remote = $modal.parameters.remote;
 
-	// Add notes web methods
-	$scope.toggleTaskDone = NotesWebService.toggleTaskDone;
-	$scope.titleKeyListener = NotesWebService.titleKeyListener;
-	$scope.contentKeyListener = NotesWebService.contentKeyListener;
-	$scope.taskKeyListener = NotesWebService.taskKeyListener;
-	$scope.startEditTask = NotesWebService.startEditTask;
-	$scope.stopEditTask = NotesWebService.stopEditTask;
-
 	/**
 	 * Resolve the conflict
-	 */
+	 *//*
 	$scope.resolve = function (which) {
 		// Resolve the conflict
 		if (which === 'local') {
@@ -383,7 +553,7 @@ webApp.controller('ConflictController', function ($scope, $rootScope, $modal, sy
 
 /**
  * Import/Export controller (modal)
- */
+ *//*
 webApp.controller('NotesImportController', function ($rootScope, $scope, $http, $modal, $download, toastr, noteResource) {
 
 	$scope.import = function () {
@@ -434,3 +604,4 @@ webApp.controller('NotesImportController', function ($rootScope, $scope, $http, 
 	};
 
 });
+*/

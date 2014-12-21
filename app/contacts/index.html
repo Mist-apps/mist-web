@@ -31,15 +31,15 @@
 <body>
 
 	<!-- Top navigation bar -->
-	<div class="navbar navbar-contacts" ng-if="$root.user">
+	<div class="navbar navbar-contacts">
 
 		<!-- Left menu icon -->
-		<div id="nav-menu" ng-click="toggleLeftMenu($event);"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
+		<div id="nav-menu"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
 
 		<!-- Right menu -->
 		<div id="nav-user">
 			<!-- Search icon -->
-			<div id="search-menu" class="fa fa-lg fa-search" ng-click="toggleSearchMenu($event);"></div>
+			<div id="search-menu" class="fa fa-lg fa-search"></div>
 			<!-- App selector -->
 			<div id="app-menu" class="dropdown dropdown-right">
 				<div class="dropdown-button"><div class="fa fa-lg fa-th"></div></div>
@@ -49,7 +49,7 @@
 					<table>
 						<tr>
 							<td><div class="fa fa-3x fa-rss"></div>Reader</td>
-							<td ng-click="goto('/contacts');"><div class="fa fa-3x fa-users"></div>Contacts</td>
+							<td><div class="fa fa-3x fa-users"></div>Contacts</td>
 						</tr>
 						<tr>
 							<td><div class="fa fa-3x fa-calendar"></div>Calendar</td>
@@ -57,7 +57,7 @@
 						</tr>
 						<tr>
 							<td><div class="fa fa-3x fa-lock"></div>Pass</td>
-							<td ng-click="goto('/notes');"><div class="fa fa-3x fa-lightbulb-o"></div>Notes</td>
+							<td onclick="location.replace('/notes');"><div class="fa fa-3x fa-lightbulb-o"></div>Notes</td>
 						</tr>
 					</table>
 				</ul>
@@ -86,8 +86,8 @@
 							</td>
 						</tr>
 						<tr>
-							<td id="user-menu-button" ng-click="showSettings()"><div class="fa fa-lg fa-cogs"></div><span>Settings</span></td>
-							<td id="user-menu-button" ng-click="logout()"><div class="fa fa-lg fa-power-off"></div><span>Logout</span></td>
+							<td class="user-menu-button" id="user-menu-settings"><div class="fa fa-lg fa-cogs"></div><span>Settings</span></td>
+							<td class="user-menu-button" id="user-menu-logout"><div class="fa fa-lg fa-power-off"></div><span>Logout</span></td>
 						</tr>
 					</table>
 				</ul>
@@ -266,7 +266,7 @@
 
 		<!-- Bottom add menu -->
 		<div id="add-menu">
-			<div><div class="fa fa-plus" ng-click="$parent.toggleAddMenu($event)"></div></div>
+			<div><div id="add-menu-button" class="fa fa-plus"></div></div>
 			<div><span>Import/export</span><div class="fa fa-cloud-upload" ng-click="importExport();"></div></div>
 			<div><span>New group</span><div class="fa fa-users" ng-click=""></div></div>
 			<div><span>New contact</span><div class="fa fa-user" ng-click="addNewContact();"></div></div>
@@ -278,7 +278,7 @@
 	<div class="dim"></div>
 
 	<!-- Loading message -->
-	<div ng-if="loading" class="loader"><span class="fa fa-refresh fa-spin"></span><br><br>Loading... Please wait...</div>
+	<div id="loader"><span class="fa fa-refresh fa-spin"></span><br><br>Loading... Please wait...</div>
 
 	<!-- Modal container -->
 	<div id="modal-container"></div>
@@ -292,15 +292,13 @@
 	<script src="../../bower_components/toastr/toastr.js"></script>
 	<!-- endbower -->
 	<script src="../global/scripts/config.js"></script>
-	<script src="../global/scripts/controllers.js"></script>
+	<script src="../global/scripts/classes.js"></script>
 	<script src="../global/scripts/resources.js"></script>
 	<script src="../global/scripts/services.js"></script>
+	<script src="../global/scripts/controllers.js"></script>
 	<!-- endbuild -->
 
 	<!-- build:js({.tmp,app}) contacts/scripts/main.js -->
-	<script src="scripts/config.js"></script>
-	<script src="scripts/controllers.js"></script>
-	<script src="scripts/resources.js"></script>
 	<!-- endbuild -->
 
 </body>

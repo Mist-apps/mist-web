@@ -16,7 +16,7 @@ var AuthService = {
 	login: function (credentials) {
 		var deferred = $.Deferred();
 		// If login attempt success
-		var success = function (data, responseHeaders) {
+		var success = function (data) {
 			// Create the session
 			Session.create(data.token, data.user);
 			// Save token in local/session storage
@@ -39,7 +39,7 @@ var AuthService = {
 			}
 		};
 		// Try to log in
-		userResource.login(credentials, success, error);
+		UserResource.login(credentials, success, error);
 		// Return a promise
 		return deferred.promise();
 	},
@@ -70,19 +70,19 @@ var AuthService = {
 		// If token found
 		if (token) {
 			// If user information retrieval success
-			var success = function (data, responseHeaders) {
+			var success = function (data) {
 				// Create the session
 				Session.create(token, data);
 				// Connected
 				deferred.resolve();
 			};
 			// If user information retrieval fails
-			var error = function (httpResponse) {
+			var error = function () {
 				// Not connected
 				deferred.reject('Unknown error when retrieving user');
 			};
 			// Get user information
-			userResource.get(success, error);
+			UserResource.recover(token, success, error);
 		}
 		// If no token found
 		else {
@@ -96,46 +96,149 @@ var AuthService = {
 	 * Check if the user is authenticated or not
 	 */
 	isAuthenticated: function () {
-		return !!Session.token;
+		return !!Session.getToken();
 	}
 
 };
 
+
 /**
  * Session containing the user, token...
  */
-var Session = {
-	this.create = function (token, user) {
-		this.token = $rootScope.token = token;
-		this.user = $rootScope.user = user;
+var Session = (function () {
+
+	// Session state
+	var token = null;
+	var user = null;
+
+	// Export methods
+	return {
+		getToken: function () {
+			return token;
+		},
+		getUser: function () {
+			return user;
+		},
+		create: function (newToken, newUser) {
+			token = newToken;
+			user = newUser;
+		},
+		destroy: function () {
+			token = null;
+			user = null;
+		},
+		update: function (newUser) {
+			user = newUser;
+		}
 	};
-	this.destroy = function () {
-		this.token = $rootScope.token = null;
-		this.user = $rootScope.user = null;
+
+})();
+
+
+/**
+ * Modal service
+ * Show and hide modals, only one modal at the same time !
+ * The modal name must be given, it must be in the modals folder,
+ * or in the global/modals folder, but then, the name must start with 'global-'.
+ * Dim and clear the screen, only if no modals are shown.
+ * When a modal is shown, some parameters may be given.
+ * They are accessible through the 'getParameters()' method.
+ */
+var ModalService = (function () {
+
+	var modal = '';
+	var parameters = {};
+
+	// Get the parameters of the modal
+	var getParameters = function () {
+		return parameters;
 	};
-	this.update = function (user) {
-		this.user = $rootScope.user = user;
+
+	// Get the modal url from the name, if starts with 'global-', look into the global modals folder
+	var _getModalUrl = function (name) {
+		if (name.indexOf('global-') === 0) {
+			return '../global/modals/' + name.substring(7) + '.html';
+		}
+		return 'modals/' + name + '.html';
 	};
-	return this;
-};
 
+	// Center the modal
+	var _center = function () {
+		// Get window height without 2 * 10px for dialog box margin
+		var windowHeight = $(window).height() - 20;
+		// Get content max height from window height minus the modal header and footer
+		var contentMaxHeight = windowHeight - $('.modal-header').outerHeight(true) - $('.modal-footer').outerHeight(true);
+		// Set content max-height
+		$('.modal-content').css('max-height', (contentMaxHeight - 40) + 'px');
+		// Get the modal effective height
+		var modalHeight = $('.modal').height();
+		// Set top window offset, add the 10px top margin
+		$('#modal-container').css('top', ((windowHeight - modalHeight) / 3 + 10) + 'px');
+	};
 
+	// Open a modal
+	var show = function (name, params) {
+		if (!modal) {
+			if (params) {
+				parameters = params;
+			}
+			dim();
+			modal = _getModalUrl(name);
+			$.get(modal).done(function (html) {
+				$('#modal-container').empty().append(html);
+				_center();
+				$(window).on('resize', _center);
+				$('.modal-content').on('resize', _center);
+			}).fail(function () {
+				toastr.error('Unable to open modal');
+			});
+		}
+	};
 
+	// Hide a modal
+	var hide = function (name) {
+		if (isShown(name)) {
+			modal = '';
+			clear();
+			parameters = {};
+			// Stop center the modal
+			$(window).off('resize', _center);
+			$('.modal-content').off('resize', _center);
+		}
+	};
 
+	// Return whether the modal is shown or not
+	var isShown = function (name) {
+		return modal === name;
+	};
 
+	// Dim the screen
+	var dim = function () {
+		if (!modal) {
+			$('#nav-search-content input').attr('tabindex', -1);
+			$('.dim').addClass('dim-active');
+		}
+	};
 
+	// Clear the screen
+	var clear = function () {
+		if (!modal) {
+			$('.dim').removeClass('dim-active');
+			$('#nav-search-content input').attr('tabindex', 1);
+		}
+	};
 
+	// Export methods
+	return {
+		getParameters:	getParameters,
+		show:			show,
+		hide:			hide,
+		isShown:		isShown,
+		dim:			dim,
+		clear:			clear
+	};
 
-
-
-
-
-
-
-
-
-
-
+})();
 
 
 /**
@@ -144,16 +247,24 @@ var Session = {
  * This service is generic so you may pass any resource you want to sync.
  * Keep in mind a Resource provider must be present and named: "{{type}}Resource"
  */
-webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr, $loader) {
+var SyncService = (function () {
 
-	// Sync status is shared
-	$rootScope.syncStatus = 'synced';
+	// Sync Status
+	var syncStatus = 'synced';
+
+	// Sync status access methods
+	var getSyncStatus = function () {
+		return syncStatus;
+	};
+	var setSyncStatus = function (newSyncStatus) {
+		syncStatus = newSyncStatus;
+	};
 
 	/**
 	 * Initialize the sync service, nothing to sync and status synced
 	 */
 	var init = function () {
-		$rootScope.syncStatus = 'synced';
+		setSyncStatus('synced');
 		resources = {};
 		metadata = {};
 	};
@@ -161,27 +272,27 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	/**
 	 * Handle sync status
 	 */
-	var setStatusSyncing = function () {
+	var _setStatusSyncing = function () {
 		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') { return; }
+		if (syncStatus === 'stopped') { return; }
 		// If the sync is in error, it is not possible to set it to syncing, wait for good sync before
-		if ($rootScope.syncStatus === 'error') { return; }
+		if (syncStatus === 'error') { return; }
 		// Set status
-		$rootScope.syncStatus = 'syncing';
+		setSyncStatus('syncing');
 	};
-	var setStatusSynced = function () {
+	var _setStatusSynced = function () {
 		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') { return; }
+		if (syncStatus === 'stopped') { return; }
 		// Set status
-		$rootScope.syncStatus = 'synced';
+		setSyncStatus('synced');
 	};
-	var setStatusError = function () {
+	var _setStatusError = function () {
 		// If the sync is set to stopped, it is not possible to change the status from the sync service
-		if ($rootScope.syncStatus === 'stopped') { return; }
+		if (syncStatus === 'stopped') { return; }
 		// If the sync pass for the first time in error, show an error notification
-		if ($rootScope.syncStatus !== 'error') { toastr.error('Unable to sync'); }
+		if (syncStatus !== 'error') { toastr.error('Unable to sync'); }
 		// Set status
-		$rootScope.syncStatus = 'error';
+		setSyncStatus('error');
 	};
 
 	/**
@@ -190,7 +301,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	window.onbeforeunload = function(event) {
 		event = event || window.event;
 		var message = '';
-		switch ($rootScope.syncStatus) {
+		switch (syncStatus) {
 			case 'syncing':		message = 'Data is syncing, if you leave, you will loose some data...'; break;
 			case 'error':		message = 'Error during sync, if you leave, you will loose some data...'; break;
 			case 'stopped':		if (_isSynced()) { break; }
@@ -205,8 +316,6 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	//	Save resources to sync, new resources have no _id but a tmpId
 	var resources = {};
 	var metadata = {};
-	// Save the HTTP resources dynamically injected
-	var httpResources = {};
 
 	/**
 	 * Handle resource modifications.
@@ -215,7 +324,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	var newResource = function (type, resource) {
 		resources[resource.tmpId] = resource;
 		metadata[resource.tmpId] = {type: type, status: 'ready', action: 'insert'};
-		setStatusSyncing();
+		_setStatusSyncing();
 	};
 	var updateResource = function (type, resource) {
 		// If the resource is not new and is not already in
@@ -232,7 +341,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 				metadata[resource._id] = {type: type, syncing: false, action: 'update'};
 			}
 			// Set syncing
-			setStatusSyncing();
+			_setStatusSyncing();
 		}
 	};
 	var deleteResource = function (type, resource) {
@@ -250,7 +359,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 				metadata[resource._id] = {type: type, syncing: false, action: 'delete'};
 			}
 			// Set syncing
-			setStatusSyncing();
+			_setStatusSyncing();
 		}
 		// If the resource is new
 		else {
@@ -275,11 +384,8 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 * Get the HTTP Resource to sync with
 	 */
 	var _getHTTPResource = function (type) {
-		type = type.toLowerCase();
-		if (!httpResources[type]) {
-			httpResources[type] = $injector.get(type + 'Resource');
-		}
-		return httpResources[type];
+		type = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+		return window[type + 'Resource'];
 	};
 
 	/**
@@ -296,12 +402,12 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 */
 	var _sync = function () {
 		// Do not sync if stopped
-		if ($rootScope.syncStatus === 'stopped') {
+		if (syncStatus === 'stopped') {
 			return;
 		}
 		// Check if something to do
 		if (_isSynced()) {
-			setStatusSynced();
+			_setStatusSynced();
 			return;
 		}
 		// If a resource sync success
@@ -328,23 +434,23 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			metadata[id] = {type: metadata[id].type, syncing: false, action: action};
 			// Check for conflict (updated)
 			if (response.status === 409) {
-				$rootScope.syncStatus = 'stopped';
+				setSyncStatus('stopped');
 				_removeResource(resource);
-				$rootScope.$broadcast('CONFLICT', resource, response.data);
+				// TODO $broadcast('CONFLICT', resource, response.data);
 			}
 			// Check for conflict (deleted)
 			if (response.status === 404) {
-				$rootScope.syncStatus = 'stopped';
+				setSyncStatus('stopped');
 				_removeResource(resource);
-				$rootScope.$broadcast('CONFLICT', resource, null);
+				// TODO $broadcast('CONFLICT', resource, null);
 			}
 		};
 		// Check if the sync is done, and set the status
 		var _checkEndOfSync = function () {
 			if (_isSynced()) {
-				setStatusSynced();
+				_setStatusSynced();
 			} else if (_isSyncError()) {
-				setStatusError();
+				_setStatusError();
 			}
 		};
 		// Handle resources
@@ -361,7 +467,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			if (metadata[id].action === 'insert') {
 				var clone = $.extend(true, {}, resource);
 				delete(clone.tmpId);
-				httpResource.save(clone,
+				httpResource.insert(clone,
 					function (data) {
 						_success(resource);
 						delete(resource.tmpId);
@@ -374,7 +480,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			}
 			// Update resource
 			else if (metadata[id].action === 'update') {
-				httpResource.update({id: id}, resource,
+				httpResource.update(id, resource,
 					function (data) {
 						_success(resource);
 						resource._revision = data._revision;
@@ -385,7 +491,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 			}
 			// Delete resource
 			else if (metadata[id].action === 'delete') {
-				httpResource.delete({id: id},
+				httpResource.delete(id,
 					function () {
 						_success(resource);
 					}, function (httpResponse) {
@@ -397,7 +503,7 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	};
 
 	// Sync the changes every X seconds
-	$interval(_sync, 2000);
+	setInterval(_sync, 2000);
 
 	/**
 	 * Get resources from server and give it through the callback.
@@ -410,117 +516,72 @@ webApp.factory('syncService', function ($interval, $rootScope, $injector, toastr
 	 * If another resource is got, the first one is no more synced.
 	 */
 	var getResources = function (type, callback) {
-		var success = function (data, responseHeaders) {
-			$loader.stop('syncService.get' + type);
+		var success = function (data) {
 			callback(null, data);
 		};
 		var error = function (httpResponse) {
-			$loader.stop('syncService.get' + type);
 			callback(new Error(httpResponse.status));
 		};
 		// Ask for resources
 		var httpResource = _getHTTPResource(type);
-		httpResource.query(success, error);
-		$loader.start('syncService.get' + type);
+		httpResource.get(success, error);
 	};
 
-	// Return change handling methods
+	// Export methods
 	return {
+		getSyncStatus:		getSyncStatus,
+		setSyncStatus:		setSyncStatus,
 		init:				init,
 		newResource:		newResource,
 		updateResource:		updateResource,
 		deleteResource:		deleteResource,
 		getResources:		getResources
 	};
-});
+
+})();
+
 
 /**
- * Modal service
+ * Loader service, shows a loading icon
+ *
+ * Methods:
+ * 		- start(identifier) 		Starts the loading process for someone, the caller identifier must be given
+ *		- stop(identifier) 			Stop the loading process for someone, the caller identifier must be given
+ *		- isLoading([identifier]) 	Is the loading process active for someone ? If no caller identifier fiven, check every caller
  */
-webApp.service('$modal', function ($rootScope) {
+var LoaderService = (function () {
 
-	// Modal template url
-	$rootScope.modal = '';
-
-	// Modal parameters
-	this.parameters = {};
-
-	// Get the modal url from the name
-	var _getModalUrl = function (name) {
-		return 'modals/' + name + '.html';
-	};
-
-	// Center the modal
-	var _center = function () {
-		// Get window height without 2 * 10px for dialog box margin
-		var windowHeight = $(window).height() - 20;
-		// Get content max height from window height minus the modal header and footer
-		var contentMaxHeight = windowHeight - $('.modal-header').outerHeight(true) - $('.modal-footer').outerHeight(true);
-		// Set content max-height
-		$('.modal-content').css('max-height', (contentMaxHeight - 40) + 'px');
-		// Get the modal effective height
-		var modalHeight = $('.modal').height();
-		// Set top window offset, add the 10px top margin
-		$('#modal-container').css('top', ((windowHeight - modalHeight) / 3 + 10) + 'px');
-	};
-
-	$rootScope.$on('$includeContentLoaded', function () {
-		_center();
-		$('.modal-content').on('resize', _center);
-	});
-
-	// Show the modal
-	this.show = function (name, params) {
-		if (!$rootScope.modal) {
-			if (params) {
-				this.parameters = params;
-			}
-			this.dim();
-			$rootScope.modal = _getModalUrl(name);
-			$(window).on('resize', _center);
-		}
-	};
-
-	// Hide the modal
-	this.hide = function (name) {
-		if (this.isShown(name)) {
-			$rootScope.modal = '';
-			this.clear();
-			this.parameters = {};
-			$(window).off('resize', _center);
-			$('.modal-content').off('resize', _center);
-		}
-	};
-
-	// Dim the screen
-	this.dim = function () {
-		if (!$rootScope.modal) {
-			$('#nav-search-content input').attr('tabindex', -1);
-			$('.dim').addClass('dim-active');
-		}
-	};
-
-	// Clear the screen
-	this.clear = function () {
-		if (!$rootScope.modal) {
-			$('.dim').removeClass('dim-active');
-			$('#nav-search-content input').attr('tabindex', 1);
-		}
-	};
-
-	// Return whether the modal is shown or not
-	this.isShown = function (name) {
-		return $rootScope.modal === _getModalUrl(name);
-	};
+	// Loading services
+	var loader = {};
 
 	// Export methods
-	return this;
+	return {
+		start: function (name) {
+			loader[name] = true;
+			if (this.isLoading()) {
+				$('#loader').show();
+			}
+		},
+		stop: function (name) {
+			delete(loader[name]);
+			if (!this.isLoading()) {
+				$('#loader').hide();
+			}
+		},
+		isLoading: function (name) {
+			if (!name) {
+				return Object.keys(loader).length > 0;
+			}
+			return loader[name] === true;
+		}
+	};
 
-});
+})();
+
 
 /**
  * Download service
- */
+ *//*
 webApp.service('$download', function () {
 
 	// Return whether the modal is shown or not
@@ -539,32 +600,4 @@ webApp.service('$download', function () {
 	return this;
 
 });
-
-/**
- * Loader service, shows a loading icon
- */
-webApp.service('$loader', function ($rootScope) {
-
-	var loader = {};
-
-	this.start = function (name) {
-		loader[name] = true;
-		$rootScope.loading = this.isLoading();
-	};
-
-	this.stop = function (name) {
-		delete(loader[name]);
-		$rootScope.loading = this.isLoading();
-	};
-
-	this.isLoading = function (name) {
-		if (!name) {
-			return Object.keys(loader).length > 0;
-		}
-		return loader[name] === true;
-	};
-
-	// Export methods
-	return this;
-
-});
+*/
