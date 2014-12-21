@@ -34,7 +34,7 @@
 	<div class="navbar navbar-contacts">
 
 		<!-- Left menu icon -->
-		<div id="nav-menu"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
+		<div id="nav-menu"><span class="fa fa-navicon"></span><span id="nav-menu-title">All</span></div>
 
 		<!-- Right menu -->
 		<div id="nav-user">
@@ -73,16 +73,16 @@
 			</div>
 			<!-- User menu -->
 			<div id="user-menu" class="dropdown dropdown-right">
-				<img class="dropdown-button" ng-src="{{$root.user.image || 'images/user.png'}}">
+				<img class="dropdown-button" src="../global/images/user.png">
 				<ul class="dropdown-menu">
 					<div class="dropdown-arrow"></div>
 					<div class="dropdown-arrow-fill"></div>
 					<table>
 						<tr>
 							<td colspan="2" id="user-menu-info">
-								<img ng-src="{{$root.user.image || 'images/user.png'}}"><br>
-								<span id="user-menu-name">{{$root.user.firstName}} {{$root.user.lastName}}</span><br>
-								<span id="user-menu-mail">{{$root.user.mail}}</span>
+								<img src="../global/images/user.png"><br>
+								<span id="user-menu-name"></span><br>
+								<span id="user-menu-mail"></span>
 							</td>
 						</tr>
 						<tr>
@@ -109,20 +109,20 @@
 		<!-- Left menu -->
 		<div class="menu">
 			<!-- Items -->
-			<div id="menu-item-all" class="menu-item" ng-click="location = 'all'" ng-class="{'menu-item-active': location==='all'}"><span class="fa fa-th fa-lg"></span>All</div>
-			<div id="menu-item-Starred" class="menu-item" ng-click="location = 'Starred'" ng-class="{'menu-item-active': location==='Starred'}"><span class="fa fa-star fa-lg"></span>Starred</div>
-			<div id="menu-item-ungrouped" class="menu-item" ng-click="location = 'ungrouped'" ng-class="{'menu-item-active': location==='ungrouped'}"><span class="fa fa-question fa-lg"></span>Ungrouped</div>
+			<div id="menu-item-all" data-item="all" class="menu-item menu-item-active"><span class="fa fa-th fa-lg"></span>All</div>
+			<div id="menu-item-Starred" data-item="Starred" class="menu-item"><span class="fa fa-star fa-lg"></span>Starred</div>
+			<div id="menu-item-ungrouped" data-item="ungrouped" class="menu-item"><span class="fa fa-question fa-lg"></span>Ungrouped</div>
 			<div class="menu-separator"></div>
 			<div id="menu-item-{{group._id}}" class="menu-item" ng-repeat="group in contacts | filter:filterGroups" ng-click="$parent.location = group._id; $parent.groupName = group.name" ng-class="{'menu-item-active': $parent.location===group._id}"><span ng-class="group.icon" class="fa fa-lg"></span>{{group.name}}</div>
 			<div class="menu-separator"></div>
-			<div id="menu-item-trash" class="menu-item" ng-click="location = 'trash'" ng-class="{'menu-item-active': location==='trash'}"><span class="fa fa-trash fa-lg"></span>Trash</div>
+			<div id="menu-item-trash" data-item="trash" class="menu-item"><span class="fa fa-trash fa-lg"></span>Trash</div>
 			<!-- Sync status -->
 			<div class="menu-bottom">
 				<div id="menu-sync">
-					<div ng-show="$root.syncStatus == 'syncing'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-refresh fa-lg"></span>Syncing</div>
-					<div ng-show="$root.syncStatus == 'synced'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-check fa-lg"></span>Synced</div>
-					<div ng-show="$root.syncStatus == 'error'" ng-click="$root.syncStatus = 'stopped'"><span class="fa fa-warning fa-lg"></span>Sync error</div>
-					<div ng-show="$root.syncStatus == 'stopped'" ng-click="$root.syncStatus = 'syncing'"><span class="fa fa-warning fa-lg"></span>Sync stopped</div>
+					<div id="menu-sync-syncing"><span class="fa fa-refresh fa-lg"></span>Syncing</div>
+					<div id="menu-sync-synced"><span class="fa fa-check fa-lg"></span>Synced</div>
+					<div id="menu-sync-error"><span class="fa fa-warning fa-lg"></span>Sync error</div>
+					<div id="menu-sync-stopped"><span class="fa fa-warning fa-lg"></span>Sync stopped</div>
 				</div>
 			</div>
 		</div>
@@ -295,6 +295,7 @@
 	<script src="../global/scripts/classes.js"></script>
 	<script src="../global/scripts/resources.js"></script>
 	<script src="../global/scripts/services.js"></script>
+	<script src="../global/scripts/modals.js"></script>
 	<script src="../global/scripts/controllers.js"></script>
 	<!-- endbuild -->
 

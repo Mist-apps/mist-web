@@ -34,7 +34,7 @@
 	<div class="navbar navbar-notes">
 
 		<!-- Left menu icon -->
-		<div id="nav-menu"><span class="fa fa-navicon"></span><span id="nav-menu-title"></span></div>
+		<div id="nav-menu"><span class="fa fa-navicon"></span><span id="nav-menu-title">All</span></div>
 
 		<!-- Right menu -->
 		<div id="nav-user">
@@ -73,16 +73,16 @@
 			</div>
 			<!-- User menu -->
 			<div id="user-menu" class="dropdown dropdown-right">
-				<img class="dropdown-button" ng-src="{{$root.user.image || 'images/user.png'}}">
+				<img class="dropdown-button" src="../global/images/user.png">
 				<ul class="dropdown-menu">
 					<div class="dropdown-arrow"></div>
 					<div class="dropdown-arrow-fill"></div>
 					<table>
 						<tr>
 							<td colspan="2" id="user-menu-info">
-								<img ng-src="{{$root.user.image || 'images/user.png'}}"><br>
-								<span id="user-menu-name">{{$root.user.firstName}} {{$root.user.lastName}}</span><br>
-								<span id="user-menu-mail">{{$root.user.mail}}</span>
+								<img src="../global/images/user.png"><br>
+								<span id="user-menu-name"></span><br>
+								<span id="user-menu-mail"></span>
 							</td>
 						</tr>
 						<tr>
@@ -109,11 +109,11 @@
 		<!-- Left menu -->
 		<div class="menu">
 			<!-- Items -->
-			<div id="menu-item-all" ng-click="location = 'all'" ng-class="{'menu-item-active': location=='all'}" class="menu-item"><span class="fa fa-th fa-lg"></span>All</div>
-			<div id="menu-item-notes" ng-click="location = 'notes'" ng-class="{'menu-item-active': location=='notes'}" class="menu-item"><span class="fa fa-lightbulb-o fa-lg"></span>Notes</div>
-			<div id="menu-item-todo" ng-click="location = 'todo'" ng-class="{'menu-item-active': location=='todo'}" class="menu-item"><span class="fa fa-check fa-lg"></span>Todo lists</div>
+			<div id="menu-item-all" data-item="all" class="menu-item menu-item-active"><span class="fa fa-th fa-lg"></span>All</div>
+			<div id="menu-item-notes" data-item="notes" class="menu-item"><span class="fa fa-lightbulb-o fa-lg"></span>Notes</div>
+			<div id="menu-item-todo" data-item="todo" class="menu-item"><span class="fa fa-check fa-lg"></span>Todo lists</div>
 			<div class="menu-separator"></div>
-			<div id="menu-item-trash" ng-click="location = 'trash'" ng-class="{'menu-item-active': location=='trash'}" class="menu-item"><span class="fa fa-trash fa-lg"></span>Trash</div>
+			<div id="menu-item-trash" data-item="trash" class="menu-item"><span class="fa fa-trash fa-lg"></span>Trash</div>
 			<!-- Sync status -->
 			<div class="menu-bottom">
 				<div id="menu-sync">
@@ -209,6 +209,7 @@
 	<script src="../global/scripts/classes.js"></script>
 	<script src="../global/scripts/resources.js"></script>
 	<script src="../global/scripts/services.js"></script>
+	<script src="../global/scripts/modals.js"></script>
 	<script src="../global/scripts/controllers.js"></script>
 	<!-- endbuild -->
 

@@ -167,7 +167,6 @@ var stopEditTask = function ($event) {
 /**
  * Get Notes from API
  */
-var notes = [];
 var getNotes = function () {
 	notes = [];
 	LoaderService.start('getNotes');
@@ -233,6 +232,10 @@ var _checkNotesOrder = function () {
  * ===========================================================================================================================================
  */
 
+// Store the notes
+var notes = [];
+// Set the active menu item
+var activeMenuItem = 'all';
 // Get notes when session recovered
 recovered.done(getNotes);
 
@@ -250,20 +253,6 @@ recovered.done(getNotes);
  * Notes Controller
  *//*
 webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syncService, NotesWebService) {
-
-	/**
-	 * Left menu location
-	 *//*
-	$scope.location = 'all';
-	$scope.$watch('location', function () {
-		var interval = setInterval(function () {
-			var title = $('#menu-item-' + $scope.location).text();
-			if (title && $('#nav-menu-title').html() !== undefined) {
-				$('#nav-menu-title').html(title);
-				clearInterval(interval);
-			}
-		}, 10);
-	});
 
 	/**
 	 * Filter the notes from the menu selection

@@ -107,12 +107,38 @@ $('#user-menu-logout').click(function () {
 	}
 });
 
+/**
+ * Stop/start syncing when clicking on the "sync status" message.
+ */
+$('#menu-sync').children().click(function () {
+	if (SyncService.getSyncStatus() === 'stopped') {
+		SyncService.setSyncStatus('syncing');
+	} else {
+		SyncService.setSyncStatus('stopped');
+	}
+});
+
+/**
+ * Change the active menu item (left menu) on click.
+ */
+var activeMenuItem;
+$('.menu-item').click(function () {
+	// Set active menu item
+	activeMenuItem = $(this).data('item');
+	$('.menu-item').removeClass('menu-item-active');
+	$('#menu-item-' + activeMenuItem).addClass('menu-item-active');
+	// Set menu title
+	var title = $('#menu-item-' + activeMenuItem).text();
+	$('#nav-menu-title').html(title);
+});
+
 
 /**
  * ===========================================================================================================================================
  * Execution flow
  * ===========================================================================================================================================
  */
+
 
 // Save recovering state
 var _deferred = $.Deferred();
@@ -138,4 +164,15 @@ AuthService.recover().then(function () {
 	// Failed
 	LoaderService.stop('recoverSession');
 	_deferred.reject();
+});
+
+
+// Populate user data
+recovered.done(function () {
+	var user = Session.getUser();
+	if (user.image) {
+		$('#user-menu img').attr('src', user.image);
+	}
+	$('#user-menu-name').html(user.firstName + ' ' + user.lastName);
+	$('#user-menu-mail').html(user.mail);
 });

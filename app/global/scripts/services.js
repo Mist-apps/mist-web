@@ -162,6 +162,14 @@ var ModalService = (function () {
 		return 'modals/' + name + '.html';
 	};
 
+	var _getModalController = function (name) {
+		if (name.indexOf('global-') === 0) {
+			name = name.substring(7)
+			return name.charAt(0).toUpperCase() + name.slice(1) + 'Controller';
+		}
+		return name.charAt(0).toUpperCase() + name.slice(1) + 'Controller';
+	}
+
 	// Center the modal
 	var _center = function () {
 		// Get window height without 2 * 10px for dialog box margin
@@ -183,9 +191,13 @@ var ModalService = (function () {
 				parameters = params;
 			}
 			dim();
-			modal = _getModalUrl(name);
-			$.get(modal).done(function (html) {
+			modal = name;
+			$.get(_getModalUrl(modal)).done(function (html) {
+				// Show modal
 				$('#modal-container').empty().append(html);
+				// Execute controller
+				window[_getModalController(name)]();
+				// Center the modal
 				_center();
 				$(window).on('resize', _center);
 				$('.modal-content').on('resize', _center);
@@ -201,6 +213,7 @@ var ModalService = (function () {
 			modal = '';
 			clear();
 			parameters = {};
+			$('#modal-container').empty();
 			// Stop center the modal
 			$(window).off('resize', _center);
 			$('.modal-content').off('resize', _center);
@@ -258,6 +271,8 @@ var SyncService = (function () {
 	};
 	var setSyncStatus = function (newSyncStatus) {
 		syncStatus = newSyncStatus;
+		$('#menu-sync').children().hide();
+		$('#menu-sync-' + syncStatus).show();
 	};
 
 	/**

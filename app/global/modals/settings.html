@@ -1,4 +1,4 @@
-<div id="modal-global-settings" class="modal" ng-controller="SettingsController">
+<div id="modal-global-settings" class="modal">
 
 	<!-- Header -->
 	<div class="modal-header">
@@ -12,15 +12,15 @@
 		<table>
 			<tr>
 				<td>First name: </td>
-				<td><input type="text" class="form-input" placeholder="First name" tabindex="1" ng-model="tmpUser.firstName"></td>
+				<td><input type="text" class="form-input" placeholder="First name" tabindex="1" name="firstName"></td>
 			</tr>
 			<tr>
 				<td>Last name: </td>
-				<td><input type="text" class="form-input" placeholder="Last name" tabindex="1" ng-model="tmpUser.lastName"></td>
+				<td><input type="text" class="form-input" placeholder="Last name" tabindex="1" name="lastName"></td>
 			</tr>
 			<tr>
 				<td>E-mail: </td>
-				<td><input type="text" class="form-input" placeholder="E-mail" tabindex="1" ng-model="tmpUser.mail"></td>
+				<td><input type="text" class="form-input" placeholder="E-mail" tabindex="1" name="mail"></td>
 			</tr>
 		</table>
 		<br><br>
@@ -28,11 +28,11 @@
 		<table>
 			<tr>
 				<td>Password: </td>
-				<td><input type="password" class="form-input" placeholder="Password" tabindex="1" ng-model="tmpUser.password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"></td>
+				<td><input type="password" class="form-input" placeholder="Password" tabindex="1" name="password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"></td>
 			</tr>
 			<tr>
 				<td>Re-type password: </td>
-				<td><input type="password" class="form-input" placeholder="Re-type password" tabindex="1" ng-model="tmpUser.password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}"></td>
+				<td><input type="password" class="form-input" placeholder="Re-type password" tabindex="1" name="password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}"></td>
 			</tr>
 		</table>
 		<br><br>
@@ -43,7 +43,7 @@
 		</div>
 		<div id="image-preview">
 			<img />
-			<span class="fa fa-2x fa-trash" ng-click="remove();"></span>
+			<span class="fa fa-2x fa-trash"></span>
 		</div>
 		<input id="user-image-input" type="file" tabindex="1" onchange="angular.element(this).scope().upload();">
 		<canvas id="image-canvas"></canvas>
@@ -51,8 +51,8 @@
 
 	<!-- Footer -->
 	<div class="modal-footer">
-		<button tabindex="1" ng-click="cancel();">Cancel</button>
-		<button tabindex="1" ng-click="save();">Save</button>
+		<button id="modal-button-cancel" tabindex="1">Cancel</button>
+		<button id="modal-button-save" tabindex="1">Save</button>
 	</div>
 
 </div>
