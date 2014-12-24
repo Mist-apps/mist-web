@@ -1,136 +1,217 @@
 'use strict';
 
 
+/*
+ * ===================================================
+ * Start/Stop the editor
+ * ===================================================
+ */
+
+
+/**
+ * Start editing a note
+ */
+var startEditNote = function (event) {
+	if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
+		// Add menu
+		var menu = $(menuPartial);
+		var color = $(this).data('resource').color;
+		color = color ? color : 'white';
+		menu.find('[data-color=' + color + ']').addClass('fa-check-square');
+		$(this).append(menu);
+		// Set tabindex
+		$(this).find('.note-title').attr('tabindex', 1);
+		$(this).find('.note-content').attr('tabindex', 1);
+		$(this).find('.note-task-content').attr('tabindex', 1);
+		$(this).find('button').attr('tabindex', 1);
+		// Show editor
+		ModalService.dim();
+		$(this).addClass('note-edit');
+		// Remove drag and drop zone
+		$(this).find('.drag-drop-zone').hide();
+		// Remove the binding to start a new edit
+		$('body').off('click', startEditNote);
+		// Listen to escape key
+		$('body').on('keydown', _escapeKeyListener);
+		// Listen to clicks on dim
+		$('.dim').on('click', stopEditNotes);
+	}
+};
+
+/**
+ * Stop editing the notes
+ */
+var stopEditNotes = function (event) {
+	// Stop focusing the element
+	if (event) {
+		$(event.target).blur();
+	}
+	// Remove notes tabindex
+	$('.note-title').attr('tabindex', -1);
+	$('.note-content').attr('tabindex', -1);
+	$('.note-task-content').attr('tabindex', -1);
+	$('.note button').attr('tabindex', -1);
+	// Remove editor
+	ModalService.clear();
+	$('.note').removeClass('note-edit');
+	$('.note-menu').remove();
+	// Add drag and drop zone
+	$('.drag-drop-zone').show();
+	// Rebind the listener to start edit a note
+	$('body').on('click', '.note', startEditNote);
+	// Remove the binding to listen to escape key
+	$('body').off('keydown', _escapeKeyListener);
+	// Remove the binding to listen to clicks on dim
+	$('.dim').off('click', stopEditNotes);
+};
+
+/**
+ * Custom listeners
+ */
+var _escapeKeyListener = function (event) {
+	if (event.which === 27) {
+		stopEditNotes(event);
+	}
+};
+
+// Listen to clicks on note to start edit it
+$('body').on('click', '.note', startEditNote);
+$('body').on('click', '.note-menu button', stopEditNotes);
+
+
+/*
+ * ===================================================
+ * Editor behaviour
+ * ===================================================
+ */
+
+
 /**
  * Check and uncheck a task in a todo list
  */
-var toggleTaskDone = function (note, task) {
+$('body').on('click', '.note-task-icon', function (event) {
 	// Toggle
-	task.done = !task.done;
-	// Set modification date
-	note.modificationDate = new Date().getTime();
+	$(this).parent().toggleClass('note-task-done');
 	// Inform sync service
-	syncService.updateResource('NOTE', note);
-};
+	SyncService.updateResource('NOTE', $(this).closest('.note').data('resource'));
+});
 
 /**
  * Listen to key events on the note titles
  */
-var titleKeyListener = function ($event, note) {
+$('body').on('keydown', '.note-title', function (event) {
 	// "ENTER" key
-	if ($event.keyCode === 13) {
-		var next = $($event.target).next();
+	if (event.keyCode === 13) {
+		var next = $(this).next();
 		// Go to content
 		if (next.hasClass('note-content')) {
 			next.focus();
 		}
 		// Go to task
 		else if (next.hasClass('note-tasks')) {
-			next.find('.note-task-content').focus();
+			next.find('.note-task-content').first().focus();
 		}
 		// Stop key default behaviour
-		$event.preventDefault();
+		event.preventDefault();
 	}
-	// Inform sync service and set modification time if necessary
-	if (!_keyMustBeIgnored($event.keyCode)) {
-		note.modificationDate = new Date().getTime();
-		syncService.updateResource('NOTE', note);
+	// Inform sync service if necessary
+	else if (!_keyMustBeIgnored(event.keyCode)) {
+		SyncService.updateResource('NOTE', $(this).closest('.note').data('resource'));
 	}
-};
+});
 
 /**
  * Listen to key events on the note contents
  */
-var contentKeyListener = function ($event, note) {
-	// Inform sync service and set modification time if necessary
-	if (!_keyMustBeIgnored($event.keyCode)) {
-		note.modificationDate = new Date().getTime();
-		syncService.updateResource('NOTE', note);
+$('body').on('keydown', '.note-content', function (event) {
+	// Inform sync service if necessary
+	if (!_keyMustBeIgnored(event.keyCode)) {
+		SyncService.updateResource('NOTE', $(this).closest('.note').data('resource'));
 	}
-};
+});
 
 /**
  * Listen for key events on the task contents
  */
-var taskKeyListener = function ($event, note, index) {
-	var target = $($event.target);
-	var tasks = note.tasks;
-
+$('body').on('keydown', '.note-task-content', function (event) {
+	var target = $(this);
+	var resource = target.closest('.note').data('resource');
 	// "ENTER" key
-	if ($event.keyCode === 13) {
+	if (event.keyCode === 13) {
 		// Get two parts of the task
 		var start = target.val().substring(0, target.prop('selectionStart'));
 		var end = target.val().substring(target.prop('selectionEnd'));
-		// Update model
-		tasks[index].content = start;
-		tasks.splice(index + 1, 0, {done: false, content: end});
+		// Update and add views
+		target.val(start);
+		var next = $(taskPartial);
+		target.parent().after(next);
+		next.find('.note-task-content').val(end).focusStart();
 		// Stop key default behaviour
-		$event.preventDefault();
-		// Wait rendering to go to the created task
-		$timeout(function () {
-			target.change();
-			target.parent().next().find('.note-task-content').focusStart();
-		});
+		event.preventDefault();
 	}
 	// "DOWN" key
-	else if ($event.which === 40) {
+	else if (event.which === 40) {
 		if (target.isCursorOnEndOfTask() && target.parent().next().length) {
-			// Focus out of the digest, because focus has a callback
-			$timeout(function () {
-				target.parent().next().find('.note-task-content').focusStart();
-			});
-			$event.preventDefault();
+			target.parent().next().find('.note-task-content').focusStart();
+			event.preventDefault();
 		}
 	}
 	// "UP" key
-	else if ($event.which === 38) {
+	else if (event.which === 38) {
 		if (target.isCursorOnStartOfTask() && target.parent().prev().length) {
-			// Focus out of the digest, because focus has a callback
-			$timeout(function () {
-				target.parent().prev().find('.note-task-content').focusEnd();
-			});
-			$event.preventDefault();
+			target.parent().prev().find('.note-task-content').focusEnd();
+			event.preventDefault();
 		}
 	}
 	// "BACKSPACE" key
-	else if ($event.which === 8) {
+	else if (event.which === 8) {
+		var prev = target.parent().prev();
 		// If there is a previous task, and the cursor is on the start of the task
-		if (target.isCursorOnStartOfTask() && target.parent().prev().length) {
-			// Move caret position after rendering
-			var pos = tasks[index - 1].content.length;
-			var elem = target.parent().prev().find('.note-task-content');
-			$timeout(function() {
-				elem.focusPosition(pos);
-			});
+		if (target.isCursorOnStartOfTask() && prev.length) {
+			var prevContent = prev.find('.note-task-content');
+			var pos = prevContent.val().length;
 			// Merge the two tasks
-			tasks[index - 1].content += tasks[index].content;
-			tasks.splice(index, 1);
+			prevContent.val(prevContent.val() + target.val());
+			target.parent().remove();
+			// Move caret position and resize the input
+			prevContent.trigger('input');
+			prevContent.focusPosition(pos);
 			// Stop key default behaviour
-			$event.preventDefault();
+			event.preventDefault();
 		}
 	}
 	// "DELETE" key
-	else if ($event.which === 46) {
+	else if (event.which === 46) {
+		var next = target.parent().next();
 		// If there is a next task, and the cursor is on the end of the task
-		if (target.isCursorOnEndOfTask() && target.parent().next().length) {
-			// Move caret position after rendering
-			var pos = tasks[index].content.length;
-			$timeout(function() {
-				target.focusPosition(pos);
-			});
+		if (target.isCursorOnEndOfTask() && next.length) {
+			var pos = target.val().length;
 			// Merge the two tasks
-			tasks[index].content += tasks[index + 1].content;
-			tasks.splice(index + 1, 1);
+			target.val(target.val() + next.find('.note-task-content').val());
+			next.remove();
+			// Move caret position and resize the input
+			target.trigger('input');
+			target.focusPosition(pos);
 			// Stop key default behaviour
-			$event.preventDefault();
+			event.preventDefault();
 		}
 	}
-	// Inform sync service and set modification time if necessary
-	if (!_keyMustBeIgnored($event.keyCode)) {
-		note.modificationDate = new Date().getTime();
-		syncService.updateResource('NOTE', note);
+	// Inform sync service if necessary
+	if (!_keyMustBeIgnored(event.keyCode)) {
+		SyncService.updateResource('NOTE', resource);
 	}
-};
+});
+
+/**
+ * Resize automatically the notes
+ */
+$('body').on('change input', 'textarea', function () {
+	// Resize the element
+	this.style.height = 'auto';
+	this.style.height = this.scrollHeight + 'px';
+	// Refresh grid layout
+	masonry.draw();
+});
 
 /**
  * Check whether the key must be ignored or not for informing
@@ -152,16 +233,56 @@ var _keyMustBeIgnored = function (keyCode) {
 /**
  * Start editing task
  */
-var startEditTask = function ($event) {
-	$($event.target).parent().addClass('note-task-edit');
-};
+$('body').on('focus', '.note-task-content', function () {
+	$(this).parent().addClass('note-task-edit');
+});
 
 /**
  * Stop editing task
  */
-var stopEditTask = function ($event) {
-	$($event.target).parent().removeClass('note-task-edit');
-};
+$('body').on('blur', '.note-task-content', function () {
+	$(this).parent().removeClass('note-task-edit');
+});
+
+
+/*
+ * ===================================================
+ * Miscellaneous
+ * ===================================================
+ */
+
+
+/**
+ * Method for the SyncService, to sync the note view with the resource
+ */
+var _syncNote = function (note) {
+	note.title = note.__view.find('.note-title').val();
+	if (!note.tasks) {
+		note.content = note.__view.find('.note-content').val();
+	} else {
+		note.tasks = [];
+		note.__view.find('.note-task').each(function () {
+			note.tasks.push({
+				done: 		$(this).hasClass('note-task-done'),
+				content: 	$(this).find('.note-task-content').val()
+			});
+		})
+	}
+}
+
+/**
+ * On clicking on the left menu, refresh the notes
+ */
+$('.menu-item').click(function () {
+	_showNotes();
+});
+
+
+/*
+ * ===================================================
+ * Retrieve notes and show them
+ * ===================================================
+ */
 
 
 /**
@@ -176,6 +297,10 @@ var getNotes = function () {
 		} else {
 			notes = data;
 			_checkNotesOrder();
+			_.each(notes, _prepareNote);
+			var now = _.now();
+			_showNotes();
+			console.log(_.now() - now);
 		}
 		LoaderService.stop('getNotes');
 	});
@@ -223,27 +348,274 @@ var _checkNotesOrder = function () {
 		}
 		i++;
 	}
+	// Sort the notes
+	notes = _.sortBy(notes, 'order');
+};
+
+/**
+ * Prepare one note with it's DOM view and it's sync function.
+ */
+var _prepareNote = function (note) {
+	// Create DOM element, and bind it
+	var item = $(notePartial);
+	note.__view = item;
+	note.__sync = _syncNote;
+	// Set data to bind the resource
+	item.data('resource', note);
+	// Set color
+	if (note.color) {
+		item.addClass('note-' + note.color);
+	}
+	// Set title
+	$('.note-title', item).val(note.title);
+	// If note
+	if (!note.tasks) {
+		$('.note-content', item).val(note.content);
+		$('.note-tasks', item).remove();
+	}
+	// If todo list
+	else {
+		// Remove the initial task and reuse it for each task
+		$('.note-content', item).remove();
+		var task = $(taskPartial);
+		var tasks = $('.note-tasks', item);
+		// For each task
+		for (var i in note.tasks) {
+			var clone = task.clone();
+			if (note.tasks[i].done) {
+				clone.addClass('note-task-done');
+			}
+			$('.note-task-content', clone).val(note.tasks[i].content);
+			tasks.append(clone);
+		}
+	}
+}
+
+/**
+ * Show the notes on the page
+ */
+var _showNotes = function () {
+	// Remove old notes
+	var container = $('#notes-container');
+	container.children().detach();
+	// Filter the notes
+	var filtered = [];
+	switch (activeMenuItem) {
+		case 'all':		filtered = _.filter(notes, function (item) {return !item.deleteDate});
+						break;
+		case 'notes':	filtered = _.filter(notes, function (item) {return !item.deleteDate && !item.tasks});
+						break;
+		case 'todo':	filtered = _.filter(notes, function (item) {return !item.deleteDate && item.tasks});
+						break;
+		case 'trash':	filtered = _.filter(notes, function (item) {return !!item.deleteDate});
+						break;
+		default:		toastr.error('Unknown menu item');
+						break;
+	}
+	// If there are notes to shown
+	if (filtered.length > 0) {
+		// Remove the "No notes" message
+		$('#nothing-message').hide();
+		// Show each note
+		for (var i in filtered) {
+			container.append(filtered[i].__view);
+			filtered[i].__view.find('textarea').change();
+			masonry.draw();
+		}
+	} else {
+		// Show the "No notes" message
+		$('#nothing-message').show();
+	}
+};
+
+/**
+ * Show the note on the page, or hide it if it must not be shown
+ */
+var _showHideNote = function (note) {
+	switch (activeMenuItem) {
+		case 'all':		!note.deleteDate ? $('#notes-container').append(note.__view) : note.__view.detach();
+						break;
+		case 'notes':	!note.deleteDate && !note.tasks ? $('#notes-container').append(note.__view) : note.__view.detach();
+						break;
+		case 'todo':	!note.deleteDate && note.tasks ? $('#notes-container').append(note.__view) : note.__view.detach();
+						break;
+		case 'trash':	!!note.deleteDate ? $('#notes-container').append(note.__view) : note.__view.detach();
+						break;
+		default:		toastr.error('Unknown menu item');
+						break;
+	}
+	masonry.draw();
 };
 
 
-/**
- * ===========================================================================================================================================
- * Execution flow
- * ===========================================================================================================================================
+/*
+ * ===================================================
+ * Right menu management
+ * ===================================================
  */
+
+
+/**
+ * Add a new empty note
+ */
+$('#add-menu-note').click(function () {
+	// Add new note
+	var date = new Date().getTime();
+	var tmpId = '' + date + Math.floor(Math.random() * 1000000);
+	var order = notes.length + 1;
+	var note = {tmpId: tmpId, title: '', content: '', creationDate: date, order: order};
+	notes.push(note);
+	_prepareNote(note);
+	_showHideNote(note);
+	// Inform sync service
+	SyncService.newResource('NOTE', note);
+});
+
+/**
+ * Add a new empty todo list
+ */
+$('#add-menu-todo').click(function () {
+	// Add new todo list
+	var date = new Date().getTime();
+	var tmpId = '' + date + Math.floor(Math.random() * 1000000);
+	var order = notes.length + 1;
+	var note = {tmpId: tmpId, title: '', tasks: [{content: '', done: false}], creationDate: date, order: order};
+	notes.push(note);
+	_prepareNote(note);
+	_showHideNote(note);
+	// Inform sync service
+	SyncService.newResource('NOTE', note);
+});
+
+/**
+ * Import/Export
+ */
+$('#add-menu-import').click(function () {
+	ModalService.show('import');
+});
+
+
+/*
+ * ===================================================
+ * Note menu buttons
+ * ===================================================
+ */
+
+
+/**
+ * Delete a note
+ */
+$('body').on('click', '#note-menu-delete', function () {
+	// Update note
+	var note = $(this).closest('.note').data('resource');
+	note.deleteDate = _.now();
+	// Stop edit the note
+	stopEditNotes();
+	// Show or hide the note
+	_showHideNote(note);
+	// Inform sync service
+	SyncService.updateResource('NOTE', note);
+});
+
+/**
+ * Delete definitively a note
+ */
+$('body').on('click', '#note-menu-destroy', function () {
+	// Remove note
+	var note = $(this).closest('.note').data('resource');
+	_showHideNote(note);
+	$(this).closest('.note').remove();
+	// Search for note to delete
+	for (var key in notes) {
+		// If the note has an id, search if id match, else, search if tmpId match
+		if ((note._id && notes[key]._id === note._id) || (!note._id && notes[key].tmpId === note.tmpId)) {
+			notes.splice(key, 1);
+			break;
+		}
+	}
+	// Pack the order numbers
+	for (var key in notes) {
+		if (notes[key].order > note.order) {
+			// Change order number
+			notes[key].order--;
+			// Inform sync service
+			SyncService.updateResource('NOTE', notes[key]);
+		}
+	}
+	// Stop edit the note
+	stopEditNotes();
+	// Inform sync service
+	SyncService.deleteResource('NOTE', note);
+});
+
+/**
+ * Restore a deleted note
+ */
+$('body').on('click', '#note-menu-restore', function () {
+	// Update note
+	var note = $(this).closest('.note').data('resource');
+	delete note.deleteDate;
+	// Stop edit the note
+	stopEditNotes();
+	// Show or hide the note
+	_showHideNote(note);
+	// Inform sync service
+	SyncService.updateResource('NOTE', note);
+});
+
+/**
+ * Change color of note
+ */
+$('body').on('click', '.note-menu ul .fa', function () {
+	var view = $(this).closest('.note');
+	var note = view.data('resource');
+	// Update button
+	$(this).removeClass('fa-square').addClass('fa-check-square');
+	$(this).siblings('.fa').removeClass('fa-check-square').addClass('fa-square');
+	// Update note color
+	view.removeClass('note-' + note.color)
+	note.color = $(this).data('color');
+	view.addClass('note-' + note.color);
+	// Inform sync service
+	SyncService.updateResource('NOTE', note);
+});
+
+
+/*
+ * ===================================================
+ * Execution flow
+ * ===================================================
+ */
+
 
 // Store the notes
 var notes = [];
 // Set the active menu item
 var activeMenuItem = 'all';
+// Initialize Masonry
+var masonry = new Masonry($('#notes-container').get(0));
+$('body').on('mousedown', '.drag-drop-zone', masonry.dragStart);
+$('body').on('mouseup', '.drag-drop-zone', function (event) {
+	masonry.dragEnd(event);
+	masonry.draw();
+});
 // Get notes when session recovered
 recovered.done(getNotes);
 
-
-
-
-
-
+// Load partials
+// TODO be sure it is done before get notes...
+var notePartial;
+var menuPartial;
+var taskPartial;
+$.get('partials/note.html').done(function (html) {
+	notePartial = html;
+});
+$.get('partials/note-menu.html').done(function (html) {
+	menuPartial = html;
+});
+$.get('partials/note-task.html').done(function (html) {
+	taskPartial = html;
+});
 
 
 
@@ -253,187 +625,6 @@ recovered.done(getNotes);
  * Notes Controller
  *//*
 webApp.controller('NotesCtrl', function ($scope, $rootScope, $modal, toastr, syncService, NotesWebService) {
-
-	/**
-	 * Filter the notes from the menu selection
-	 *//*
-	$scope.filterNotes = function (value) {
-		if ($scope.location === 'all') {
-			return !value.deleteDate;
-		} else if ($scope.location === 'notes') {
-			return !value.deleteDate && !value.tasks;
-		} else if ($scope.location === 'todo') {
-			return !value.deleteDate && value.tasks;
-		} else if ($scope.location === 'trash') {
-			return value.deleteDate;
-		} else {
-			return false;
-		}
-	};
-
-	/**
-	 * Add a new empty note
-	 *//*
-	$scope.addNewNote = function () {
-		// Add new note
-		var date = new Date().getTime();
-		var tmpId = '' + date + Math.floor(Math.random() * 1000000);
-		var order = $scope.notes.length + 1;
-		var note = {tmpId: tmpId, title: '', content: '', creationDate: date, order: order};
-		$scope.notes.push(note);
-		// Inform sync service
-		syncService.newResource('NOTE', note);
-	};
-
-	/**
-	 * Add a new empty todo list
-	 *//*
-	$scope.addNewTodo = function () {
-		// Add new todo list
-		var date = new Date().getTime();
-		var tmpId = '' + date + Math.floor(Math.random() * 1000000);
-		var order = $scope.notes.length + 1;
-		var note = {tmpId: tmpId, title: '', tasks: [{content: '', done: false}], creationDate: date, order: order};
-		$scope.notes.push(note);
-		// Inform sync service
-		syncService.newResource('NOTE', note);
-	};
-
-	/**
-	 * Delete a note
-	 *//*
-	$scope.deleteNote = function (note) {
-		// Update note
-		note.deleteDate = new Date().getTime();
-		// Stop edit the note
-		$scope.stopEditNotes();
-		// Inform sync service
-		syncService.updateResource('NOTE', note);
-	};
-
-	/**
-	 * Delete definitively a note
-	 *//*
-	$scope.destroyNote = function (note) {
-		// Search for note to delete
-		for (var key in $scope.notes) {
-			// If the note has an id, search if id match, else, search if tmpId match
-			if ((note._id && $scope.notes[key]._id === note._id) || (!note._id && $scope.notes[key].tmpId === note.tmpId)) {
-				$scope.notes.splice(key, 1);
-				break;
-			}
-		}
-		// Pack the order numbers
-		for (var key in $scope.notes) {
-			if ($scope.notes[key].order > note.order) {
-				// Change order number
-				$scope.notes[key].order--;
-				// Inform sync service
-				syncService.updateResource('NOTE', $scope.notes[key]);
-			}
-		}
-		// Stop edit the note
-		$scope.stopEditNotes();
-		// Inform sync service
-		syncService.deleteResource('NOTE', note);
-	};
-
-	/**
-	 * Restore a deleted note
-	 *//*
-	$scope.restoreNote = function (note) {
-		// Update note
-		delete(note.deleteDate);
-		// Stop edit the note
-		$scope.stopEditNotes();
-		// Inform sync service
-		syncService.updateResource('NOTE', note);
-	};
-
-	/**
-	 * Change color of note
-	 *//*
-	$scope.setColor = function (note, color) {
-		// Set the color
-		note.color = color;
-		// Inform sync service
-		syncService.updateResource('NOTE', note);
-	}
-
-	/**
-	 * Start editing a note
-	 *//*
-	$scope.startEditNote = function (event) {
-		if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
-			// Set tabindex
-			$(this).find('.note-title').attr('tabindex', 1);
-			$(this).find('.note-content').attr('tabindex', 1);
-			$(this).find('.note-task-content').attr('tabindex', 1);
-			$(this).find('button').attr('tabindex', 1);
-			// Show editor
-			$modal.dim();
-			$(this).addClass('note-edit');
-			$(this).find('.note-menu').addClass('note-menu-active');
-			// Remove drag and drop zone
-			$(this).find('.drag-drop-zone').hide();
-			// Remove the binding to start a new edit
-			$('body').off('click', $scope.startEditNote);
-			// Listen to escape key
-			$('body').on('keydown', _escapeKeyListener);
-			// Listen to clicks on dim
-			$('.dim').on('click', $scope.stopEditNotes);
-			// Reorganize grid
-			$rootScope.masonry.draw();
-		}
-	};
-
-	/**
-	 * Stop editing the notes
-	 *//*
-	$scope.stopEditNotes = function (event) {
-		// Stop focusing the element
-		if (event) {
-			$(event.target).blur();
-		}
-		// Remove notes tabindex
-		$('.note-title').attr('tabindex', -1);
-		$('.note-content').attr('tabindex', -1);
-		$('.note-task-content').attr('tabindex', -1);
-		$('.note button').attr('tabindex', -1);
-		// Remove editor
-		$modal.clear();
-		$('.note').removeClass('note-edit');
-		$('.note-menu').removeClass('note-menu-active');
-		// Add drag and drop zone
-		$('.drag-drop-zone').show();
-		// Rebind the listener to start edit a note
-		$('body').on('click', '.note', $scope.startEditNote);
-		// Remove the binding to listen to escape key
-		$('body').off('keydown', _escapeKeyListener);
-		// Remove the binding to listen to clicks on dim
-		$('.dim').off('click', $scope.stopEditNotes);
-		// Reorganize grid
-		$rootScope.masonry.draw();
-	};
-
-	// Listen to clicks on note to start edit it
-	$('body').on('click', '.note', $scope.startEditNote);
-
-	/**
-	 * Custom listeners
-	 *//*
-	var _escapeKeyListener = function (event) {
-		if (event.which === 27) {
-			$scope.stopEditNotes(event);
-		}
-	};
-
-	/**
-	 * Import/Export
-	 *//*
-	$scope.importExport = function () {
-		$modal.show('notes-import');
-	};
 
 	/**
 	 * Move the note after the "previous" note.

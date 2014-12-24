@@ -1,0 +1,16 @@
+<!-- Notes view -->
+<div class="note" ng-class="'note-' + (note.color || 'white')">
+
+	<!-- Drag and drop zone -->
+	<div class="drag-drop-zone" ng-mouseup="$root.masonry.dragEnd($event, moveNote);"></div>
+
+	<!-- Title -->
+	<input class="note-title" type="text" placeholder="Title" tabindex="-1" />
+
+	<!-- If note, print contents -->
+	<textarea class="note-content" rows="1" placeholder="Note" tabindex="-1"></textarea>
+
+	<!-- If todo list, print tasks -->
+	<div class="note-tasks"></div>
+
+</div>

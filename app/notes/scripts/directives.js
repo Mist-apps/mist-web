@@ -20,33 +20,3 @@ webApp.directive('resize', function ($timeout, $rootScope) {
 		}
 	};
 });
-
-/**
- * Manage grid
- */
-webApp.directive('grid', function ($rootScope) {
-	return {
-		restrict: 'A',
-		link: function(scope, element, attrs) {
-			// Create masonry object
-			$rootScope.masonry = new Masonry(element[0]);
-		}
-	};
-});
-
-/**
- * Grid elements
- */
-webApp.directive('gridItem', function ($rootScope) {
-	return {
-		restrict: 'A',
-		link: function(scope, element, attrs) {
-			// Refresh layout when item destroyed
-			scope.$on('$destroy', function () {
-				$rootScope.masonry.draw();
-			});
-			// Refresh the grid when item added
-			$rootScope.masonry.draw();
-		}
-	};
-});

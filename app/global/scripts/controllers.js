@@ -132,6 +132,20 @@ $('.menu-item').click(function () {
 	$('#nav-menu-title').html(title);
 });
 
+/**
+ * Populate the user fields
+ */
+var populateUser = function () {
+	var user = Session.getUser();
+	if (user.image) {
+		$('#user-menu img').attr('src', user.image);
+	} else {
+		$('#user-menu img').attr('src', '../global/images/user.png');
+	}
+	$('#user-menu-name').html(user.firstName + ' ' + user.lastName);
+	$('#user-menu-mail').html(user.mail);
+};
+
 
 /**
  * ===========================================================================================================================================
@@ -168,11 +182,4 @@ AuthService.recover().then(function () {
 
 
 // Populate user data
-recovered.done(function () {
-	var user = Session.getUser();
-	if (user.image) {
-		$('#user-menu img').attr('src', user.image);
-	}
-	$('#user-menu-name').html(user.firstName + ' ' + user.lastName);
-	$('#user-menu-mail').html(user.mail);
-});
+recovered.done(populateUser);

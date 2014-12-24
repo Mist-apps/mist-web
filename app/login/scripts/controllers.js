@@ -15,8 +15,6 @@ $('form').on('submit', function () {
 	AuthService.login(credentials).then(
 		// If login success
 		function () {
-			// Initialize sync service
-			// TODO syncService.init();
 			// Go to home
 			location.replace('/notes');
 		},

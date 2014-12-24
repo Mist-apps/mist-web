@@ -507,6 +507,7 @@ body {
 	color: #FFF;
 	text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 	cursor: default;
+	display: none;
 
 		span {
 			font-size: 100px;
@@ -514,7 +515,6 @@ body {
 }
 
 #loader {
-	display: none;
 	position: absolute;
 	top: 80px;
 	width: 100%;
@@ -669,7 +669,6 @@ textarea {
 
 .form-input-error {
 	border-color: #DB4437;
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 6px #DB4437;
 }
 
 .drag-drop-zone {

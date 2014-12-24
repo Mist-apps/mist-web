@@ -11,11 +11,11 @@ $.ajaxSetup({
 	statusCode: {
 		401: function () {
 			// If we were authenticated, show modal (does nothing if already shown)
-			if (!!Session.token) {
+			if (AuthService.isAuthenticated()) {
 				ModalService.show('global-login');
 			}
-			// If we were not authenticated, redirect to login form
-			else {
+			// If we were not authenticated, and not on a login page, redirect to login form
+			else if (location.pathname !== '/login/' && !ModalService.isShown('global-login')) {
 				location.replace('/login');
 			}
 			// Logout the user properly (delete token, user...)

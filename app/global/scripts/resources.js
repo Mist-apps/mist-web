@@ -43,3 +43,23 @@ UserResource.login = function (credentials, success, error) {
 		error:			error
 	});
 };
+
+/**
+ * Update the user, no need to give the id, it is retrieved by the session.
+ *
+ * @param data the data to insert
+ * @param success(data, textStatus, jqXHR)
+ * @param error(jqXHR, textStatus, errorThrown)
+ */
+UserResource.update = function (data, success, error) {
+	$.ajax({
+		url:			API_URL + this.path,
+		type:			'PUT',
+		headers:		{'API-Token': Session.getToken()},
+		data:			JSON.stringify(data),
+		contentType:	'application/json; charset=utf-8',
+		processData:	false,
+		success:		success,
+		error:			error
+	});
+};

@@ -46,7 +46,7 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
  * Miscellaneous
  */
 
-#grid-container {
+#notes-container {
 	position: relative;
 	margin: auto;
 }
@@ -195,11 +195,12 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 .note-menu {
 
 	background-color: rgba(0, 0, 0, 0.15);
-	height: 0px;
+	height: 40px;
 	width: 100%;
+	line-height: 40px;
+	vertical-align: middle;
 	position: relative;
 	left: 0px;
-	display: none;
 	transition-duration: 0.3s;
 	transition-property: height;
 	transition-timing-function: linear;
@@ -253,13 +254,6 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 
 }
 
-.note-menu-active {
-	height: 40px;
-	line-height: 40px;
-	display: block;
-	vertical-align: middle;
-}
-
 
 /**
  * Notes editor
@@ -305,27 +299,27 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
  * Note menu colors
  */
 
-.note-menu-white {
-	color: #B8C4C9;
+.note-menu .fa[data-color="white"] {
+	color: #EEEEEE;
 }
-.note-menu-red {
+.note-menu .fa[data-color="red"] {
 	color: #FF6D3F;
 }
-.note-menu-orange {
+.note-menu .fa[data-color="orange"] {
 	color: #FF9B00;
 }
-.note-menu-yellow {
+.note-menu .fa[data-color="yellow"] {
 	color: #FFDA00;
 }
-.note-menu-green {
+.note-menu .fa[data-color="green"] {
 	color: #95D641;
 }
-.note-menu-turquoise {
+.note-menu .fa[data-color="turquoise"] {
 	color: #1CE8B5;
 }
-.note-menu-blue {
+.note-menu .fa[data-color="blue"] {
 	color: #3FC3FF;
 }
-.note-menu-grey {
+.note-menu .fa[data-color="grey"] {
 	color: #B8C4C9;
 }

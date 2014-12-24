@@ -139,7 +139,7 @@ var Session = (function () {
  * Modal service
  * Show and hide modals, only one modal at the same time !
  * The modal name must be given, it must be in the modals folder,
- * or in the global/modals folder, but then, the name must start with 'global-'.
+ * or in the global/partials folder, but then, the name must start with 'global-'.
  * Dim and clear the screen, only if no modals are shown.
  * When a modal is shown, some parameters may be given.
  * They are accessible through the 'getParameters()' method.
@@ -154,12 +154,12 @@ var ModalService = (function () {
 		return parameters;
 	};
 
-	// Get the modal url from the name, if starts with 'global-', look into the global modals folder
+	// Get the modal url from the name, if starts with 'global-', look into the global partials folder
 	var _getModalUrl = function (name) {
 		if (name.indexOf('global-') === 0) {
-			return '../global/modals/' + name.substring(7) + '.html';
+			return '../global/partials/' + name.substring(7) + '.html';
 		}
-		return 'modals/' + name + '.html';
+		return 'partials/' + name + '.html';
 	};
 
 	var _getModalController = function (name) {
@@ -480,8 +480,13 @@ var SyncService = (function () {
 			}
 			// Insert resource
 			if (metadata[id].action === 'insert') {
-				var clone = $.extend(true, {}, resource);
-				delete(clone.tmpId);
+				// Sync the resource with the DOM view
+				if (resource.__sync) {
+					resource.__sync(resource);
+				}
+				// Clone the resource to remove the wrong data
+				var clone = _.omit(resource, ['tmpId', '__view', '__sync']);
+				// Send the request
 				httpResource.insert(clone,
 					function (data) {
 						_success(resource);
@@ -495,7 +500,14 @@ var SyncService = (function () {
 			}
 			// Update resource
 			else if (metadata[id].action === 'update') {
-				httpResource.update(id, resource,
+				// Sync the resource with the DOM view
+				if (resource.__sync) {
+					resource.__sync(resource);
+				}
+				// Clone the resource to remove the wrong data
+				var clone = _.omit(resource, ['__view', '__sync']);
+				// Send the request
+				httpResource.update(id, clone,
 					function (data) {
 						_success(resource);
 						resource._revision = data._revision;

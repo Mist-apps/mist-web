@@ -1,0 +1,21 @@
+<div class="note-menu">
+	<div id="note-menu-delete" class="fa fa-trash" ng-if="!note.deleteDate"></div>
+	<div class="dropdown dropdown-left" ng-if="!note.deleteDate">
+		<div class="fa fa-paint-brush dropdown-button"></div>
+		<ul class="dropdown-menu">
+			<div class="dropdown-arrow"></div>
+			<div class="dropdown-arrow-fill"></div>
+			<div class="fa fa-square" data-color="red"></div>
+			<div class="fa fa-square" data-color="orange"></div>
+			<div class="fa fa-square" data-color="yellow"></div>
+			<div class="fa fa-square" data-color="green"></div>
+			<div class="fa fa-square" data-color="turquoise"></div>
+			<div class="fa fa-square" data-color="blue"></div>
+			<div class="fa fa-square" data-color="grey"></div>
+			<div class="fa fa-square" data-color="white"></div>
+		</ul>
+	</div>
+	<div id="note-menu-destroy" class="fa fa-remove" ng-if="note.deleteDate" ng-click="destroyNote(note);"></div>
+	<div id="note-menu-restore" class="fa fa-undo" ng-if="note.deleteDate" ng-click="restoreNote(note);"></div>
+	<button>OK</button>
+</div>
