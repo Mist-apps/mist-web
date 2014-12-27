@@ -210,7 +210,7 @@ $('body').on('change input', 'textarea', function () {
 	this.style.height = 'auto';
 	this.style.height = this.scrollHeight + 'px';
 	// Refresh grid layout
-	masonry.draw();
+	//masonry.draw();
 });
 
 /**
@@ -298,14 +298,11 @@ var getNotes = function () {
 			notes = data;
 			_checkNotesOrder();
 			_.each(notes, _prepareNote);
-			var now = _.now();
 			_showNotes();
-			console.log(_.now() - now);
 		}
 		LoaderService.stop('getNotes');
 	});
 }
-
 
 /**
  * Check the notes order for gaps, or duplicates
@@ -419,9 +416,10 @@ var _showNotes = function () {
 		// Show each note
 		for (var i in filtered) {
 			container.append(filtered[i].__view);
-			filtered[i].__view.find('textarea').change();
-			masonry.draw();
+			//filtered[i].__view.find('textarea').change();
 		}
+		// Draw the notes
+		// masonry.draw();
 	} else {
 		// Show the "No notes" message
 		$('#nothing-message').show();

@@ -67,34 +67,19 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 
 	opacity: 0;
 
-	-moz-transform: scale(0.001);
-	-webkit-transform: scale(0.001);
-	-o-transform: scale(0.001);
-	-ms-transform: scale(0.001);
 	transform: scale(0.001);
 
-	-webkit-transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
-	-moz-transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
-	-o-transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
-	-ms-transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
 	transition: top 0.3s linear, left 0.3s linear, transform 0.1s linear;
 
 }
 
 .note-dragging {
-	-moz-transition: none;
-	-webkit-transition: none;
-	-o-transition: color 0 ease-in;
 	transition: none;
 }
 
 .note-visible {
 	opacity: 1;
 
-	-moz-transform: scale(1);
-	-webkit-transform: scale(1);
-	-o-transform: scale(1);
-	-ms-transform: scale(1);
 	transform: scale(1);
 }
 

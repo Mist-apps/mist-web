@@ -8,6 +8,7 @@ var Masonry = function (container) {
 	var columnNumber;
 	var offsetTop = 80;
 	var offsetLeft = 35;
+	var noteDrawInterval = 50;
 
 	var timeout;
 
@@ -23,17 +24,71 @@ var Masonry = function (container) {
 		if (timeout) {
 			clearTimeout(timeout);
 		}
-		timeout = setTimeout(_draw, 100);
+		timeout = setTimeout(_draw2, 100);
 	}
 
+	var drawing;
+
 	var _draw = function () {
+		alert('start');
+		// Wait until function done before drawing again
+		if (drawing) {
+			return;
+		}
+		drawing = true;
+		// Initialize the columns height to 0
 		var columns = [];
 		for (var i = 0; i < columnNumber; i++) {
 			columns[i] = 0;
 		}
-		// Set each item position
+		// Set container width
+		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
+		// Set one item position
 		var items = container.children;
-		for (var i = 0; i < items.length; i++) {
+		var _setPosition = function (i) {
+			console.log(i);
+			var col = _getSmallestCol(columns);
+			items[i].style.top = columns[col] + 'px';
+			items[i].style.left = ((itemWidth + gap) * col) + 'px';
+			$(items[i]).addClass('note-visible');
+			// Remove the menu height if necessary
+			if ($(items[i]).find('.note-menu').is(':visible')) {
+				columns[col] += gap + $(items[i]).height() - $(items[i]).find('.note-menu').height();
+			} else {
+				columns[col] += gap + $(items[i]).height();
+			}
+		};
+		// Set each item position each 100ms
+		for (var i = 0; i < items.length - 1; i++) {
+			var f = function (j) {
+				return function () { _setPosition(j) };
+			}(i);
+			setTimeout(f, noteDrawInterval * i);
+		}
+		// Last item, and container size set...
+		setTimeout(function () {
+			// Set position
+			_setPosition(items.length - 1);
+			// Prepare height
+			var height = columns[_getHighestCol(columns)];
+			height = height > gap ? height - gap : height;
+			// Set container height
+			container.style.height = height + 'px';
+			// Next call is now posssible
+			drawing = false;
+		}, (items.length - 1) * noteDrawInterval);
+	};
+
+	var _draw2 = function () {
+		alert('start');
+		// Initialize the columns height to 0
+		var columns = [];
+		for (var i = 0; i < columnNumber; i++) {
+			columns[i] = 0;
+		}
+		// Set items position
+		var items = container.children;
+		for (var i = 0; i < items.length - 1; i++) {
 			var col = _getSmallestCol(columns);
 			items[i].style.top = columns[col] + 'px';
 			items[i].style.left = ((itemWidth + gap) * col) + 'px';
