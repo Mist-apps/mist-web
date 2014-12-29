@@ -210,7 +210,7 @@ $('body').on('change input', 'textarea', function () {
 	this.style.height = 'auto';
 	this.style.height = this.scrollHeight + 'px';
 	// Refresh grid layout
-	//masonry.draw();
+	_showNotes();
 });
 
 /**
@@ -274,6 +274,15 @@ var _syncNote = function (note) {
  * On clicking on the left menu, refresh the notes
  */
 $('.menu-item').click(function () {
+	maxToShow = 10;
+	_showNotes();
+});
+
+/**
+ * On clicking on the "ellipsis" button, increase the max number of notes to show
+ */
+$('#more span').click(function () {
+	maxToShow += 10;
 	_showNotes();
 });
 
@@ -297,10 +306,19 @@ var getNotes = function () {
 		} else {
 			notes = data;
 			_checkNotesOrder();
-			_.each(notes, _prepareNote);
-			_showNotes();
+			// Show notes, after...
+			var showNotes = _.after(notes.length, function () {
+				LoaderService.stop('getNotes');
+				_showNotes();
+			});
+			// Prepare the notes in the container
+			_.each(notes, function (note, index) {
+				_.delay(function (note) {
+					_prepareNote(note);
+					showNotes();
+				}, index * 10, note);
+			});
 		}
-		LoaderService.stop('getNotes');
 	});
 }
 
@@ -355,7 +373,7 @@ var _checkNotesOrder = function () {
 var _prepareNote = function (note) {
 	// Create DOM element, and bind it
 	var item = $(notePartial);
-	note.__view = item;
+	note.__view = item[2];
 	note.__sync = _syncNote;
 	// Set data to bind the resource
 	item.data('resource', note);
@@ -386,63 +404,55 @@ var _prepareNote = function (note) {
 			tasks.append(clone);
 		}
 	}
+	// Add DOM element to notes container
+	$('#notes-container').append(note.__view);
+	// Set textarea height
+	var textarea = $(note.__view).find('textarea').get(0);
+	textarea.style.height = 'auto';
+	textarea.style.height = textarea.scrollHeight + 'px';
 }
 
 /**
  * Show the notes on the page
  */
 var _showNotes = function () {
-	// Remove old notes
-	var container = $('#notes-container');
-	container.children().detach();
 	// Filter the notes
-	var filtered = [];
+	var partitions = [];
 	switch (activeMenuItem) {
-		case 'all':		filtered = _.filter(notes, function (item) {return !item.deleteDate});
+		case 'all':		partitions = _.partition(notes, function (item) {return !item.deleteDate});
 						break;
-		case 'notes':	filtered = _.filter(notes, function (item) {return !item.deleteDate && !item.tasks});
+		case 'notes':	partitions = _.partition(notes, function (item) {return !item.deleteDate && !item.tasks});
 						break;
-		case 'todo':	filtered = _.filter(notes, function (item) {return !item.deleteDate && item.tasks});
+		case 'todo':	partitions = _.partition(notes, function (item) {return !item.deleteDate && item.tasks});
 						break;
-		case 'trash':	filtered = _.filter(notes, function (item) {return !!item.deleteDate});
+		case 'trash':	partitions = _.partition(notes, function (item) {return !!item.deleteDate});
 						break;
 		default:		toastr.error('Unknown menu item');
 						break;
 	}
 	// If there are notes to shown
-	if (filtered.length > 0) {
+	if (partitions[0].length > 0) {
 		// Remove the "No notes" message
 		$('#nothing-message').hide();
-		// Show each note
-		for (var i in filtered) {
-			container.append(filtered[i].__view);
-			//filtered[i].__view.find('textarea').change();
-		}
-		// Draw the notes
-		// masonry.draw();
 	} else {
 		// Show the "No notes" message
 		$('#nothing-message').show();
 	}
-};
-
-/**
- * Show the note on the page, or hide it if it must not be shown
- */
-var _showHideNote = function (note) {
-	switch (activeMenuItem) {
-		case 'all':		!note.deleteDate ? $('#notes-container').append(note.__view) : note.__view.detach();
-						break;
-		case 'notes':	!note.deleteDate && !note.tasks ? $('#notes-container').append(note.__view) : note.__view.detach();
-						break;
-		case 'todo':	!note.deleteDate && note.tasks ? $('#notes-container').append(note.__view) : note.__view.detach();
-						break;
-		case 'trash':	!!note.deleteDate ? $('#notes-container').append(note.__view) : note.__view.detach();
-						break;
-		default:		toastr.error('Unknown menu item');
-						break;
+	// If there are more notes to show than the maximum authorized, transfer them in the second array (to hide)
+	if (partitions[0].length > maxToShow) {
+		partitions[1] = partitions[1].concat(partitions[0].slice(maxToShow));
+		partitions[0] = partitions[0].slice(0, maxToShow);
+		//$('#more').show();
+	} else {
+		//$('#more').hide();
 	}
-	masonry.draw();
+	// Draw the notes
+	masonry.draw(partitions[0], partitions[1]);
+	if (partitions[0].length > maxToShow) {
+		$('#more').show();
+	} else {
+		$('#more').hide();
+	}
 };
 
 
@@ -464,7 +474,7 @@ $('#add-menu-note').click(function () {
 	var note = {tmpId: tmpId, title: '', content: '', creationDate: date, order: order};
 	notes.push(note);
 	_prepareNote(note);
-	_showHideNote(note);
+	_showNotes();
 	// Inform sync service
 	SyncService.newResource('NOTE', note);
 });
@@ -480,7 +490,7 @@ $('#add-menu-todo').click(function () {
 	var note = {tmpId: tmpId, title: '', tasks: [{content: '', done: false}], creationDate: date, order: order};
 	notes.push(note);
 	_prepareNote(note);
-	_showHideNote(note);
+	_showNotes();
 	// Inform sync service
 	SyncService.newResource('NOTE', note);
 });
@@ -510,7 +520,7 @@ $('body').on('click', '#note-menu-delete', function () {
 	// Stop edit the note
 	stopEditNotes();
 	// Show or hide the note
-	_showHideNote(note);
+	_showNotes();
 	// Inform sync service
 	SyncService.updateResource('NOTE', note);
 });
@@ -521,7 +531,7 @@ $('body').on('click', '#note-menu-delete', function () {
 $('body').on('click', '#note-menu-destroy', function () {
 	// Remove note
 	var note = $(this).closest('.note').data('resource');
-	_showHideNote(note);
+	_showNotes();
 	$(this).closest('.note').remove();
 	// Search for note to delete
 	for (var key in notes) {
@@ -556,7 +566,7 @@ $('body').on('click', '#note-menu-restore', function () {
 	// Stop edit the note
 	stopEditNotes();
 	// Show or hide the note
-	_showHideNote(note);
+	_showNotes();
 	// Inform sync service
 	SyncService.updateResource('NOTE', note);
 });
@@ -590,6 +600,8 @@ $('body').on('click', '.note-menu ul .fa', function () {
 var notes = [];
 // Set the active menu item
 var activeMenuItem = 'all';
+// Number of notes to show (maximum)
+var maxToShow = 15;
 // Initialize Masonry
 var masonry = new Masonry($('#notes-container').get(0));
 $('body').on('mousedown', '.drag-drop-zone', masonry.dragStart);

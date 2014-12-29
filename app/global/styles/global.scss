@@ -465,11 +465,11 @@ body {
 
 	position: relative;
 	top: $navbar-height;
-	padding: 35px 35px 50px 35px;
+	padding: 35px 35px 35px 35px;
 	min-height: 100px;
 
 	@media (max-width: 600px) {
-		padding: 20px 10px 45px 10px;
+		padding: 20px 10px 20px 10px;
 	}
 
 }
@@ -512,6 +512,26 @@ body {
 		span {
 			font-size: 100px;
 		}
+}
+
+#more {
+
+	display: none;
+	text-align: center;
+	color: #FFF;
+	text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+	margin-top: 30px;
+
+	span {
+
+		cursor: pointer;
+		padding: 5px 15px 0px 15px;
+
+		&:hover {
+			color: rgba(0, 0, 0, 0.1);
+		}
+	}
+
 }
 
 #loader {

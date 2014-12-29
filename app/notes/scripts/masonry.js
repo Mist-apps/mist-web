@@ -8,9 +8,9 @@ var Masonry = function (container) {
 	var columnNumber;
 	var offsetTop = 80;
 	var offsetLeft = 35;
-	var noteDrawInterval = 50;
+	var drawDebounce = 100;
+	var drawing;
 
-	var timeout;
 
 	var init = function () {
 		pageWidth = $(container).parent().width();
@@ -20,84 +20,32 @@ var Masonry = function (container) {
 		}
 	};
 
-	this.draw = function () {
-		if (timeout) {
-			clearTimeout(timeout);
-		}
-		timeout = setTimeout(_draw2, 100);
-	}
-
-	var drawing;
-
-	var _draw = function () {
-		alert('start');
-		// Wait until function done before drawing again
-		if (drawing) {
-			return;
-		}
-		drawing = true;
+	this.draw = _.debounce(function (toShow, toHide) {
 		// Initialize the columns height to 0
 		var columns = [];
 		for (var i = 0; i < columnNumber; i++) {
 			columns[i] = 0;
 		}
-		// Set container width
-		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
-		// Set one item position
-		var items = container.children;
-		var _setPosition = function (i) {
-			console.log(i);
-			var col = _getSmallestCol(columns);
-			items[i].style.top = columns[col] + 'px';
-			items[i].style.left = ((itemWidth + gap) * col) + 'px';
-			$(items[i]).addClass('note-visible');
-			// Remove the menu height if necessary
-			if ($(items[i]).find('.note-menu').is(':visible')) {
-				columns[col] += gap + $(items[i]).height() - $(items[i]).find('.note-menu').height();
-			} else {
-				columns[col] += gap + $(items[i]).height();
-			}
-		};
-		// Set each item position each 100ms
-		for (var i = 0; i < items.length - 1; i++) {
-			var f = function (j) {
-				return function () { _setPosition(j) };
-			}(i);
-			setTimeout(f, noteDrawInterval * i);
+		// Set items to 0,0 position and hide them
+		for (var i = 0; i < toHide.length; i++) {
+			toHide[i].__view.style.top = 0;
+			toHide[i].__view.style.left = 0;
+			delete toHide[i].__view.style.top;
+			delete toHide[i].__view.style.left;
+			$(toHide[i].__view).removeClass('note-visible');
 		}
-		// Last item, and container size set...
-		setTimeout(function () {
-			// Set position
-			_setPosition(items.length - 1);
-			// Prepare height
-			var height = columns[_getHighestCol(columns)];
-			height = height > gap ? height - gap : height;
-			// Set container height
-			container.style.height = height + 'px';
-			// Next call is now posssible
-			drawing = false;
-		}, (items.length - 1) * noteDrawInterval);
-	};
-
-	var _draw2 = function () {
-		alert('start');
-		// Initialize the columns height to 0
-		var columns = [];
-		for (var i = 0; i < columnNumber; i++) {
-			columns[i] = 0;
-		}
-		// Set items position
-		var items = container.children;
-		for (var i = 0; i < items.length - 1; i++) {
+		// Set items position and show them
+		for (var i = 0; i < toShow.length; i++) {
 			var col = _getSmallestCol(columns);
-			items[i].style.top = columns[col] + 'px';
-			items[i].style.left = ((itemWidth + gap) * col) + 'px';
-			$(items[i]).addClass('note-visible');
+			//toShow[i].__view.style.top = columns[col] + 'px';
+			toShow[i].__view.style.left = ((itemWidth + gap) * col) + 'px';
+			$(toShow[i].__view).css('top', columns[col]);
+			$(toShow[i].__view).addClass('note-visible');
 			// Remove the menu height if necessary
-			if ($(items[i]).find('.note-menu').is(':visible')) {
-				columns[col] += gap + $(items[i]).height() - $(items[i]).find('.note-menu').height();
+			if ($(toShow[i].__view).find('.note-menu').is(':visible')) {
+				columns[col] += gap + $(toShow[i].__view).height() - $(toShow[i].__view).find('.note-menu').height();
 			} else {
-				columns[col] += gap + $(items[i]).height();
+				columns[col] += gap + $(toShow[i].__view).height();
 			}
 		}
 		// Prepare height
@@ -106,7 +54,7 @@ var Masonry = function (container) {
 		// Set container size
 		container.style.height = height + 'px';
 		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
-	};
+	}, drawDebounce);
 
 	var _getSmallestCol = function (columns) {
 		var smallestCol = 0;
