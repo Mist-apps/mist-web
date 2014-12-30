@@ -1,4 +1,7 @@
-
+/**
+ * Library to control the notes on a grid:
+ * 		- Show them on a beatifull
+ */
 var Masonry = function (container) {
 
 	var container = container;
@@ -21,6 +24,12 @@ var Masonry = function (container) {
 	};
 
 	this.draw = _.debounce(function (toShow, toHide, moreToShow) {
+		// If no arguments, create them
+		if (!toShow && !toHide) {
+			toShow = _getItemsToShow();
+			toHide = [];
+			moreToShow = $('#more').is(':visible');
+		}
 		// Initialize the columns height to 0
 		var columns = [];
 		for (var i = 0; i < columnNumber; i++) {
@@ -83,6 +92,16 @@ var Masonry = function (container) {
 		return highestCol;
 	};
 
+	var _getItemsToShow = function () {
+		var toShow = [];
+		_.each(container.children, function (item) {
+			if ($(item).hasClass('note-visible')) {
+				toShow.push($(item).data('resource'));
+			}
+		})
+		return toShow;
+	};
+
 	// Check window resizing
 	var _onWindowResizeDraw = this.draw;
 	window.onresize = function () {
@@ -92,9 +111,6 @@ var Masonry = function (container) {
 
 	// Initialize the grid
 	init();
-
-
-
 
 	/**
 	 * Drag and drop
@@ -107,19 +123,19 @@ var Masonry = function (container) {
 	var SENSITIVITY = 100;
 	var senseTimeout;
 
-	this.dragStart = function ($event) {
+	this.dragStart = function (event) {
 		// Wait sensitivity before start dragging
 		senseTimeout = setTimeout(function () {
 			// Get note
-			var note = $($event.target).parent();
+			var note = $(event.target).parent();
 			// Set note in front and disable transitions
 			note.addClass('note-edit note-dragging');
 			// Save offsets
 			offsetTop = note.parent().offset().top;
 			offsetLeft = note.parent().offset().left;
 			// Save relative position of the note from the mouse
-			var relX = $event.pageX - note.offset().left;
-			var relY = $event.pageY - note.offset().top;
+			var relX = event.pageX - note.offset().left;
+			var relY = event.pageY - note.offset().top;
 			// Listen to mouse move
 			$(document).bind('mousemove', function (event) {
 				dragging = true;
@@ -137,13 +153,13 @@ var Masonry = function (container) {
 		}, SENSITIVITY);
 	};
 
-	this.dragEnd = function ($event, callback) {
+	this.dragEnd = function (event) {
 		// Clear the timeout if needed
 		clearTimeout(senseTimeout);
 		// Stop listening to mouse move
 		$(document).unbind('mousemove');
 		// Get note
-		var note = $($event.target).parent();
+		var note = $(event.target).parent();
 		// Remove note from front
 		note.removeClass('note-edit note-dragging');
 		// If we were dragging
@@ -158,16 +174,16 @@ var Masonry = function (container) {
 			clearInterval(interval);
 			interval = null;
 			// Cancel click event if dragged
-			$($event.target).one('click', false);
-			// Callback
-			if (callback) {
-				var noteOrder = parseInt($(note).find('input[name="order"]').val());
-				var previousOrder = parseInt($(previous).find('input[name="order"]').val());
-				if (isNaN(previousOrder)) {
-					previousOrder = 0;
-				}
-				callback(noteOrder, previousOrder);
+			$(event.target).one('click', false);
+			// Set note order
+			var noteOrder = parseInt($(note).find('input[name="order"]').val());
+			var previousOrder = parseInt($(previous).find('input[name="order"]').val());
+			if (isNaN(previousOrder)) {
+				previousOrder = 0;
 			}
+			callback(noteOrder, previousOrder);
+			// Draw the grid
+			this.draw();
 		}
 	};
 
@@ -177,12 +193,12 @@ var Masonry = function (container) {
 			columns[i] = 0;
 		}
 		// Set each item position
-		var items = container.children;
+		var items = _getItemsToShow();
 		var lastDrawn = undefined;
 		var skipped = false;
 		for (var i = 0; i < items.length; i++) {
 			// Skip the dragging item
-			if (note.get(0) === items[i]) {
+			if (note.data('resource') === items[i]) {
 				continue;
 			}
 			// Get col to draw into
@@ -220,13 +236,13 @@ var Masonry = function (container) {
 			// Draw item
 			else {
 				// Set position and css
-				items[i].style.top = itemY + 'px';
-				items[i].style.left = itemX + 'px';
-				$(items[i]).addClass('note-visible');
+				items[i].__view.get(0).style.top = itemY + 'px';
+				items[i].__view.get(0).style.left = itemX + 'px';
+				items[i].__view.addClass('note-visible');
 				// Add the note height in the column
-				columns[col] += gap + $(items[i]).height();
+				columns[col] += gap + items[i].__view.height();
 				// Keep the last item drawn
-				lastDrawn = items[i];
+				lastDrawn = items[i].__view;
 			}
 		}
 		// If no place for note were skipped, then the note must be set at the end of the grid

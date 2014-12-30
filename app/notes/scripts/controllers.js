@@ -565,7 +565,6 @@ var masonry = new Masonry($('#notes-container').get(0));
 $('body').on('mousedown', '.drag-drop-zone', masonry.dragStart);
 $('body').on('mouseup', '.drag-drop-zone', function (event) {
 	masonry.dragEnd(event);
-	//masonry.draw();
 });
 // Get notes when session recovered
 recovered.done(getNotes);
