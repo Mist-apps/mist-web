@@ -42,3 +42,9 @@ toastr.options = {
 	'showMethod': 'fadeIn',
 	'hideMethod': 'fadeOut'
 };
+
+
+/**
+ * Underscore settings
+ */
+_.templateSettings.variable = 'rc';

@@ -133,7 +133,7 @@
 		<div id="notes-container"></div>
 
 		<!-- No notes message -->
-		<div id="more"><span class="fa fa-3x fa-ellipsis-v"></span></div>
+		<div id="more"><span id="nbr-shown"></span> of <span id="nbr-total"></span><br><span class="fa fa-2x fa-ellipsis-v"></span></div>
 
 		<!-- Bottom add menu -->
 		<div id="add-menu">
@@ -156,6 +156,62 @@
 
 	<!-- Download link -->
 	<a id="download-link" style="display: none"></a>
+
+	<!-- Note template -->
+	<script type="text/template" id="template-note">
+		<div class="note <% if(rc.color) print('note-' + rc.color) %>">
+			<div class="drag-drop-zone" ng-mouseup="$root.masonry.dragEnd($event, moveNote);"></div>
+			<input class="note-title" type="text" placeholder="Title" tabindex="-1" value="<%= rc.title %>" />
+			<% if (rc.tasks) { %>
+			<div class="note-tasks">
+				<% _.each(rc.tasks, function (task) { %>
+				<div class="note-task <% if (task.done) print('note-task-done'); %>">
+					<div class="note-task-icon"></div>
+					<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="-1"><%= task.content %></textarea>
+				</div>
+				<% }) %>
+			</div>
+			<% } else { %>
+			<textarea class="note-content" rows="1" placeholder="Note" tabindex="-1"><%= rc.content %></textarea>
+			<% } %>
+		</div>
+	</script>
+
+	<!-- Note task template -->
+	<script type="text/template" id="template-note-task">
+		<div class="note-task">
+			<div class="note-task-icon"></div>
+			<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="-1"></textarea>
+		</div>
+	</script>
+
+	<!-- Note menu template -->
+	<script type="text/template" id="template-note-menu">
+		<div class="note-menu">
+			<% if (rc.deleteDate) { %>
+			<div id="note-menu-destroy" class="fa fa-remove"></div>
+			<div id="note-menu-restore" class="fa fa-undo"></div>
+			<% } else { %>
+			<div id="note-menu-delete" class="fa fa-trash"></div>
+			<div id="note-menu-color" class="dropdown dropdown-left">
+				<div class="fa fa-paint-brush dropdown-button"></div>
+				<ul class="dropdown-menu">
+					<div class="dropdown-arrow"></div>
+					<div class="dropdown-arrow-fill"></div>
+					<div class="fa fa-square <% if (rc.color === 'red') print('fa-check-square'); %>" data-color="red"></div>
+					<div class="fa fa-square <% if (rc.color === 'orange') print('fa-check-square'); %>" data-color="orange"></div>
+					<div class="fa fa-square <% if (rc.color === 'yellow') print('fa-check-square'); %>" data-color="yellow"></div>
+					<div class="fa fa-square <% if (rc.color === 'green') print('fa-check-square'); %>" data-color="green"></div>
+					<div class="fa fa-square <% if (rc.color === 'turquoise') print('fa-check-square'); %>" data-color="turquoise"></div>
+					<div class="fa fa-square <% if (rc.color === 'blue') print('fa-check-square'); %>" data-color="blue"></div>
+					<div class="fa fa-square <% if (rc.color === 'grey') print('fa-check-square'); %>" data-color="grey"></div>
+					<div class="fa fa-square <% if (!rc.color || rc.color === 'white') print('fa-check-square'); %>" data-color="white"></div>
+				</ul>
+			</div>
+			<% } %>
+			<button>OK</button>
+		</div>
+	</script>
 
 	<!-- build:js(.) global/scripts/vendor.js -->
 	<!-- bower:js -->

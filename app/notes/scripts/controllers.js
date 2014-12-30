@@ -14,16 +14,9 @@
 var startEditNote = function (event) {
 	if (event.target.className !== '' && event.target.className !== 'note-task-icon') {
 		// Add menu
-		var menu = $(menuPartial);
-		var color = $(this).data('resource').color;
-		color = color ? color : 'white';
-		menu.find('[data-color=' + color + ']').addClass('fa-check-square');
-		$(this).append(menu);
+		$(this).append(templateNoteMenu($(this).data('resource')));
 		// Set tabindex
-		$(this).find('.note-title').attr('tabindex', 1);
-		$(this).find('.note-content').attr('tabindex', 1);
-		$(this).find('.note-task-content').attr('tabindex', 1);
-		$(this).find('button').attr('tabindex', 1);
+		$(this).find('.note-title, .note-content, .note-task-content, button').attr('tabindex', 1);
 		// Show editor
 		ModalService.dim();
 		$(this).addClass('note-edit');
@@ -47,10 +40,7 @@ var stopEditNotes = function (event) {
 		$(event.target).blur();
 	}
 	// Remove notes tabindex
-	$('.note-title').attr('tabindex', -1);
-	$('.note-content').attr('tabindex', -1);
-	$('.note-task-content').attr('tabindex', -1);
-	$('.note button').attr('tabindex', -1);
+	$('.note-title, .note-content, .note-task-content, button').attr('tabindex', -1);
 	// Remove editor
 	ModalService.clear();
 	$('.note').removeClass('note-edit');
@@ -143,7 +133,7 @@ $('body').on('keydown', '.note-task-content', function (event) {
 		var end = target.val().substring(target.prop('selectionEnd'));
 		// Update and add views
 		target.val(start);
-		var next = $(taskPartial);
+		var next = $(templateNoteTask(resource));
 		target.parent().after(next);
 		next.find('.note-task-content').val(end).focusStart();
 		// Stop key default behaviour
@@ -274,7 +264,7 @@ var _syncNote = function (note) {
  * On clicking on the left menu, refresh the notes
  */
 $('.menu-item').click(function () {
-	maxToShow = 10;
+	maxToShow = 15;
 	_showNotes();
 });
 
@@ -307,16 +297,13 @@ var getNotes = function () {
 			notes = data;
 			_checkNotesOrder();
 			// Show notes, after...
-			var showNotes = _.after(notes.length, function () {
-				LoaderService.stop('getNotes');
-				_showNotes();
-			});
+			var showNotes = _.after(notes.length, _showNotes);
 			// Prepare the notes in the container
 			_.each(notes, function (note, index) {
 				_.delay(function (note) {
 					_prepareNote(note);
 					showNotes();
-				}, index * 10, note);
+				}, index * 30, note);
 			});
 		}
 	});
@@ -372,44 +359,17 @@ var _checkNotesOrder = function () {
  */
 var _prepareNote = function (note) {
 	// Create DOM element, and bind it
-	var item = $(notePartial);
-	note.__view = item[2];
+	var item = $(templateNote(note));
+	note.__view = item;
 	note.__sync = _syncNote;
 	// Set data to bind the resource
 	item.data('resource', note);
-	// Set color
-	if (note.color) {
-		item.addClass('note-' + note.color);
-	}
-	// Set title
-	$('.note-title', item).val(note.title);
-	// If note
-	if (!note.tasks) {
-		$('.note-content', item).val(note.content);
-		$('.note-tasks', item).remove();
-	}
-	// If todo list
-	else {
-		// Remove the initial task and reuse it for each task
-		$('.note-content', item).remove();
-		var task = $(taskPartial);
-		var tasks = $('.note-tasks', item);
-		// For each task
-		for (var i in note.tasks) {
-			var clone = task.clone();
-			if (note.tasks[i].done) {
-				clone.addClass('note-task-done');
-			}
-			$('.note-task-content', clone).val(note.tasks[i].content);
-			tasks.append(clone);
-		}
-	}
 	// Add DOM element to notes container
 	$('#notes-container').append(note.__view);
 	// Set textarea height
-	var textarea = $(note.__view).find('textarea').get(0);
-	textarea.style.height = 'auto';
-	textarea.style.height = textarea.scrollHeight + 'px';
+	var textarea = item.find('textarea').each(function () {
+		this.style.height = this.scrollHeight + 'px';
+	});
 }
 
 /**
@@ -439,20 +399,18 @@ var _showNotes = function () {
 		$('#nothing-message').show();
 	}
 	// If there are more notes to show than the maximum authorized, transfer them in the second array (to hide)
+	var moreToShow = false
 	if (partitions[0].length > maxToShow) {
+		$('#more #nbr-total').html(partitions[0].length);
 		partitions[1] = partitions[1].concat(partitions[0].slice(maxToShow));
 		partitions[0] = partitions[0].slice(0, maxToShow);
-		//$('#more').show();
-	} else {
-		//$('#more').hide();
+		$('#more #nbr-shown').html(partitions[0].length);
+		moreToShow = true;
 	}
+	// Stop loading
+	LoaderService.stop('getNotes');
 	// Draw the notes
-	masonry.draw(partitions[0], partitions[1]);
-	if (partitions[0].length > maxToShow) {
-		$('#more').show();
-	} else {
-		$('#more').hide();
-	}
+	masonry.draw(partitions[0], partitions[1], moreToShow);
 };
 
 
@@ -607,26 +565,15 @@ var masonry = new Masonry($('#notes-container').get(0));
 $('body').on('mousedown', '.drag-drop-zone', masonry.dragStart);
 $('body').on('mouseup', '.drag-drop-zone', function (event) {
 	masonry.dragEnd(event);
-	masonry.draw();
+	//masonry.draw();
 });
 // Get notes when session recovered
 recovered.done(getNotes);
 
-// Load partials
-// TODO be sure it is done before get notes...
-var notePartial;
-var menuPartial;
-var taskPartial;
-$.get('partials/note.html').done(function (html) {
-	notePartial = html;
-});
-$.get('partials/note-menu.html').done(function (html) {
-	menuPartial = html;
-});
-$.get('partials/note-task.html').done(function (html) {
-	taskPartial = html;
-});
-
+// Load templates
+var templateNote = _.template($('#template-note').html());
+var templateNoteMenu = _.template($('#template-note-menu').html());
+var templateNoteTask = _.template($('#template-note-task').html());
 
 
 

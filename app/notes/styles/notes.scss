@@ -65,7 +65,7 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 	position: absolute;
 	visibility: hidden;
 	transform: scale(0.001);
-	transition: transform 0.4s linear;
+	transition: top 0.3s linear, left 0.3s linear, transform 0.3s linear;
 }
 
 .note-dragging {
@@ -75,7 +75,6 @@ $navbar-text-hover-color: rgba(0, 0, 0, 0.9);
 .note-visible {
 	visibility: visible;
 	transform: scale(1);
-	transition: top 0.4s linear, left 0.4s linear, transform 0.4s linear;
 }
 
 .note-edit {

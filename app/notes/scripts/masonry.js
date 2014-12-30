@@ -20,7 +20,7 @@ var Masonry = function (container) {
 		}
 	};
 
-	this.draw = _.debounce(function (toShow, toHide) {
+	this.draw = _.debounce(function (toShow, toHide, moreToShow) {
 		// Initialize the columns height to 0
 		var columns = [];
 		for (var i = 0; i < columnNumber; i++) {
@@ -28,24 +28,21 @@ var Masonry = function (container) {
 		}
 		// Set items to 0,0 position and hide them
 		for (var i = 0; i < toHide.length; i++) {
-			toHide[i].__view.style.top = 0;
-			toHide[i].__view.style.left = 0;
-			delete toHide[i].__view.style.top;
-			delete toHide[i].__view.style.left;
-			$(toHide[i].__view).removeClass('note-visible');
+			toHide[i].__view.css('top', '');
+			toHide[i].__view.css('left', '');
+			toHide[i].__view.removeClass('note-visible');
 		}
 		// Set items position and show them
 		for (var i = 0; i < toShow.length; i++) {
 			var col = _getSmallestCol(columns);
-			//toShow[i].__view.style.top = columns[col] + 'px';
-			toShow[i].__view.style.left = ((itemWidth + gap) * col) + 'px';
-			$(toShow[i].__view).css('top', columns[col]);
-			$(toShow[i].__view).addClass('note-visible');
+			toShow[i].__view.css('top', columns[col]);
+			toShow[i].__view.css('left', ((itemWidth + gap) * col));
+			toShow[i].__view.addClass('note-visible');
 			// Remove the menu height if necessary
-			if ($(toShow[i].__view).find('.note-menu').is(':visible')) {
-				columns[col] += gap + $(toShow[i].__view).height() - $(toShow[i].__view).find('.note-menu').height();
+			if (toShow[i].__view.find('.note-menu').is(':visible')) {
+				columns[col] += gap + toShow[i].__view.height() - toShow[i].__view.find('.note-menu').height();
 			} else {
-				columns[col] += gap + $(toShow[i].__view).height();
+				columns[col] += gap + toShow[i].__view.height();
 			}
 		}
 		// Prepare height
@@ -54,6 +51,12 @@ var Masonry = function (container) {
 		// Set container size
 		container.style.height = height + 'px';
 		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
+		// If there are more notes to show
+		if (moreToShow) {
+			$('#more').show();
+		} else {
+			$('#more').hide();
+		}
 	}, drawDebounce);
 
 	var _getSmallestCol = function (columns) {
