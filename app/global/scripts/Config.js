@@ -1,7 +1,14 @@
+/* exported Config */
+/* global AuthService, ModalService */
 'use strict';
 
 
-var API_URL = 'http://localhost:8080';
+/**
+ * Application configuration
+ */
+var Config = {
+	api:		'http://localhost:8080'
+};
 
 
 /**
@@ -45,6 +52,6 @@ toastr.options = {
 
 
 /**
- * Underscore settings
+ * Underscore configuration
  */
 _.templateSettings.variable = 'rc';

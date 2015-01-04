@@ -1,4 +1,5 @@
 {
+
 	"node": true,
 	"browser": true,
 	"esnext": true,
@@ -18,12 +19,12 @@
 	"strict": true,
 	"trailing": true,
 	"smarttabs": true,
+
 	"globals": {
-		"angular": false,
-		"webApp": false,
+		// Libraries
 		"$": false,
-		"toastr": false,
-		"API_URL": false,
-		"Masonry": false
+		"_": false,
+		"toastr": false
 	}
+
 }

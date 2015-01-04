@@ -12,15 +12,15 @@
 		<table>
 			<tr>
 				<td>First name: </td>
-				<td><input type="text" class="form-input" placeholder="First name" tabindex="1" name="firstName"></td>
+				<td><input type="text" class="form-input" placeholder="First name" tabindex="1" name="firstName" value="<%= rc.firstName %>"></td>
 			</tr>
 			<tr>
 				<td>Last name: </td>
-				<td><input type="text" class="form-input" placeholder="Last name" tabindex="1" name="lastName"></td>
+				<td><input type="text" class="form-input" placeholder="Last name" tabindex="1" name="lastName" value="<%= rc.lastName %>"></td>
 			</tr>
 			<tr>
 				<td>E-mail: </td>
-				<td><input type="email" class="form-input" placeholder="E-mail" tabindex="1" name="mail"></td>
+				<td><input type="email" class="form-input" placeholder="E-mail" tabindex="1" name="mail" value="<%= rc.mail %>"></td>
 			</tr>
 		</table>
 		<br><br>
@@ -28,11 +28,11 @@
 		<table>
 			<tr>
 				<td>Password: </td>
-				<td><input type="password" class="form-input" placeholder="Password" tabindex="1" name="password" ng-class="{'form-input-error': tmpUser.password !== '' && tmpUser.password.length < 6}"></td>
+				<td><input type="password" class="form-input" placeholder="Password" tabindex="1" name="password"></td>
 			</tr>
 			<tr>
 				<td>Re-type password: </td>
-				<td><input type="password" class="form-input" placeholder="Re-type password" tabindex="1" name="password2" ng-class="{'form-input-error': tmpUser.password !== tmpUser.password2}"></td>
+				<td><input type="password" class="form-input" placeholder="Re-type password" tabindex="1" name="password2"></td>
 			</tr>
 		</table>
 		<br><br>

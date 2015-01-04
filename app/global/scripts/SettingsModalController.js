@@ -1,32 +1,16 @@
-/**
- * Confirmation controller
- */
-var ConfirmController = function () {
-
-	$('#modal-button-logout').click(function () {
-		// Hide modal
-		ModalService.hide('global-confirm');
-		// Logout
-		AuthService.logout();
-		// Initialize sync service
-		SyncService.init();
-		// Go to login page
-		location.replace('/login');
-	});
-
-	$('#modal-button-cancel').click(function () {
-		// Hide modal
-		ModalService.hide('global-confirm');
-	});
-
-};
+/* exported SettingsModalController */
+/* global UserResource, ApplicationController, Session, ModalService */
+'use strict';
 
 
 /**
  * Settings controller
  */
-var SettingsController = function () {
+var SettingsModalController = function () {
 
+	// Clone the user
+	var user = $.extend(true, {}, Session.getUser());
+	user.password = user.password2 = '';
 	// Boundaries for cropping
 	var imagePreviewWidth = $('#image-preview').width();
 	var imagePreviewHeight = $('#image-preview').height();
@@ -34,7 +18,7 @@ var SettingsController = function () {
 	// Cropping library
 	var jcrop;
 	// Is default image
-	var isDefault = false;
+	var isDefault;
 
 	/**
 	 * Set the default image
@@ -56,7 +40,7 @@ var SettingsController = function () {
 			var ctx = canvas.getContext('2d');
 			ctx.drawImage(image, 0, 0, 85, 85);
 			$('#image-preview > img').attr('src', canvas.toDataURL());
-		}
+		};
 	};
 
 	/**
@@ -77,7 +61,7 @@ var SettingsController = function () {
 			// Send the resize event, for centering the modal
 			$('.modal-content').resize();
 		}
-	}
+	};
 
 	/**
 	 * Preview the result of the crop operation
@@ -157,7 +141,7 @@ var SettingsController = function () {
 		} else {
 			inputPassword2.removeClass('form-input-error');
 		}
-	}
+	};
 	inputPassword.on('input', checkPasswords);
 	inputPassword2.on('input', checkPasswords);
 
@@ -203,7 +187,7 @@ var SettingsController = function () {
 		UserResource.update(user,
 			function (data) {
 				Session.update(data);
-				populateUser();
+				ApplicationController.populateUser();
 				toastr.success('Settings saved');
 			}, function () {
 				toastr.error('Unable to save settings');
@@ -225,73 +209,11 @@ var SettingsController = function () {
 	 * Execution
 	 */
 
-	// Clone the user
-	var user = $.extend(true, {}, Session.getUser());
-	user.password = user.password2 = '';
-
-	// Populate the modal
-	$('input:text[name=firstName]').val(user.firstName);
-	$('input:text[name=lastName]').val(user.lastName);
-	$('input[name=mail]').val(user.mail);
-
 	// Initialize image
 	if (user.image) {
 		$('#image-preview > img').attr('src', user.image);
 	} else {
 		_setDefault();
 	}
-
-};
-
-
-/**
- * Login Controller
- */
-var LoginController = function () {
-
-	/**
-	 * Try to login by calling the AuthService with the credentials
-	 */
-	$('form').on('submit', function () {
-		// Get credentials
-		var credentials = {
-			login:		$('input:text[name=login]').val(),
-			password:	$('input:password[name=password]').val(),
-			remember:	$('input:checkbox[name=remember]').is(":checked")
-		};
-		// Try to log in
-		AuthService.login(credentials).then(
-			// If login success
-			function () {
-				// Remove modal
-				ModalService.hide('global-login');
-			},
-			// If login error
-			function (reason) {
-				if (reason.code === 1) {
-					$('.login-form-input').addClass('shake login-form-input-error');
-				} else {
-					$('.login-form-input').removeClass('login-form-input-error');
-				}
-				$('#login-error').html(reason.message).show();
-			}
-		);
-		// Do not redirect to "action" page
-		return false;
-	});
-
-	/**
-	 * Auto remove shake class
-	 */
-	$('body').on('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', '.shake', function () {
-		$(this).removeClass('shake');
-	});
-
-	/**
-	 * Execution
-	 */
-
-	// Auto-focus the login field
-	$('input[name="login"]').focus();
 
 };

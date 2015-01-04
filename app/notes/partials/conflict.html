@@ -1,4 +1,4 @@
-<div id="modal-notes-conflict" class="modal" ng-controller="ConflictController">
+<div id="modal-notes-conflict" class="modal">
 
 	<!-- Header -->
 	<div class="modal-header">
@@ -22,54 +22,79 @@
 
 			<div class="note-conflict-version-title">Local version</div>
 
-			<div class="note note-visible note-edit note-conflict">
-				<input class="note-title" type="text" placeholder="Title" tabindex="1" ng-keydown="titleKeyListener($event, local);" ng-model="local.title" />
-				<textarea class="note-content" ng-if="!local.tasks" rows="1" placeholder="Note" tabindex="1" ng-keydown="contentKeyListener($event, local);" ng-model="local.content" resize></textarea>
-				<div class="note-tasks" ng-if="local.tasks">
-					<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in local.tasks">
-						<div class="note-task-icon" ng-click="toggleTaskDone(local, task);"></div>
-						<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="1" ng-keydown="taskKeyListener($event, local, $index)" ng-model="task.content" resize></textarea>
+			<div id="local-note" class="note note-visible note-edit note-conflict <% if(rc.local.color) print('note-' + rc.local.color) %>">
+				<input class="note-title" type="text" placeholder="Title" tabindex="1" value="<%= rc.local.title %>" />
+				<% if (rc.local.tasks) { %>
+				<div class="note-tasks">
+					<% _.each(rc.local.tasks, function (task) { %>
+					<div class="note-task <% if (task.done) print('note-task-done'); %>">
+						<div class="note-task-icon"></div>
+						<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="1"><%= task.content %></textarea>
 					</div>
+					<% }) %>
 				</div>
+				<% } else { %>
+				<textarea class="note-content" rows="1" placeholder="Note" tabindex="1"><%= rc.local.content %></textarea>
+				<% } %>
 			</div>
 
-			<div class="note-conflict-date" ng-if="local.modificationDate">Last modification on {{local.modificationDate | date:'short'}}</div>
-			<div class="note-conflict-date" ng-if="local.deleteDate">Deleted on {{local.deleteDate | date:'short'}}</div>
+			<% if (rc.local.modificationDate) { %>
+			<div class="note-conflict-date">Last modification on <%= rc.local.modificationDate %></div>
+			<% } %>
+			<% if (rc.local.deleteDate) { %>
+			<div class="note-conflict-date">Deleted on <%= rc.local.deleteDate %></div>
+			<% } %>
 
 			<br>
 
-			<div ng-if="remote"><button tabindex="3" ng-click="resolve('local')">Choose this version</button></div>
-			<div ng-if="!remote"><button tabindex="3" ng-click="resolve('local')">Add this note</button></div>
+			<% if (rc.remote) { %>
+			<div><button class="modal-button-local" tabindex="3">Choose this version</button></div>
+			<% } else { %>
+			<div><button class="modal-button-local" tabindex="3">Add this note</button></div>
+			<% } %>
 		</div>
 
 		<!-- Remote note view -->
 		<div  class="modal-content-column">
+
 			<div class="note-conflict-version-title">Remote version</div>
 
-			<!-- If remote note -->
-			<div class="note note-visible note-edit note-conflict" ng-if="remote">
-				<input class="note-title" type="text" placeholder="Title" tabindex="2" ng-keydown="titleKeyListener($event, remote);" ng-model="remote.title" />
-				<textarea class="note-content" ng-if="!remote.tasks" rows="1" placeholder="Note" tabindex="2" ng-keydown="contentKeyListener($event, remote);" ng-model="remote.content" resize></textarea>
-				<div class="note-tasks" ng-if="remote.tasks">
-					<div class="note-task" ng-class="{'note-task-done': task.done}" ng-repeat="task in remote.tasks">
-						<div class="note-task-icon" ng-click="toggleTaskDone(remote, task);"></div>
-						<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="2" ng-keydown="taskKeyListener($event, remote, $index)" ng-model="task.content" resize></textarea>
+			<% if (rc.remote) { %>
+			<div id="remote-note" class="note note-visible note-edit note-conflict <% if(rc.remote.color) print('note-' + rc.remote.color) %>">
+				<input class="note-title" type="text" placeholder="Title" tabindex="2" value="<%= rc.remote.title %>" />
+				<% if (rc.remote.tasks) { %>
+				<div class="note-tasks">
+					<% _.each(rc.remote.tasks, function (task) { %>
+					<div class="note-task <% if (task.done) print('note-task-done'); %>">
+						<div class="note-task-icon"></div>
+						<textarea class="note-task-content" rows="1" placeholder="Task" tabindex="2"><%= task.content %></textarea>
 					</div>
+					<% }) %>
 				</div>
+				<% } else { %>
+				<textarea class="note-content" rows="1" placeholder="Note" tabindex="2"><%= rc.remote.content %></textarea>
+				<% } %>
 			</div>
-
-			<div class="note-conflict-date" ng-if="remote && remote.modificationDate">Last modification on {{remote.modificationDate | date:'short'}}</div>
-			<div class="note-conflict-date" ng-if="remote && remote.deleteDate">Deleted on {{remote.deleteDate | date:'short'}}</div>
-
-			<!-- If no remote note -->
-			<div class="note-conflict-no-remote" ng-if="!remote">
+			<% } else { %>
+			<div class="note-conflict-no-remote">
 				No note found on the server.
 			</div>
+			<% } %>
+
+			<% if (rc.remote && rc.remote.modificationDate) { %>
+			<div class="note-conflict-date">Last modification on <%= rc.remote.modificationDate %></div>
+			<% } %>
+			<% if (rc.remote && rc.remote.deleteDate) { %>
+			<div class="note-conflict-date">Deleted on <%= rc.remote.deleteDate %></div>
+			<% } %>
 
 			<br>
 
-			<div ng-if="remote"><button tabindex="3" ng-click="resolve('remote')">Choose this version</button></div>
-			<div ng-if="!remote"><button tabindex="3" ng-click="resolve('remote')">Delete note</button></div>
+			<% if (rc.remote) { %>
+			<div><button class="modal-button-remote" tabindex="3">Choose this version</button></div>
+			<% } else { %>
+			<div><button class="modal-button-remote" tabindex="3">Delete note</button></div>
+			<% } %>
 		</div>
 
 	</div>

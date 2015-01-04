@@ -254,6 +254,7 @@ body {
 		right: 0px;
 		float: right;
 		cursor: pointer;
+		display: none;
 
 		@media (max-width: 600px) {
 			margin-right: 16px;

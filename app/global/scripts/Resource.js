@@ -1,3 +1,5 @@
+/* exported Resource */
+/* global Config, Session */
 'use strict';
 
 
@@ -8,7 +10,7 @@
  */
 function Resource(path) {
 	this.path = path;
-};
+}
 
 /**
  * Get all the resources
@@ -18,7 +20,7 @@ function Resource(path) {
  */
 Resource.prototype.get = function (success, error) {
 	var request = {
-		url:		API_URL + this.path,
+		url:		Config.api + this.path,
 		type:		'GET',
 		headers:	{'API-Token': Session.getToken()},
 		success:	success,
@@ -36,7 +38,7 @@ Resource.prototype.get = function (success, error) {
  */
 Resource.prototype.insert = function (data, success, error) {
 	$.ajax({
-		url:			API_URL + this.path,
+		url:			Config.api + this.path,
 		type:			'POST',
 		headers:		{'API-Token': Session.getToken()},
 		data:			JSON.stringify(data),
@@ -45,7 +47,7 @@ Resource.prototype.insert = function (data, success, error) {
 		success:		success,
 		error:			error
 	});
-}
+};
 
 /**
  * Update a resource by it's id
@@ -57,7 +59,7 @@ Resource.prototype.insert = function (data, success, error) {
  */
 Resource.prototype.update = function (id, data, success, error) {
 	$.ajax({
-		url:			API_URL + this.path + '/' + id,
+		url:			Config.api + this.path + '/' + id,
 		type:			'PUT',
 		headers:		{'API-Token': Session.getToken()},
 		data:			JSON.stringify(data),
@@ -77,7 +79,7 @@ Resource.prototype.update = function (id, data, success, error) {
  */
 Resource.prototype.delete = function (id, success, error) {
 	$.ajax({
-		url:			API_URL + this.path + '/' + id,
+		url:			Config.api + this.path + '/' + id,
 		type:			'DELETE',
 		headers:		{'API-Token': Session.getToken()},
 		success:		success,

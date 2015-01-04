@@ -98,8 +98,8 @@
 		<!-- Search menu -->
 		<div id="nav-search">
 			<span id="nav-search-icon" class="fa fa-search"></span>
-			<div id="nav-search-content"><input type="text" ng-model="$root.search" placeholder="Search" tabindex="1"></div>
-			<span id="nav-search-stop" class="fa fa-remove" ng-show="$root.search && $root.search !== ''" ng-click="$root.search = '';" ></span>
+			<div id="nav-search-content"><input type="text" placeholder="Search" tabindex="1"></div>
+			<span id="nav-search-stop" class="fa fa-remove"></span>
 		</div>
 
 	</div>
@@ -220,19 +220,35 @@
 	<script src="../../bower_components/jcrop/js/jquery.Jcrop.js"></script>
 	<script src="../../bower_components/underscore/underscore.js"></script>
 	<!-- endbower -->
-	<script src="../global/scripts/config.js" defer></script>
-	<script src="../global/scripts/classes.js" defer></script>
-	<script src="../global/scripts/resources.js" defer></script>
-	<script src="../global/scripts/services.js" defer></script>
-	<script src="../global/scripts/modals.js" defer></script>
-	<script src="../global/scripts/controllers.js" defer></script>
+	<script src="../global/scripts/Config.js" defer></script>
+	<script src="../global/scripts/Session.js" defer></script>
+	<script src="../global/scripts/Application.js" defer></script>
+
+	<script src="../global/scripts/Resource.js" defer></script>
+	<script src="../global/scripts/UserResource.js" defer></script>
+
+	<script src="../global/scripts/AuthService.js" defer></script>
+	<script src="../global/scripts/DownloadService.js" defer></script>
+	<script src="../global/scripts/LoaderService.js" defer></script>
+	<script src="../global/scripts/ModalService.js" defer></script>
+	<script src="../global/scripts/SyncService.js" defer></script>
+
+	<script src="../global/scripts/ApplicationController.js" defer></script>
+	<script src="../global/scripts/SettingsModalController.js" defer></script>
+	<script src="../global/scripts/LoginModalController.js" defer></script>
+	<script src="../global/scripts/ConfirmModalController.js" defer></script>
 	<!-- endbuild -->
 
 	<!-- build:js({.tmp,app}) notes/scripts/main.js -->
 	<script src="scripts/jquery-functions.js" defer></script>
-	<script src="scripts/masonry.js" defer></script>
-	<script src="scripts/resources.js" defer></script>
-	<script src="scripts/controllers.js" defer></script>
+	<script src="scripts/NoteResource.js" defer></script>
+	<script src="scripts/Masonry.js" defer></script>
+	<script src="scripts/ImportModalController.js" defer></script>
+	<script src="scripts/ConflictModalController.js" defer></script>
+	<script src="scripts/EditorController.js" defer></script>
+	<script src="scripts/MenuController.js" defer></script>
+	<script src="scripts/NotesController.js" defer></script>
+	<script src="scripts/main.js" defer></script>
 	<!-- endbuild -->
 
 </body>

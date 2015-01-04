@@ -1,11 +1,12 @@
+/* exported UserResource */
+/* global Resource, Config, Session */
 'use strict';
 
 
 /**
  * User resource to CRUD the User API
  */
-
-var UserResource = new Resource('/user')
+var UserResource = new Resource('/user');
 
 /**
  * Try to recover a session and get the connected user information
@@ -16,7 +17,7 @@ var UserResource = new Resource('/user')
  */
 UserResource.recover = function (token, success, error) {
 	$.ajax({
-		url:		API_URL + '/user',
+		url:		Config.api + '/user',
 		type:		'GET',
 		headers:	{'API-Token': token},
 		success:	success,
@@ -33,7 +34,7 @@ UserResource.recover = function (token, success, error) {
  */
 UserResource.login = function (credentials, success, error) {
 	$.ajax({
-		url:			API_URL + '/login',
+		url:			Config.api + '/login',
 		type:			'POST',
 		headers:		{},
 		data:			JSON.stringify(credentials),
@@ -53,7 +54,7 @@ UserResource.login = function (credentials, success, error) {
  */
 UserResource.update = function (data, success, error) {
 	$.ajax({
-		url:			API_URL + this.path,
+		url:			Config.api + this.path,
 		type:			'PUT',
 		headers:		{'API-Token': Session.getToken()},
 		data:			JSON.stringify(data),

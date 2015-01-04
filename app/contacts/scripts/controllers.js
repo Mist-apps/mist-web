@@ -32,7 +32,7 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 				$scope.contacts = data;
 			}
 		});
-	}
+	};
 	$scope.getContacts();
 
 	/**
@@ -187,9 +187,12 @@ webApp.controller('ContactsController', function ($scope, $modal, syncService) {
 			if ($scope.activeContact.birthday) {
 				var tmp = new Date(parseInt($scope.activeContact.birthday));
 				var _zero = function (number) {
-					if (number <= 9) return '0' + number
-					else return number;
-				}
+					if (number <= 9) {
+						return '0' + number;
+					} else {
+						return number;
+					}
+				};
 				$scope.tmpDate = tmp.getFullYear() + '-' + _zero(tmp.getMonth() + 1) + '-' + _zero(tmp.getDate());
 			}
 			// Remove the binding to listen to escape key
@@ -436,7 +439,7 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 			var ctx = canvas.getContext('2d');
 			ctx.drawImage(image, 0, 0, 85, 85);
 			$('#image-preview > img').attr('src', canvas.toDataURL());
-		}
+		};
 	};
 
 	/**
@@ -457,7 +460,7 @@ webApp.controller('ImagePickerController', function ($scope, $modal, syncService
 			// Send the resize event, for centering the modal
 			$('.modal-content').resize();
 		}
-	}
+	};
 
 	/**
 	 * Preview the result of the crop operation

@@ -1,34 +1,72 @@
+/* exported Masonry */
+'use strict';
+
+
 /**
  * Library to control the notes on a grid:
- * 		- Show them on a beatifull
+ * 		- Show them on a beatifull grid
+ *		- Allow the drag and drop
+ *		- Check the window resizing to re-draw the grid
+ *
+ * Configuration:
+ *		- container 	a JQuery DOM object containing the notes to show/hide
+ *		- itemWidth 	the width of a note item
+ *		- gap			the gap between the notes in the grid
+ *		- debounce 		the time frame in which multiple drawings may not be done
+ *		- sensitivity 	the sensitivity of the drag start event
+ *		- setOrder 		a callback called when a note is droped in another position (args: note order, new previous note order)
  */
-var Masonry = function (container) {
+var Masonry = function (config) {
 
-	var container = container;
-	var pageWidth;
-	var itemWidth = 250;
-	var gap = 20;
+	// Prepare config (merge with defaults)
+	config = _.defaults(config || {}, {
+		container:		$('#notes-container'),
+		itemWidth:		250,
+		gap:			20,
+		debounce:		100,
+		sensitivity:	100,
+		setOrder: 		_.noop
+	});
+
+	// Internal attributes for grid drawing
 	var columnNumber;
 	var offsetTop = 80;
 	var offsetLeft = 35;
-	var drawDebounce = 100;
-	var drawing;
+	var lastShown = [];
 
-
-	var init = function () {
-		pageWidth = $(container).parent().width();
-		columnNumber = Math.floor((pageWidth + gap) / (itemWidth + gap));
+	/**
+	 * Initialize the column number
+	 */
+	var _initColumnNumber = function () {
+		columnNumber = Math.floor((config.container.parent().width() + config.gap) / (config.itemWidth + config.gap));
 		if (columnNumber < 1) {
 			columnNumber = 1;
 		}
 	};
 
-	this.draw = _.debounce(function (toShow, toHide, moreToShow) {
+	_initColumnNumber();
+
+
+	/**
+	 * Draw the notes. Show some, and hide others.
+	 * If some notes are hidden because there is not enough place, an ellipsis is shown (#more).
+	 *
+	 * This method cannot be called more than one time each time frame (defined in config).
+	 *
+	 * @param toShow The notes to show, they must have a "__view" jquery view property.
+	 * @param toHide The notes to hide, they must have a "__view" jquery view property.
+	 * @param moreToShow Whethert there are more notes to show or not
+	 */
+	var draw = _.debounce(function (toShow, toHide, moreToShow) {
 		// If no arguments, create them
 		if (!toShow && !toHide) {
-			toShow = _getItemsToShow();
+			toShow = lastShown;
 			toHide = [];
 			moreToShow = $('#more').is(':visible');
+		}
+		// Else, save the notes to show
+		else {
+			lastShown = toShow;
 		}
 		// Initialize the columns height to 0
 		var columns = [];
@@ -45,29 +83,32 @@ var Masonry = function (container) {
 		for (var i = 0; i < toShow.length; i++) {
 			var col = _getSmallestCol(columns);
 			toShow[i].__view.css('top', columns[col]);
-			toShow[i].__view.css('left', ((itemWidth + gap) * col));
+			toShow[i].__view.css('left', ((config.itemWidth + config.gap) * col));
 			toShow[i].__view.addClass('note-visible');
 			// Remove the menu height if necessary
 			if (toShow[i].__view.find('.note-menu').is(':visible')) {
-				columns[col] += gap + toShow[i].__view.height() - toShow[i].__view.find('.note-menu').height();
+				columns[col] += config.gap + toShow[i].__view.height() - toShow[i].__view.find('.note-menu').height();
 			} else {
-				columns[col] += gap + toShow[i].__view.height();
+				columns[col] += config.gap + toShow[i].__view.height();
 			}
 		}
 		// Prepare height
 		var height = columns[_getHighestCol(columns)];
-		height = height > gap ? height - gap : height;
+		height = height > config.gap ? height - config.gap : height;
 		// Set container size
-		container.style.height = height + 'px';
-		container.style.width = (columnNumber * (itemWidth + gap) - gap) + 'px';
+		config.container.get(0).style.height = height + 'px';
+		config.container.get(0).style.width = (columnNumber * (config.itemWidth + config.gap) - config.gap) + 'px';
 		// If there are more notes to show
 		if (moreToShow) {
 			$('#more').show();
 		} else {
 			$('#more').hide();
 		}
-	}, drawDebounce);
+	}, config.drawDebounce);
 
+	/**
+	 * Get the smallest column of the columns passed.
+	 */
 	var _getSmallestCol = function (columns) {
 		var smallestCol = 0;
 		var minColSize = 9999999;
@@ -80,6 +121,9 @@ var Masonry = function (container) {
 		return smallestCol;
 	};
 
+	/**
+	 * Get the highest column of the columns passed.
+	 */
 	var _getHighestCol = function (columns) {
 		var highestCol = 0;
 		var maxColSize = 0;
@@ -92,38 +136,23 @@ var Masonry = function (container) {
 		return highestCol;
 	};
 
-	var _getItemsToShow = function () {
-		var toShow = [];
-		_.each(container.children, function (item) {
-			if ($(item).hasClass('note-visible')) {
-				toShow.push($(item).data('resource'));
-			}
-		})
-		return toShow;
+	// Check window resizing
+	window.onresize = function () {
+		_initColumnNumber();
+		draw();
 	};
 
-	// Check window resizing
-	var _onWindowResizeDraw = this.draw;
-	window.onresize = function () {
-		init();
-		_onWindowResizeDraw();
-	}
-
-	// Initialize the grid
-	init();
-
-	/**
-	 * Drag and drop
-	 */
-
+	// Internal attributes for drag and drop
 	var dragging = false;
 	var interval;
 	var mouse;
-	var afterItem = undefined;
-	var SENSITIVITY = 100;
+	var afterItem;
 	var senseTimeout;
 
-	this.dragStart = function (event) {
+	/**
+	 * Start dragging the note
+	 */
+	config.container.on('mousedown', '.drag-drop-zone', function (event) {
 		// Wait sensitivity before start dragging
 		senseTimeout = setTimeout(function () {
 			// Get note
@@ -150,10 +179,13 @@ var Masonry = function (container) {
 					}, 50);
 				}
 			});
-		}, SENSITIVITY);
-	};
+		}, config.sensitivity);
+	});
 
-	this.dragEnd = function (event) {
+	/**
+	 * Stop dragging the note
+	 */
+	config.container.on('mouseup', '.drag-drop-zone', function (event) {
 		// Clear the timeout if needed
 		clearTimeout(senseTimeout);
 		// Stop listening to mouse move
@@ -176,25 +208,23 @@ var Masonry = function (container) {
 			// Cancel click event if dragged
 			$(event.target).one('click', false);
 			// Set note order
-			var noteOrder = parseInt($(note).find('input[name="order"]').val());
-			var previousOrder = parseInt($(previous).find('input[name="order"]').val());
-			if (isNaN(previousOrder)) {
-				previousOrder = 0;
-			}
-			callback(noteOrder, previousOrder);
-			// Draw the grid
-			this.draw();
+			var noteOrder = parseInt(note.data('resource').order);
+			var previousOrder = previous ? parseInt(previous.data('resource').order) : 0;
+			config.setOrder(noteOrder, previousOrder);
 		}
-	};
+	});
 
+	/**
+	 * Move the note and redraw the grid
+	 */
 	var _move = function (note) {
 		var columns = [];
 		for (var i = 0; i < columnNumber; i++) {
 			columns[i] = 0;
 		}
 		// Set each item position
-		var items = _getItemsToShow();
-		var lastDrawn = undefined;
+		var items = lastShown;
+		var lastDrawn;
 		var skipped = false;
 		for (var i = 0; i < items.length; i++) {
 			// Skip the dragging item
@@ -206,13 +236,13 @@ var Masonry = function (container) {
 			// Get variables
 			var mouseX = mouse.x - offsetLeft;
 			var mouseY = mouse.y - offsetTop;
-			var itemX = ((itemWidth + gap) * col);
+			var itemX = ((config.itemWidth + config.gap) * col);
 			var itemY = columns[col];
 			var noteItemHeight = note.height();
 			// If the mouse is in a place where a note can be drawn, skip the place
-			if (mouseX >= itemX && mouseX <= itemX + itemWidth && mouseY >= itemY && mouseY <= itemY + noteItemHeight) {
+			if (mouseX >= itemX && mouseX <= itemX + config.itemWidth && mouseY >= itemY && mouseY <= itemY + noteItemHeight) {
 				// Add the note in the column (without drawing it, so it is skipped)
-				columns[col] += gap + noteItemHeight;
+				columns[col] += config.gap + noteItemHeight;
 				// Redraw the current element we have not drawn
 				i--;
 				// The dragged note is just after the last drawn item
@@ -225,7 +255,7 @@ var Masonry = function (container) {
 			// If
 			else if (afterItem !== undefined && afterItem === lastDrawn) {
 				// Add the note in the column (without drawing it, so it is skipped)
-				columns[col] += gap + noteItemHeight;
+				columns[col] += config.gap + noteItemHeight;
 				// Redraw the current element we have not drawn
 				i--;
 				// No note drawn this time
@@ -240,7 +270,7 @@ var Masonry = function (container) {
 				items[i].__view.get(0).style.left = itemX + 'px';
 				items[i].__view.addClass('note-visible');
 				// Add the note height in the column
-				columns[col] += gap + items[i].__view.height();
+				columns[col] += config.gap + items[i].__view.height();
 				// Keep the last item drawn
 				lastDrawn = items[i].__view;
 			}
@@ -249,6 +279,11 @@ var Masonry = function (container) {
 		if (!skipped) {
 			afterItem = lastDrawn;
 		}
-	}
+	};
+
+	// Export public methods
+	return {
+		draw:	draw
+	};
 
 };

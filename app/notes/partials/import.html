@@ -1,10 +1,10 @@
-<div id="modal-notes-import" class="modal" ng-controller="NotesImportController">
+<div id="modal-notes-import" class="modal">
 
 	<!-- Header -->
 	<div class="modal-header">
 		<span class="fa fa-cloud-upload"></span>
 		Import - Export
-		<span class="modal-header-close" ng-click="close();">x</span>
+		<span id="modal-button-close"class="modal-header-close">x</span>
 	</div>
 
 	<!-- Content -->
@@ -19,7 +19,7 @@
 			<input class="import-file" type="file" tabindex="1">
 		</div>
 		<br>
-		<button tabindex="2" ng-click="import();">Import</button>
+		<button id="modal-button-import" tabindex="2">Import</button>
 
 		<hr>
 
@@ -27,7 +27,7 @@
 		<div class="fa fa-cloud-download"></div>
 		<i>Export the data in the JSON format to backup your notes, or import them in another Mist Notes application.</i><br>
 		<br>
-		<button tabindex="5" ng-click="export();">Export</button>
+		<button id="modal-button-export" tabindex="5">Export</button>
 
 	</div>
 
