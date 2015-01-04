@@ -7,6 +7,11 @@
  */
 var ConflictModalController = function () {
 
+	// Set textarea height
+	$('#modal-container .note textarea').each(function () {
+		this.style.height = this.scrollHeight + 'px';
+	});
+
 	// Get conflicted notes
 	var local = ModalService.getParameters().local;
 	var remote = ModalService.getParameters().remote;

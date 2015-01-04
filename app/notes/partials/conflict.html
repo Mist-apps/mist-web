@@ -39,10 +39,10 @@
 			</div>
 
 			<% if (rc.local.modificationDate) { %>
-			<div class="note-conflict-date">Last modification on <%= rc.local.modificationDate %></div>
+			<div class="note-conflict-date">Last modification on <%= (new Date(rc.local.modificationDate)).toLocaleString() %></div>
 			<% } %>
 			<% if (rc.local.deleteDate) { %>
-			<div class="note-conflict-date">Deleted on <%= rc.local.deleteDate %></div>
+			<div class="note-conflict-date">Deleted on <%= (new Date(rc.local.deleteDate)).toLocaleString() %></div>
 			<% } %>
 
 			<br>
@@ -82,10 +82,10 @@
 			<% } %>
 
 			<% if (rc.remote && rc.remote.modificationDate) { %>
-			<div class="note-conflict-date">Last modification on <%= rc.remote.modificationDate %></div>
+			<div class="note-conflict-date">Last modification on <%= (new Date(rc.remote.modificationDate)).toLocaleString() %></div>
 			<% } %>
 			<% if (rc.remote && rc.remote.deleteDate) { %>
-			<div class="note-conflict-date">Deleted on <%= rc.remote.deleteDate %></div>
+			<div class="note-conflict-date">Deleted on <%= (new Date(rc.remote.deleteDate)).toLocaleString() %></div>
 			<% } %>
 
 			<br>

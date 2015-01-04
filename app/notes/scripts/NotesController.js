@@ -234,6 +234,13 @@ var NotesController = (function () {
 			Application.maxToShow += 10;
 			_showNotes();
 		});
+		// Infinite scroll
+		$(window).scroll(function () {
+			if ($(window).height() + $(window).scrollTop() === $(document).height()) {
+				Application.maxToShow += 10;
+				_showNotes();
+			}
+		});
 		// Add a new empty note
 		$('#add-menu-note').click(function () {
 			// Add new note
