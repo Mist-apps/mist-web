@@ -3,8 +3,13 @@
 'use strict';
 
 
+/**
+ * ImportModalController to manage import and export of
+ * notes to JSON Mist files.
+ */
 var ImportModalController = function () {
 
+	// Import button binding
 	$('#modal-button-import').click(function () {
 		var input = $('#modal-notes-import .import-file').get(0);
 		if (input.files && input.files[0]) {
@@ -34,6 +39,7 @@ var ImportModalController = function () {
 		}
 	});
 
+	// Export button binding
 	$('#modal-button-export').click(function () {
 		NoteResource.exportJSON(
 			function (data) {
@@ -46,6 +52,7 @@ var ImportModalController = function () {
 		);
 	});
 
+	// Close modal button
 	$('#modal-button-close').click(function () {
 		// Hide modal
 		ModalService.hide('import');
