@@ -19,7 +19,14 @@ module.exports = function (grunt) {
 			app: {
 				src: [
 					'app/{,*/}*.html'
-				]
+				],
+                fileTypes: {
+                    html: {
+                        replace: {
+                            js: '<script src="{{filePath}}" defer></script>',   
+                        }
+                    }
+                }
 			}
 		},
 
@@ -37,8 +44,8 @@ module.exports = function (grunt) {
 		// Sass to CSS compilation
 		compass: {
 			options: {
-				sassDir: 'app/*/styles',
-				cssDir: '.tmp/*/styles',
+				sassDir: 'app',
+				cssDir: '.tmp',
 				importPath: './bower_components',
 				relativeAssets: false,
 				assetCacheBuster: false
@@ -83,7 +90,7 @@ module.exports = function (grunt) {
 		// concat, minify and revision files. Creates configurations in memory so
 		// additional tasks can operate on them
 		useminPrepare: {
-			html: 'app/index.html',
+			html: 'app/*/index.html',
 			options: {
 				dest: 'dist',
 				flow: {
