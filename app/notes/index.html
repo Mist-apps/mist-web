@@ -160,7 +160,7 @@
 	<!-- Note template -->
 	<script type="text/template" id="template-note">
 		<div class="note <% if(rc.color) print('note-' + rc.color) %>">
-			<div class="drag-drop-zone" ng-mouseup="$root.masonry.dragEnd($event, moveNote);"></div>
+			<div class="drag-drop-zone"></div>
 			<input class="note-title" type="text" placeholder="Title" tabindex="-1" value="<%= rc.title %>" />
 			<% if (rc.tasks) { %>
 			<div class="note-tasks">

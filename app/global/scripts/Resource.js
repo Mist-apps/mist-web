@@ -7,10 +7,54 @@
  * Resource class definition
  *
  * @param path the path of the resource to CRUD (/notes, /contacts...)
+ * @param methods additional methods for the resource
  */
-function Resource(path) {
+function Resource(path, methods) {
+	// Set the path
 	this.path = path;
-}
+	// Make function for ajax calls
+	var getFunctionFor = function (method) {
+		// Prepare the query
+		var query = {
+			url:			Config.api + this.path + method.path,
+			type:			method.method || 'GET',
+			headers:		method.headers || {},
+		}
+		// If authentication needed
+		if (method.auth !== false) {
+			query.headers['API-Token'] = Session.getToken();
+		}
+		// Return function
+		return function (params, data, success, error) {
+			// If there are parameters
+			if (method.params) {
+				for (var key in method.params) {
+					var regexp = new RegExp('{{' + key + '}}', 'g');
+					query.url = query.url.replace(regexp, method.params[key]);
+				}
+			}
+			// If there is data
+			if (method.data) {
+				query.processData = false;
+				if (_.isObject(method.data)) {
+					query.data = JSON.stringify(data);
+					query.contentType = 'application/json; charset=utf-8';
+				} else {
+					query.data = data;
+				}
+			}
+			// Set callbacks
+			query.success = success;
+			query.error = error;
+			// Execute query
+			$.ajax(query);
+		}
+	};
+	// Set the additional methods
+	for (var key in methods) {
+		this[key] = getFunctionFor(methods[key]);
+	}
+};
 
 /**
  * Get all the resources

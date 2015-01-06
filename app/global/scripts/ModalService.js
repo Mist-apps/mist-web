@@ -80,7 +80,6 @@ var ModalService = (function () {
 			$('#modal-container').empty();
 			// Stop center the modal
 			$(window).off('resize', _center);
-			$('.modal-content').off('resize', _center);
 		}
 	};
 
@@ -91,18 +90,14 @@ var ModalService = (function () {
 
 	// Dim the screen
 	var dim = function () {
-		if (!modal) {
-			$('#nav-search-content input').attr('tabindex', -1);
-			$('.dim').addClass('dim-active');
-		}
+		$('#nav-search-content input').attr('tabindex', -1);
+		$('.dim').addClass('dim-active');
 	};
 
 	// Clear the screen
 	var clear = function () {
-		if (!modal) {
-			$('.dim').removeClass('dim-active');
-			$('#nav-search-content input').attr('tabindex', 1);
-		}
+		$('.dim').removeClass('dim-active');
+		$('#nav-search-content input').attr('tabindex', 1);
 	};
 
 	// Export methods

@@ -16,10 +16,10 @@ var ApplicationController = (function () {
 			// Check if the dropdown is not already shown
 			if (!dropdown.is(':visible')) {
 				// Show the dropdown
-				dropdown.show();
+				dropdown.show(200);
 				// Remove on next click
 				$(document).one('click', function () {
-					dropdown.hide();
+					dropdown.hide(200);
 				});
 			}
 		});
