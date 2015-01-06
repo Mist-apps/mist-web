@@ -3,8 +3,26 @@
 'use strict';
 
 
+// Helper to get a query for a specific method
+var _getQueryFor = function (method) {
+	return function () { this._query(method, arguments); };
+};
+
 /**
- * Resource class definition
+ * Resource class definition.
+ *
+ * A resource can handle additional methods, configured by a method config object:
+ *		- path: an additional path to add after the global path (default '')
+ *		- method: the method of the query (default GET)
+ *		- headers: an object containing key-values pairs of headers (default {})
+ *		- auth: whether the method needs authentication or not (default true)
+ *
+ * When executing the method, params may be given, and will replace the mustaches in the
+ * path of the query. They must always be in first position in the function arguments.
+ *
+ * When executing the method, data may be given, it may be JSON or not. If JSON, content-type
+ * is automatically set, and the object stringified. If raw data, the content-type must be set
+ * manually in the headers. This argument must always be set between the params and the callbacks.
  *
  * @param path the path of the resource to CRUD (/notes, /contacts...)
  * @param methods additional methods for the resource
@@ -12,121 +30,62 @@
 function Resource(path, methods) {
 	// Set the path
 	this.path = path;
-	// Make function for ajax calls
-	var getFunctionFor = function (method) {
-		// Prepare the query
-		var query = {
-			url:			Config.api + this.path + method.path,
-			type:			method.method || 'GET',
-			headers:		method.headers || {},
-		}
-		// If authentication needed
-		if (method.auth !== false) {
-			query.headers['API-Token'] = Session.getToken();
-		}
-		// Return function
-		return function (params, data, success, error) {
-			// If there are parameters
-			if (method.params) {
-				for (var key in method.params) {
-					var regexp = new RegExp('{{' + key + '}}', 'g');
-					query.url = query.url.replace(regexp, method.params[key]);
-				}
-			}
-			// If there is data
-			if (method.data) {
-				query.processData = false;
-				if (_.isObject(method.data)) {
-					query.data = JSON.stringify(data);
-					query.contentType = 'application/json; charset=utf-8';
-				} else {
-					query.data = data;
-				}
-			}
-			// Set callbacks
-			query.success = success;
-			query.error = error;
-			// Execute query
-			$.ajax(query);
-		}
-	};
 	// Set the additional methods
 	for (var key in methods) {
-		this[key] = getFunctionFor(methods[key]);
+		this[key] = _getQueryFor(methods[key]);
 	}
-};
+}
 
 /**
- * Get all the resources
- *
- * @param success(data, textStatus, jqXHR)
- * @param error(jqXHR, textStatus, errorThrown)
+ * Default query method, it takes the method definition, and the arguments of the call
  */
-Resource.prototype.get = function (success, error) {
-	var request = {
-		url:		Config.api + this.path,
-		type:		'GET',
-		headers:	{'API-Token': Session.getToken()},
-		success:	success,
-		error:		error
+Resource.prototype._query = function (method, args) {
+	// Prepare the query
+	var query = {
+		url:			Config.api + this.path + (method.path || ''),
+		type:			method.method || 'GET',
+		headers:		method.headers || {},
 	};
-	$.ajax(request);
+	// If authentication needed
+	if (method.auth !== false) {
+		query.headers['API-Token'] = Session.getToken();
+	}
+	var currentArg = 0;
+	// If there must be parameters
+	if (query.url.indexOf('{{') !== -1) {
+		for (var key in args[currentArg]) {
+			var regexp = new RegExp('{{' + key + '}}', 'g');
+			query.url = query.url.replace(regexp, args[currentArg][key]);
+		}
+		currentArg++;
+	}
+	// If there is data
+	if (!_.isFunction(args[currentArg])) {
+		query.processData = false;
+		if (_.isObject(args[currentArg])) {
+			query.data = JSON.stringify(args[currentArg]);
+			query.contentType = 'application/json; charset=utf-8';
+		} else {
+			query.data = args[currentArg];
+		}
+		currentArg++;
+	}
+	// Set callbacks
+	if (_.isFunction(args[currentArg])) {
+		query.success = args[currentArg];
+		currentArg++;
+	}
+	if (_.isFunction(args[currentArg])) {
+		query.error = args[currentArg];
+	}
+	// Execute query
+	$.ajax(query);
 };
 
 /**
- * Insert a resource
- *
- * @param data the data to insert
- * @param success(data, textStatus, jqXHR)
- * @param error(jqXHR, textStatus, errorThrown)
+ * Default CRUD methods for each resource
  */
-Resource.prototype.insert = function (data, success, error) {
-	$.ajax({
-		url:			Config.api + this.path,
-		type:			'POST',
-		headers:		{'API-Token': Session.getToken()},
-		data:			JSON.stringify(data),
-		contentType:	'application/json; charset=utf-8',
-		processData:	false,
-		success:		success,
-		error:			error
-	});
-};
-
-/**
- * Update a resource by it's id
- *
- * @param id the id of the resource to update
- * @param data the data to insert
- * @param success(data, textStatus, jqXHR)
- * @param error(jqXHR, textStatus, errorThrown)
- */
-Resource.prototype.update = function (id, data, success, error) {
-	$.ajax({
-		url:			Config.api + this.path + '/' + id,
-		type:			'PUT',
-		headers:		{'API-Token': Session.getToken()},
-		data:			JSON.stringify(data),
-		contentType:	'application/json; charset=utf-8',
-		processData:	false,
-		success:		success,
-		error:			error
-	});
-};
-
-/**
- * Delete a resource by it's id
- *
- * @param id the id of the resource to delete
- * @param success(data, textStatus, jqXHR)
- * @param error(jqXHR, textStatus, errorThrown)
- */
-Resource.prototype.delete = function (id, success, error) {
-	$.ajax({
-		url:			Config.api + this.path + '/' + id,
-		type:			'DELETE',
-		headers:		{'API-Token': Session.getToken()},
-		success:		success,
-		error:			error
-	});
-};
+Resource.prototype.get = _getQueryFor({});
+Resource.prototype.insert = _getQueryFor({method: 'POST'});
+Resource.prototype.update = _getQueryFor({method: 'PUT', path: '/{{id}}'});
+Resource.prototype.delete = _getQueryFor({method: 'DELETE', path: '/{{id}}'});

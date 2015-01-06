@@ -1,5 +1,5 @@
 /* exported ContactsController */
-/* global Application, SyncService, LoaderService */
+/* global Application, SyncService, LoaderService, ModalService */
 'use strict';
 
 

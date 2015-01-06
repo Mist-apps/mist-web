@@ -229,7 +229,7 @@ var SyncService = (function () {
 				// Clone the resource to remove the wrong data
 				var clone = _.omit(resource, ['__view', '__sync']);
 				// Send the request
-				httpResource.update(id, clone,
+				httpResource.update({id: id}, clone,
 					function (data) {
 						_success(resource);
 						resource._revision = data._revision;
@@ -240,7 +240,7 @@ var SyncService = (function () {
 			}
 			// Delete resource
 			else if (metadata[id].action === 'delete') {
-				httpResource.delete(id,
+				httpResource.delete({id: id},
 					function () {
 						_success(resource);
 					}, function (httpResponse) {

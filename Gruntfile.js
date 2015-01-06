@@ -23,7 +23,7 @@ module.exports = function (grunt) {
                 fileTypes: {
                     html: {
                         replace: {
-                            js: '<script src="{{filePath}}" defer></script>',   
+                            js: '<script src="{{filePath}}" defer></script>',
                         }
                     }
                 }
@@ -126,7 +126,7 @@ module.exports = function (grunt) {
 					src: [
 						'*.{ico,png,txt}',
 						'.htaccess',
-						'{,*/}{,modals/}*.html'
+						'{,*/}{,partials/}*.html'
 					]
 				}, {
 					expand: true,
@@ -151,7 +151,7 @@ module.exports = function (grunt) {
 				files: [{
 					expand: true,
 					cwd: 'dist',
-					src: ['{,*/}{,modals/}*.html'],
+					src: ['{,*/}{,partials/}*.html'],
 					dest: 'dist'
 				}]
 			}
@@ -233,7 +233,7 @@ module.exports = function (grunt) {
 			},
 			livereload: {
 				files: [
-					'app/{,*/}{,modals/}*.html',
+					'app/{,*/}{,partials/}*.html',
 					'.tmp/{,*/}{,styles/}*.css',
 					'app/{,*/}{,images/}*.{png,jpg,jpeg,gif}'
 				],

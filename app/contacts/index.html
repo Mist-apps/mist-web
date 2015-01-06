@@ -14,7 +14,7 @@
 	<title>Mist - Contacts</title>
 	<link rel="icon" type="image/png" href="favicon.png">
 
-	<!-- build:css({.,app}) global/styles/vendor.css -->
+	<!-- build:css(.tmp/global) global/styles/vendor.css -->
 	<!-- bower:css -->
 	<link rel="stylesheet" href="../../bower_components/toastr/toastr.css" />
 	<link rel="stylesheet" href="../../bower_components/fontawesome/css/font-awesome.css" />
@@ -23,7 +23,7 @@
 	<link rel="stylesheet" href="../global/styles/global.css">
 	<!-- endbuild -->
 
-	<!-- build:css(.tmp) contacts/styles/main.css -->
+	<!-- build:css(.tmp/contacts) contacts/styles/main.css -->
 	<link rel="stylesheet" href="styles/contacts.css">
 	<!-- endbuild -->
 
@@ -290,7 +290,7 @@
 		</div>
 	</script>
 
-	<!-- build:js(.) global/scripts/vendor.js -->
+	<!-- build:js global/scripts/vendor.js -->
 	<!-- bower:js -->
 	<script src="../../bower_components/jquery/dist/jquery.js" defer></script>
 	<script src="../../bower_components/toastr/toastr.js" defer></script>
@@ -316,7 +316,7 @@
 	<script src="../global/scripts/ConfirmModalController.js" defer></script>
 	<!-- endbuild -->
 
-	<!-- build:js({.tmp,app}) contacts/scripts/main.js -->
+	<!-- build:js contacts/scripts/main.js -->
 	<script src="scripts/ContactResource.js" defer></script>
 	<script src="scripts/ContactsController.js" defer></script>
 	<script src="scripts/main.js" defer></script>
