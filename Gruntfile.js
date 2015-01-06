@@ -37,8 +37,8 @@ module.exports = function (grunt) {
 		// Sass to CSS compilation
 		compass: {
 			options: {
-				sassDir: 'app/*/styles',
-				cssDir: '.tmp/*/styles',
+				sassDir: 'app',
+				cssDir: '.tmp',
 				importPath: './bower_components',
 				relativeAssets: false,
 				assetCacheBuster: false
