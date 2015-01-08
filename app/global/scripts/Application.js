@@ -8,6 +8,8 @@
 var Application = {
 
 	// The active menu item in the left menu
-	activeMenuItem: 	undefined
+	activeMenuItem: 	'all',
+	// Number of resources to show (maximum)
+	maxToShow:			15
 
 };

@@ -10,10 +10,6 @@ var NotesController = (function () {
 
 	// Store the notes
 	Application.notes = [];
-	// Set the active menu item
-	Application.activeMenuItem = 'all';
-	// Number of notes to show (maximum)
-	Application.maxToShow = 15;
 	// Get note template
 	var templateNote = _.template($('#template-note').html());
 

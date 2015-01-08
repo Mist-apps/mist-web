@@ -8,7 +8,7 @@
  */
 var ContactResource = new Resource('/contact', {
 	importMist:		{method: 'POST', path: '/import', headers: {'Content-Type': 'application/json; app=mist'}},
-	importGoogle:	{method: 'POST', path: '/import', headers: {'Content-Type': 'application/json; app=google'}},
-	importOutlook:	{method: 'POST', path: '/import', headers: {'Content-Type': 'application/json; app=outlook'}},
+	importGoogle:	{method: 'POST', path: '/import', headers: {'Content-Type': 'text/csv; app=google'}},
+	importOutlook:	{method: 'POST', path: '/import', headers: {'Content-Type': 'text/csv; app=outlook'}},
 	exportJSON:		{path: '/export', headers: {Accept: 'application/json'}}
 });

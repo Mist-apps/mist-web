@@ -93,7 +93,7 @@ var ApplicationController = (function () {
 			}
 		});
 		// Change the active menu item (left menu) on click.
-		$('.menu-item').click(function () {
+		$('.menu').on('click', '.menu-item', function () {
 			// Set active menu item
 			Application.activeMenuItem = $(this).data('item');
 			$('.menu-item').removeClass('menu-item-active');

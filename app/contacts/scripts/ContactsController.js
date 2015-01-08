@@ -10,10 +10,10 @@ var ContactsController = (function () {
 
 	// Store the contacts
 	Application.contacts = [];
-	// Set the active menu item
-	Application.activeMenuItem = 'all';
-	// Number of contacts to show (maximum)
-	Application.maxToShow = 15;
+	// Store the groups
+	Application.groups = [];
+	// Get menu item template
+	var templateMenuItem = _.template($('#template-menu-item').html());
 	// Get contacts template
 	var templateContact = _.template($('#template-contact').html());
 
@@ -31,7 +31,14 @@ var ContactsController = (function () {
 			if (err) {
 				toastr.error('Unable to get contacts (' + err.message + ')');
 			} else {
-				Application.contacts = data;
+				// Separate contacts and groups
+				var partition = _.partition(data, function (item) { return !item.name; });
+				Application.contacts = partition[0];
+				Application.groups = partition[1];
+				// Sort the contacts
+				Application.contacts = _.sortBy(Application.contacts, function (item) {return '' + item.firstName + item.lastName;});
+				// Show groups
+				_showGroups();
 				// Show contacts, after...
 				var showContacts = _.after(Application.contacts.length, _showContacts);
 				// Prepare the contacts in the container
@@ -39,7 +46,7 @@ var ContactsController = (function () {
 					_.delay(function (contact) {
 						_prepareContact(contact);
 						showContacts();
-					}, index * 30, contact);
+					}, index * 5, contact);
 				});
 			}
 		});
@@ -81,24 +88,45 @@ var ContactsController = (function () {
 	};
 
 	/**
+	 * Show the groups in the menu
+	 */
+	var _showGroups = function () {
+		$('#menu-groups').empty();
+		Application.groups = _.sortBy(Application.groups, 'name');
+		_.each(Application.groups, function (group) {
+			$('#menu-groups').append($(templateMenuItem(group)));
+		});
+	};
+
+	/**
 	 * Show the contacts on the grid
 	 */
 	var _showContacts = function () {
-		// Sort the contacts
-		Application.contacts = _.sortBy(Application.contacts, function (item) { return '' + item.firstName + item.lastName; });
+		// Check if contact is in group
+		var isInGroup = function (contact) {
+			for (var key in Application.groups) {
+				if (Application.activeMenuItem === Application.groups[key]._id) {
+					return contact.groups.indexOf(Application.groups[key].name) > -1;
+				}
+			}
+		};
 		// Create the search function
 		var search = function (item) {
-			return !Application.search || item.firstName.indexOf(Application.search) !== -1 || item.lastName.indexOf(Application.search) !== -1;
+			return !Application.search || (item.firstName && item.firstName.indexOf(Application.search) !== -1) || (item.lastName && item.lastName.indexOf(Application.search) !== -1);
 		};
 		// Filter the contacts
 		var partitions = [];
 		switch (Application.activeMenuItem) {
-			case 'all':		partitions = _.partition(Application.contacts, function (item) {return !item.deleteDate && search(item);});
-							break;
-			case 'trash':	partitions = _.partition(Application.contacts, function (item) {return !!item.deleteDate && search(item);});
-							break;
-			default:		toastr.error('Unknown menu item');
-							break;
+			case 'all':			partitions = _.partition(Application.contacts, function (item) {return !item.deleteDate && search(item);});
+								break;
+			case 'ungrouped':	partitions = _.partition(Application.contacts, function (item) {return (!item.groups || item.groups.length === 0) && search(item);});
+								break;
+			case 'starred':		partitions = _.partition(Application.contacts, function (item) {return item.groups && item.groups.indexOf('Starred') > -1 && search(item);});
+								break;
+			case 'trash':		partitions = _.partition(Application.contacts, function (item) {return !!item.deleteDate && search(item);});
+								break;
+			default:			partitions = _.partition(Application.contacts, function (item) {return item.groups && isInGroup(item) && search(item);}); // TODO not active menu item, but group name
+								break;
 		}
 		// If there are contacts to shown
 		if (partitions[0].length > 0) {
@@ -119,6 +147,15 @@ var ContactsController = (function () {
 		}
 		// Stop loading
 		LoaderService.stop('ContactsController.load');
+		// Show and hide
+		_.each(partitions[1], function (contact) { contact.__view.hide(); });
+		_.each(partitions[0], function (contact) { contact.__view.show(); });
+		// Show or hide the ellipsis button
+		if (moreToShow) {
+			$('#more').show();
+		} else {
+			$('#more').hide();
+		}
 	};
 
 	/**
@@ -126,7 +163,7 @@ var ContactsController = (function () {
 	 */
 	var bind = function () {
 		// On clicking on the left menu, refresh the contacts
-		$('.menu-item').click(function () {
+		$('.menu').on('click', '.menu-item', function () {
 			Application.maxToShow = 15;
 			_showContacts();
 		});
@@ -156,8 +193,8 @@ var ContactsController = (function () {
 			SyncService.newResource('contact', contact);
 		});
 		// Add a new empty todo list
-		$('#add-menu-todo').click(function () {
-			// Add new todo list
+		$('#add-menu-group').click(function () {
+			// Add new group
 			var date = _.now();
 			var tmpId = '' + date + _.uniqueId();
 			var order = Application.contacts.length + 1;
@@ -184,12 +221,28 @@ var ContactsController = (function () {
 	};
 
 	/**
+	 * Format an address in a one line way
+	 */
+	var formatInlineAddress = function (address) {
+		// Clean an address to remove unused spaces and '-' characters
+		var _clean = function (address) {
+			return address.replace(/-\s+-/g, ' ').replace(/\s{2,}/g, ' ').trim().replace(/-$/, '').trim();
+		};
+		// Format
+		if (address) {
+			return _clean((address.street || '') + ' ' + (address.number || '') + ' - ' + (address.postalCode || '') + ' ' + (address.locality || '') + ' - ' + (address.country || ''));
+		}
+		return '';
+	};
+
+	/**
 	 * Exports
 	 */
 	return {
-		bind:		bind,
-		load:		load,
-		refresh:	_showContacts
+		bind:					bind,
+		load:					load,
+		refresh:				_showContacts,
+		formatInlineAddress: 	formatInlineAddress
 	};
 
 })();

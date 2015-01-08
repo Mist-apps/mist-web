@@ -1,10 +1,10 @@
-<div id="modal-contacts-import" class="modal" ng-controller="ContactsImportController">
+<div id="modal-contacts-import" class="modal">
 
 	<!-- Header -->
 	<div class="modal-header">
 		<span class="fa fa-cloud-upload"></span>
 		Import - Export
-		<span class="modal-header-close" ng-click="close();">x</span>
+		<span id="modal-button-close" class="modal-header-close">x</span>
 	</div>
 
 	<!-- Content -->
@@ -20,14 +20,14 @@
 			<div class="import-type">
 				Please choose the file type:<br>
 				<div>
-					<input type="radio" ng-model="importType" tabindex="2" value="mist">Mist (JSON)<br>
-					<input type="radio" ng-model="importType" tabindex="3" value="google">Google (CSV)<br>
-					<input type="radio" ng-model="importType" tabindex="4" value="outlook">Outlook (CSV)
+					<input type="radio" name="import-type" tabindex="1" value="mist">Mist (JSON)<br>
+					<input type="radio" name="import-type" tabindex="1" value="google">Google (CSV)<br>
+					<input type="radio" name="import-type" tabindex="1" value="outlook">Outlook (CSV)
 				</div>
 			</div>
 		</div>
 		<br>
-		<button tabindex="5" ng-click="import();">Import</button>
+		<button id="modal-button-import" tabindex="2">Import</button>
 
 		<hr>
 
@@ -35,7 +35,7 @@
 		<div class="fa fa-cloud-download"></div>
 		<i>Export the data in the JSON format to backup your contacts, or import them in another Mist Contacts application.</i><br>
 		<br>
-		<button tabindex="6" ng-click="export();">Export</button>
+		<button id="modal-button-export" tabindex="3">Export</button>
 
 	</div>
 
